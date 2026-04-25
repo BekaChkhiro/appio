@@ -19,7 +19,7 @@ dependencies = [
     "voyageai>=0.2.3",  # 0.3.x requires Python <3.14; 0.2.x supports 3.14
     "pgvector>=0.3.6",
     "pillow>=10.0.0",
-    "stripe>=11.4.0",
+    "stripe>=15.1.0",
     "posthog>=3.5.0",
     "cryptography>=44.0.0",
 ]
