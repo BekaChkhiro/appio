@@ -2,10 +2,11 @@
 node_modules/
 .venv/
 
-# Build outputs
+# Build outputs (anchor to root-level dirs to avoid catching the
+# apps/web/src/app/(app)/build/ Next.js route).
 .next/
 dist/
-build/
+/build/
 .expo/
 *.tsbuildinfo
 
