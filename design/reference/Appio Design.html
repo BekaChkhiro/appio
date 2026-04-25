@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Appio — Design</title>
+<link rel="stylesheet" href="tokens.css"/>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<style>
+  body { margin: 0; background: var(--surface-0); color: var(--text-primary); font-family: var(--f-ui); }
+  .app-shell { display: flex; min-height: 100vh; }
+
+  /* left nav */
+  .nav {
+    width: 260px; flex-shrink: 0; background: var(--surface-1); border-right: 1px solid var(--hair);
+    padding: 20px 0; position: sticky; top: 0; height: 100vh; overflow-y: auto;
+  }
+  [data-theme="dark"] .nav { background: #08080C; }
+  .nav-logo { padding: 0 20px 20px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--hair); margin-bottom: 12px; }
+  .nav-logo-mark { width: 22px; height: 22px; border-radius: 6px; background: var(--accent); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:13px; font-family: var(--f-display); }
+  .nav-logo-text { font-family: var(--f-display); font-size: 15px; font-weight: 600; }
+  .nav-logo-sub { font-size: 10px; color: var(--text-muted); font-family: var(--f-mono); letter-spacing: 0.06em; text-transform: uppercase; margin-top: 1px; }
+  .nav-group { padding: 14px 20px 4px; }
+  .nav-group-label { font-family: var(--f-mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-subtle); margin-bottom: 6px; }
+  .nav-item { padding: 7px 14px 7px 20px; display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--text-muted); cursor: pointer; border-left: 2px solid transparent; transition: all var(--t-fast); white-space: nowrap; }
+  .nav-item:hover { color: var(--text-primary); background: var(--surface-1); }
+  .nav-item.active { color: var(--text-primary); border-left-color: var(--accent); background: var(--surface-1); font-weight: 500; }
+  .nav-num { font-family: var(--f-mono); font-size: 10px; color: var(--text-subtle); width: 16px; flex-shrink: 0; }
+  .nav-item.active .nav-num { color: var(--accent); }
+
+  /* main */
+  .main { flex: 1; min-width: 0; }
+  .frame-wrap { max-width: 1440px; margin: 0 auto; padding: 32px; }
+  .frame-header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 20px; gap: 20px; }
+  .frame-title { font-family: var(--f-display); font-size: 28px; letter-spacing: -0.02em; font-weight: 600; }
+  .frame-meta { font-family: var(--f-mono); font-size: 11px; color: var(--text-muted); letter-spacing: 0.04em; text-transform: uppercase; }
+  .frame-desc { color: var(--text-muted); font-size: 14px; max-width: 640px; margin-top: 6px; }
+  .frame-nav-btns { display: flex; gap: 6px; }
+  .frame-nav-btn { padding: 7px 10px; background: var(--surface-1); border: 1px solid var(--hair); border-radius: 6px; color: var(--text-muted); cursor: pointer; font-size: 12px; display:flex; align-items:center; gap: 6px; }
+  .frame-nav-btn:hover { color: var(--text-primary); border-color: var(--strong); }
+
+  .frame {
+    background: var(--surface-1); border: 1px solid var(--hair); border-radius: 12px; overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    height: 820px;
+    position: relative;
+  }
+  .frame-inner { height: 100%; overflow: hidden; }
+
+  /* Tweaks */
+  .tweaks-panel {
+    position: fixed; bottom: 24px; right: 24px; width: 320px;
+    background: var(--surface-1); border: 1px solid var(--strong); border-radius: 12px;
+    padding: 18px; box-shadow: var(--shadow-modal); z-index: 200;
+    animation: diffIn 220ms var(--ease-out);
+  }
+  .tweaks-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .tweaks-title { font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+  .tweaks-title::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+  .tweaks-row { padding: 10px 0; border-top: 1px solid var(--hair); }
+  .tweaks-label { font-size: 11px; color: var(--text-muted); margin-bottom: 6px; font-family: var(--f-mono); letter-spacing: 0.04em; text-transform: uppercase; }
+  .tweaks-options { display: flex; gap: 4px; flex-wrap: wrap; }
+  .tweaks-chip { padding: 5px 10px; background: var(--surface-2); border: 1px solid var(--hair); border-radius: 6px; font-size: 12px; color: var(--text-muted); cursor: pointer; }
+  .tweaks-chip.active { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-ink); }
+  .tweaks-swatches { display: flex; gap: 6px; }
+  .tweaks-swatch { width: 28px; height: 28px; border-radius: 6px; cursor: pointer; border: 2px solid transparent; }
+  .tweaks-swatch.active { border-color: var(--text-primary); }
+  .tweaks-switch { display: flex; justify-content: space-between; align-items: center; }
+
+  /* Print */
+  @media print {
+    .nav, .tweaks-panel { display: none; }
+    .frame { page-break-inside: avoid; }
+  }
+</style>
+
+<script type="application/json" id="__editmode__">/*EDITMODE-BEGIN*/{
+  "accent": "violet",
+  "mode": "dark",
+  "frameBg": "studio"
+}/*EDITMODE-END*/</script>
+</head>
+
+<body>
+<div id="root"></div>
+
+<script type="text/babel" src="components/Icon.jsx"></script>
+<script type="text/babel" src="components/UI.jsx"></script>
+<script type="text/babel" src="components/IPhoneFrame.jsx"></script>
+<script type="text/babel" src="components/StreakApp.jsx"></script>
+<script type="text/babel" src="components/AppState.jsx"></script>
+<script type="text/babel" src="components/Modals.jsx"></script>
+<script type="text/babel" src="components/CommandPalette.jsx"></script>
+<script type="text/babel" src="screens/DesignSystem.jsx"></script>
+<script type="text/babel" src="screens/GroupA.jsx"></script>
+<script type="text/babel" src="screens/GroupB.jsx"></script>
+<script type="text/babel" src="screens/GroupC.jsx"></script>
+<script type="text/babel" src="screens/GroupD.jsx"></script>
+<script type="text/babel" src="screens/GroupE.jsx"></script>
+<script type="text/babel" src="screens/GroupF.jsx"></script>
+<script type="text/babel" src="screens/GroupG.jsx"></script>
+<script type="text/babel" src="screens/Extended.jsx"></script>
+
+<script type="text/babel">
+const SCREENS = [
+  { group: 'Foundations', items: [
+    { id: 'design-system', n: '00', title: 'Design System', desc: 'Typography, color, components — the vocabulary every other frame is built from.', comp: 'DesignSystemScreen', height: 2400 },
+    { id: 'journey',       n: '**', title: 'Journey map',   desc: 'Idea → live URL. The five screens that define Appio.',                         comp: 'JourneyMap', height: 900 },
+  ]},
+  { group: 'Marketing & Entry', items: [
+    { id: 'landing',       n: '01', title: 'Landing',       desc: "Editorial pitch. Clara, Dev, Marco, Sofia — four real people who shipped.", comp: 'LandingScreen', height: 3200 },
+    { id: 'signin',        n: '02', title: 'Sign in',       desc: 'One-page, two-provider. Minimal friction.',                                  comp: 'SignInScreen' },
+    { id: 'signup',        n: '03', title: 'Sign up',       desc: 'Email gate with social fast-path.',                                          comp: 'SignUpScreen' },
+    { id: 'onb-welcome',   n: '04', title: 'Onboarding — Welcome', desc: 'Personal. One question at a time.',                                  comp: 'OnboardingWelcomeScreen' },
+    { id: 'onb-firstapp',  n: '05', title: 'Onboarding — First app',desc: 'Capture the first idea before we show the dashboard.',               comp: 'OnboardingFirstAppScreen' },
+  ]},
+  { group: 'Creation', items: [
+    { id: 'dashboard',     n: '06', title: 'Dashboard',     desc: "Every app the creator has built, at a glance.",                              comp: 'DashboardScreen' },
+    { id: 'dashboard-empty', n: '06b', title: 'Dashboard — empty', desc: 'The first-login state. Invitational, not apologetic.',               comp: 'DashboardEmptyScreen' },
+    { id: 'new-project',   n: '07', title: 'New project',   desc: "One sentence. That's all we ask.",                                            comp: 'NewProjectModalScreen' },
+  ]},
+  { group: 'Builder', items: [
+    { id: 'builder',       n: '08', title: 'Builder',       desc: "Left: screens. Middle: live preview of Streak. Right: chat. The heart of the product.", comp: 'BuilderScreen' },
+    { id: 'builder-think', n: '09', title: 'Builder — thinking', desc: 'The moment between ask and answer.',                                    comp: 'BuilderThinkingScreen' },
+    { id: 'builder-error', n: '10', title: 'Builder — error', desc: 'When generation fails: calm, honest, recoverable.',                        comp: 'BuilderErrorScreen' },
+    { id: 'builder-theme', n: '11', title: 'Theme picker',  desc: "Five personas, each a real render of Streak. Same data, different feel.",   comp: 'BuilderThemeScreen' },
+    { id: 'builder-code',  n: '12', title: 'Builder — code view', desc: "The code is always there if you want it. Most creators won't look.",   comp: 'BuilderCodeScreen' },
+  ]},
+  { group: 'Publish', items: [
+    { id: 'prepublish',    n: '13', title: 'Pre-publish',   desc: "What will ship — in plain language.",                                        comp: 'PrePublishScreen' },
+    { id: 'connect-convex',n: '14', title: 'Connect Convex',desc: 'BYO-data, explained so a non-dev can trust it.',                             comp: 'ConvexConnectScreen' },
+    { id: 'publishing',    n: '15', title: 'Publishing',    desc: "Live deploy log. About 30 seconds.",                                         comp: 'PublishingScreen' },
+    { id: 'published',     n: '16', title: 'Published',     desc: 'Live URL, QR, share. The payoff.',                                          comp: 'PublishedScreen' },
+  ]},
+  { group: 'Post-publish', items: [
+    { id: 'analytics',     n: '17', title: 'Analytics',     desc: "30-day bars, top screens, errors. Sober.",                                   comp: 'AnalyticsScreen', height: 1100 },
+    { id: 'versions',      n: '18', title: 'Version history', desc: "Every revision, one click to restore.",                                    comp: 'VersionsScreen', height: 1000 },
+    { id: 'app-settings',  n: '19', title: 'App settings',  desc: "Name, domain, data, danger zone.",                                           comp: 'AppSettingsScreen', height: 1200 },
+  ]},
+  { group: 'Account', items: [
+    { id: 'account',       n: '20', title: 'Profile',       desc: 'Identity + connected services.',                                             comp: 'AccountSettingsScreen', height: 1100 },
+    { id: 'billing',       n: '21', title: 'Billing',       desc: 'Usage, invoice, plan tiers.',                                                comp: 'BillingScreen' },
+  ]},
+  { group: 'System states', items: [
+    { id: 'empty',         n: '22', title: 'Empty states',  desc: 'Three flavors of nothing-there.',                                            comp: 'EmptyStateTemplate' },
+    { id: 'error',         n: '23', title: 'Error states',  desc: "Failure modes, handled gracefully.",                                         comp: 'ErrorStateTemplate' },
+    { id: 'loading',       n: '24', title: 'Loading',       desc: "Skeletons + inline shimmers.",                                               comp: 'LoadingSkeletonTemplate' },
+  ]},
+  { group: 'Extended', items: [
+    { id: 'templates',            n: '25', title: 'Templates gallery',      desc: '230 starter apps, filterable, every card a real Streak render in a different theme.', comp: 'TemplatesScreen',           height: 1600 },
+    { id: 'pricing',              n: '26', title: 'Pricing',                desc: 'Three tiers, comparison table, FAQ.',                                                comp: 'PricingScreen',             height: 1600 },
+    { id: 'changelog',            n: '27', title: 'Changelog',              desc: 'Running log — New / Improved / Fixed, timestamped.',                                 comp: 'ChangelogScreen',           height: 1400 },
+    { id: 'roadmap',              n: '28', title: 'Roadmap',                desc: 'Shipped / In progress / Exploring, with vote counts.',                               comp: 'RoadmapScreen',             height: 1200 },
+    { id: 'account-connected',    n: '29', title: 'Account — connected',    desc: 'Third-party integrations with per-service state.',                                   comp: 'AccountConnectedPage',      height: 900 },
+    { id: 'account-notifications',n: '30', title: 'Account — notifications',desc: 'Email + in-app matrix with DND.',                                                    comp: 'AccountNotificationsPage',  height: 1000 },
+    { id: 'account-security',     n: '31', title: 'Account — security',     desc: '2FA setup + active sessions.',                                                       comp: 'AccountSecurityPage',       height: 1100 },
+    { id: 'about',                n: '32', title: 'About',                  desc: 'Placeholder — page shell with nav + footer.',                                        comp: 'AboutPage',                 height: 900 },
+    { id: 'blog',                 n: '33', title: 'Blog',                   desc: 'Placeholder.',                                                                       comp: 'BlogPage',                  height: 900 },
+    { id: 'docs',                 n: '34', title: 'Docs',                   desc: 'Placeholder.',                                                                       comp: 'DocsPage',                  height: 900 },
+    { id: 'community',            n: '35', title: 'Community',              desc: 'Placeholder.',                                                                       comp: 'CommunityPage',             height: 900 },
+    { id: 'support',              n: '36', title: 'Support',                desc: 'Placeholder.',                                                                       comp: 'SupportPage',               height: 900 },
+    { id: 'privacy',              n: '37', title: 'Privacy',                desc: 'Placeholder — legal.',                                                               comp: 'PrivacyPage',               height: 900 },
+    { id: 'terms',                n: '38', title: 'Terms',                  desc: 'Placeholder — legal.',                                                               comp: 'TermsPage',                 height: 900 },
+  ]},
+];
+
+const FLAT = SCREENS.flatMap(g => g.items);
+
+const App = () => {
+  const [currentId, setCurrentId] = React.useState(() => localStorage.getItem('appio-screen') || 'design-system');
+  const [tweaks, setTweaks] = React.useState(() => {
+    const el = document.getElementById('__editmode__');
+    try { return JSON.parse(el.textContent.replace(/\/\*EDITMODE-(BEGIN|END)\*\//g, '')); }
+    catch { return { accent: 'violet', mode: 'dark', frameBg: 'studio' }; }
+  });
+  const [editMode, setEditMode] = React.useState(false);
+
+  React.useEffect(() => { localStorage.setItem('appio-screen', currentId); }, [currentId]);
+
+  // Dark/light mode
+  React.useEffect(() => {
+    document.documentElement.setAttribute('data-theme', tweaks.mode === 'light' ? 'light' : 'dark');
+  }, [tweaks.mode]);
+
+  // Tweak effects
+  React.useEffect(() => {
+    const accents = tweaks.mode === 'light'
+      ? { violet: ['#5D3DFF','#4A2BE8','#ECE6FF','#2A1A6A'], amber: ['#B5721A','#9A5F12','#F5E6D0','#5A3A10'], emerald: ['#0D9668','#0B7F58','#D7F5E5','#0A4A38'] }
+      : { violet: ['#7C5CFF','#9179ff','#2A2140','#E7DEFF'], amber: ['#F5A524','#FBB938','#3A2A12','#FDE4B5'], emerald: ['#10B981','#34D399','#103B2B','#A7F3D0'] };
+    const [a, h, s, ink] = accents[tweaks.accent] || accents.violet;
+    document.documentElement.style.setProperty('--accent', a);
+    document.documentElement.style.setProperty('--accent-hover', h);
+    document.documentElement.style.setProperty('--accent-soft', s);
+    document.documentElement.style.setProperty('--accent-ink', ink);
+  }, [tweaks.accent, tweaks.mode]);
+
+  // Keyboard nav
+  React.useEffect(() => {
+    const onKey = (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      const i = FLAT.findIndex(s => s.id === currentId);
+      if ((e.key === 'j' || e.key === 'ArrowDown') && i < FLAT.length - 1) setCurrentId(FLAT[i+1].id);
+      if ((e.key === 'k' || e.key === 'ArrowUp') && i > 0) setCurrentId(FLAT[i-1].id);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [currentId]);
+
+  // Edit mode protocol
+  React.useEffect(() => {
+    const onMsg = (e) => {
+      if (!e.data) return;
+      if (e.data.type === '__activate_edit_mode') setEditMode(true);
+      if (e.data.type === '__deactivate_edit_mode') setEditMode(false);
+    };
+    window.addEventListener('message', onMsg);
+    window.parent.postMessage({ type: '__edit_mode_available' }, '*');
+    return () => window.removeEventListener('message', onMsg);
+  }, []);
+
+  const updateTweak = (key, value) => {
+    const next = { ...tweaks, [key]: value };
+    setTweaks(next);
+    window.parent.postMessage({ type: '__edit_mode_set_keys', edits: { [key]: value } }, '*');
+  };
+
+  const current = FLAT.find(s => s.id === currentId) || FLAT[0];
+  const idx = FLAT.findIndex(s => s.id === currentId);
+  const Comp = window[current.comp];
+
+  // Navigate handler passed to AppProvider so modals/CommandPalette/screens can jump frames
+  const navigate = React.useCallback((id) => {
+    if (FLAT.find(s => s.id === id)) setCurrentId(id);
+  }, []);
+
+  const frameBgs = tweaks.mode === 'light' ? {
+    studio: 'radial-gradient(circle at 30% 0%, rgba(93,61,255,0.06), transparent 50%), var(--surface-0)',
+    plain: 'var(--surface-0)',
+    paper: '#F0EDE5',
+  } : {
+    studio: 'radial-gradient(circle at 30% 0%, rgba(124,92,255,0.05), transparent 50%), var(--surface-0)',
+    plain: 'var(--surface-0)',
+    paper: '#0F0F14',
+  };
+
+  return (
+    <AppProvider navigate={navigate}>
+    <div className="app-shell">
+      <aside className="nav">
+        <div className="nav-logo">
+          <div className="nav-logo-mark">A</div>
+          <div>
+            <div className="nav-logo-text">Appio</div>
+            <div className="nav-logo-sub">Design · Sprint 02</div>
+          </div>
+        </div>
+        {SCREENS.map(g => (
+          <div key={g.group} className="nav-group">
+            <div className="nav-group-label">{g.group}</div>
+            {g.items.map(s => (
+              <div key={s.id} className={`nav-item ${currentId === s.id ? 'active' : ''}`} onClick={() => setCurrentId(s.id)}>
+                <span className="nav-num">{s.n}</span>
+                <span>{s.title}</span>
+              </div>
+            ))}
+          </div>
+        ))}
+        <div style={{ padding: '24px 20px 12px', marginTop: 20, borderTop: '1px solid var(--hair)', fontSize: 11, color: 'var(--text-subtle)', fontFamily: 'var(--f-mono)', lineHeight: 1.6 }}>
+          {FLAT.length} frames<br/>
+          J · K navigate<br/>
+          ⌘ P export
+        </div>
+      </aside>
+
+      <main className="main">
+        <div className="frame-wrap" style={{ background: frameBgs[tweaks.frameBg] || frameBgs.studio, minHeight: '100vh' }}>
+          <div className="frame-header">
+            <div>
+              <div className="frame-meta">Frame {current.n} · {idx + 1} of {FLAT.length}</div>
+              <div className="frame-title">{current.title}</div>
+              <div className="frame-desc">{current.desc}</div>
+            </div>
+            <div className="frame-nav-btns">
+              <div className="frame-nav-btn" onClick={() => { const i = Math.max(0, idx - 1); setCurrentId(FLAT[i].id); }}>← Prev</div>
+              <div className="frame-nav-btn" onClick={() => { const i = Math.min(FLAT.length - 1, idx + 1); setCurrentId(FLAT[i].id); }}>Next →</div>
+            </div>
+          </div>
+          <div className="frame" style={{ height: current.height || 820 }} data-screen-label={`${current.n} ${current.title}`}>
+            <div className="frame-inner">
+              {Comp ? <Comp/> : <div style={{ padding: 40 }}>Component not found: {current.comp}</div>}
+            </div>
+          </div>
+          <div style={{ marginTop: 14, fontSize: 11, color: 'var(--text-subtle)', fontFamily: 'var(--f-mono)', letterSpacing: '0.04em' }}>
+            SCREENS/{current.id.toUpperCase()}.TSX
+          </div>
+        </div>
+      </main>
+
+      </div>
+      {editMode && (
+        <div className="tweaks-panel">
+          <div className="tweaks-header">
+            <div className="tweaks-title">Tweaks</div>
+            <span style={{ fontSize: 10, color: 'var(--text-muted)', fontFamily: 'var(--f-mono)' }}>LIVE</span>
+          </div>
+          <div className="tweaks-row">
+            <div className="tweaks-label">Mode</div>
+            <div className="tweaks-options">
+              {[['dark','☾  Dark'],['light','☀  Light']].map(([k, label]) => (
+                <div key={k} className={`tweaks-chip ${tweaks.mode === k ? 'active' : ''}`} onClick={() => updateTweak('mode', k)} style={{ flex: 1, textAlign: 'center' }}>{label}</div>
+              ))}
+            </div>
+          </div>
+          <div className="tweaks-row">
+            <div className="tweaks-label">Accent</div>
+            <div className="tweaks-swatches">
+              {[['violet','#7C5CFF'],['amber','#F5A524'],['emerald','#10B981']].map(([k, c]) => (
+                <div key={k} className={`tweaks-swatch ${tweaks.accent === k ? 'active' : ''}`} style={{ background: c }} onClick={() => updateTweak('accent', k)} title={k}/>
+              ))}
+            </div>
+          </div>
+          <div className="tweaks-row">
+            <div className="tweaks-label">Frame background</div>
+            <div className="tweaks-options">
+              {['studio','plain','paper'].map(k => (
+                <div key={k} className={`tweaks-chip ${tweaks.frameBg === k ? 'active' : ''}`} onClick={() => updateTweak('frameBg', k)}>{k}</div>
+              ))}
+            </div>
+          </div>
+          <div className="tweaks-row" style={{ paddingBottom: 0 }}>
+            <div style={{ fontSize: 11, color: 'var(--text-subtle)', lineHeight: 1.5 }}>
+              Tip: the Builder screen is live — try typing "make it playful", "change theme", or "add a screen".
+            </div>
+          </div>
+        </div>
+      )}
+    </AppProvider>
+  );
+};
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>

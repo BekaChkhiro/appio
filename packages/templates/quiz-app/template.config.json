@@ -1,0 +1,64 @@
+{
+  "id": "quiz-app",
+  "version": "1.0.0",
+  "name": "quiz-app",
+  "displayName": "Quiz App",
+  "category": "Education",
+  "description": "Interactive quizzes with scoring, timer, and results screen",
+  "components": [
+    "QuestionCard",
+    "AnswerOption",
+    "ScoreBoard",
+    "Timer",
+    "ResultsScreen",
+    "ProgressIndicator",
+    "QuizList",
+    "EmptyState"
+  ],
+  "layouts": ["stack", "tabs"],
+  "dataModel": {
+    "quiz": {
+      "_id": "Id<'quizzes'>",
+      "tenantId": "string",
+      "title": "string",
+      "description": "string",
+      "category": "string",
+      "questions": "Array<{ id: string; text: string; options: string[]; correctIndex: number; explanation?: string }>",
+      "timeLimit": "number",
+      "createdAt": "number"
+    },
+    "attempt": {
+      "_id": "Id<'attempts'>",
+      "tenantId": "string",
+      "quizId": "Id<'quizzes'>",
+      "score": "number",
+      "totalQuestions": "number",
+      "timeTaken": "number",
+      "completedAt": "number"
+    }
+  },
+  "persona": "vibrant-gradient",
+  "defaultTheme": {
+    "primary": "#8b5cf6",
+    "primaryLight": "#a78bfa",
+    "background": "#faf5ff",
+    "surface": "#ffffff",
+    "textPrimary": "#1e1b4b",
+    "textSecondary": "#6b7280"
+  },
+  "propSchemas": {
+    "QuestionCard": { "questionIndex": "number", "title": "string", "showHint": "boolean" },
+    "AnswerOption": { "optionIndex": "number", "selected": "boolean", "disabled": "boolean" },
+    "ScoreBoard": { "showBest": "boolean", "title": "string", "showAverage": "boolean" },
+    "Timer": { "duration": "number", "onExpire": "string", "showWarning": "boolean", "warningAt": "number" },
+    "ResultsScreen": { "attemptId": "string", "showCorrectAnswers": "boolean", "title": "string" },
+    "ProgressIndicator": { "total": "number", "current": "number", "label": "string", "showFraction": "boolean" },
+    "QuizList": { "category": "string", "title": "string", "sortBy": "string", "limit": "number" },
+    "EmptyState": { "message": "string", "actionLabel": "string", "title": "string", "icon": "string" }
+  },
+  "constraints": {
+    "maxPages": 5,
+    "maxComponentsPerPage": 6,
+    "storageBackend": "convex"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "name": "@appio/mobile-convex-poc",
+  "private": true,
+  "version": "0.0.1",
+  "description": "T2.3 Capacitor + Convex offline-validation harness. Wraps the todo-list-convex template in iOS + Android shells for empirical mobile testing. Not a shipped product.",
+  "scripts": {
+    "setup": "bash scripts/setup.sh",
+    "build": "bash scripts/build-and-sync.sh",
+    "open:ios": "npx cap open ios",
+    "open:android": "npx cap open android",
+    "run:ios": "bash scripts/run-ios.sh",
+    "run:android": "npx cap run android",
+    "sync": "npx cap sync"
+  },
+  "dependencies": {
+    "@capacitor/android": "^6.1.2",
+    "@capacitor/core": "^6.1.2",
+    "@capacitor/ios": "^6.1.2"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.1.2",
+    "typescript": "^5.5.4"
+  }
+}

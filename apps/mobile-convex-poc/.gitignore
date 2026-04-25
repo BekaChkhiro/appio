@@ -1,0 +1,11 @@
+node_modules/
+www/
+
+# Capacitor native scaffolds — regenerated per machine via `npm run setup`.
+# Tracking them would bloat the repo with Xcode + Gradle artefacts and
+# pin Pods / SDK versions to whoever ran `cap add` first.
+ios/
+android/
+
+# Capacitor caches
+.capacitor/

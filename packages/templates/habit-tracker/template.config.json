@@ -1,0 +1,62 @@
+{
+  "id": "habit-tracker",
+  "version": "1.0.0",
+  "name": "habit-tracker",
+  "displayName": "Habit Tracker",
+  "category": "Health",
+  "description": "Daily habit tracking with streaks, weekly charts, and reminders",
+  "components": [
+    "HabitList",
+    "HabitItem",
+    "HabitForm",
+    "StreakCounter",
+    "WeeklyChart",
+    "DayGrid",
+    "StatsCard",
+    "EmptyState"
+  ],
+  "layouts": ["stack", "tabs"],
+  "dataModel": {
+    "habit": {
+      "_id": "Id<'habits'>",
+      "tenantId": "string",
+      "name": "string",
+      "icon": "string",
+      "color": "string",
+      "frequency": "string",
+      "createdAt": "number"
+    },
+    "completion": {
+      "_id": "Id<'completions'>",
+      "tenantId": "string",
+      "habitId": "Id<'habits'>",
+      "date": "string",
+      "completed": "boolean",
+      "createdAt": "number"
+    }
+  },
+  "persona": "brutalist-bold",
+  "defaultTheme": {
+    "primary": "#ef4444",
+    "primaryLight": "#f87171",
+    "background": "#fef2f2",
+    "surface": "#ffffff",
+    "textPrimary": "#1c1917",
+    "textSecondary": "#6b7280"
+  },
+  "propSchemas": {
+    "HabitList": { "date": "string", "filter": "string", "title": "string", "showCompleted": "boolean" },
+    "HabitItem": { "habitId": "string", "date": "string", "showStreak": "boolean" },
+    "HabitForm": { "defaultFrequency": "string", "title": "string", "placeholder": "string" },
+    "StreakCounter": { "habitId": "string", "title": "string", "label": "string", "showRecord": "boolean" },
+    "WeeklyChart": { "habitId": "string", "weekStart": "string", "title": "string", "height": "number", "showLabels": "boolean" },
+    "DayGrid": { "habitId": "string", "months": "number", "title": "string", "showLegend": "boolean" },
+    "StatsCard": { "metric": "string", "title": "string", "label": "string", "icon": "string", "value": "string" },
+    "EmptyState": { "message": "string", "actionLabel": "string", "title": "string", "icon": "string" }
+  },
+  "constraints": {
+    "maxPages": 5,
+    "maxComponentsPerPage": 6,
+    "storageBackend": "convex"
+  }
+}

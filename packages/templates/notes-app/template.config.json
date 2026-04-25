@@ -1,0 +1,58 @@
+{
+  "id": "notes-app",
+  "version": "1.0.0",
+  "name": "notes-app",
+  "displayName": "Notes App",
+  "category": "Productivity",
+  "description": "Note-taking with folders, search, and rich text editing",
+  "components": [
+    "NoteList",
+    "NoteItem",
+    "NoteEditor",
+    "FolderList",
+    "SearchBar",
+    "EmptyState"
+  ],
+  "layouts": ["stack", "tabs"],
+  "dataModel": {
+    "note": {
+      "_id": "Id<'notes'>",
+      "tenantId": "string",
+      "title": "string",
+      "content": "string",
+      "folderId": "Id<'folders'> | undefined",
+      "pinned": "boolean",
+      "createdAt": "number",
+      "updatedAt": "number"
+    },
+    "folder": {
+      "_id": "Id<'folders'>",
+      "tenantId": "string",
+      "name": "string",
+      "color": "string",
+      "createdAt": "number"
+    }
+  },
+  "persona": "editorial-serif",
+  "defaultTheme": {
+    "primary": "#f59e0b",
+    "primaryLight": "#fbbf24",
+    "background": "#fffbeb",
+    "surface": "#ffffff",
+    "textPrimary": "#1c1917",
+    "textSecondary": "#78716c"
+  },
+  "propSchemas": {
+    "NoteList": { "sortBy": "string", "folder": "string", "title": "string", "limit": "number", "showPinned": "boolean" },
+    "NoteItem": { "noteId": "string", "showPreview": "boolean", "showDate": "boolean", "showFolder": "boolean" },
+    "NoteEditor": { "noteId": "string", "placeholder": "string", "autoFocus": "boolean" },
+    "FolderList": { "showCount": "boolean", "title": "string", "collapsible": "boolean" },
+    "SearchBar": { "placeholder": "string", "autoFocus": "boolean" },
+    "EmptyState": { "message": "string", "actionLabel": "string", "title": "string", "icon": "string" }
+  },
+  "constraints": {
+    "maxPages": 5,
+    "maxComponentsPerPage": 6,
+    "storageBackend": "convex"
+  }
+}

@@ -1,0 +1,105 @@
+# Appio FastAPI backend image.
+#
+# Multi-stage:
+#   1. builder → install deps into a dedicated /install prefix
+#   2. runtime → minimal image with only the installed site-packages
+#
+# Runs as a non-root user. HEALTHCHECK probes /health.
+#
+# Base is python:3.12-slim-bookworm (glibc — required for asyncpg / pgvector
+# wheels). Pinned to a specific patch + hash in production via Renovate.
+
+# ───────────────────────── Stage 1: builder ────────────────────────────
+
+FROM python:3.12-slim-bookworm AS builder
+
+ENV PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PYTHONDONTWRITEBYTECODE=1
+
+# Build-time deps for wheels that may not have musl-free prebuilts.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        build-essential \
+        libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /src
+
+# Copy only what's needed to resolve dependencies (better layer caching).
+COPY apps/api/pyproject.toml apps/api/pyproject.toml
+COPY python/shared/pyproject.toml python/shared/pyproject.toml
+COPY python/db/pyproject.toml python/db/pyproject.toml
+COPY python/builder/pyproject.toml python/builder/pyproject.toml
+COPY apps/api/__init__.py apps/api/__init__.py
+
+# Now copy source so the editable installs have actual code to link to.
+COPY python/ python/
+COPY apps/api/ apps/api/
+
+# Install into an isolated prefix so we can copy just the packages into
+# the runtime image.  codegen/ is deprecated (Agent-Only architecture v6)
+# and intentionally omitted from the image.
+RUN pip install --prefix=/install \
+        -e python/shared \
+        -e python/db \
+        -e python/builder \
+        -e apps/api
+
+# ───────────────────────── Stage 2: runtime ────────────────────────────
+
+FROM python:3.12-slim-bookworm AS runtime
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PATH=/install/bin:$PATH \
+    PYTHONPATH=/src
+
+# libpq is needed at runtime for asyncpg; curl for HEALTHCHECK.
+# Node 20 + the convex CLI are required by the Dramatiq publish worker
+# (runs in this same image) to invoke `npx convex deploy/run/export/import`
+# during the T3.9 scratch-deployment data migration. Version pinned to
+# match packages/templates/base/package.json so scratch + user deployments
+# speak the same CLI protocol.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        libpq5 \
+        curl \
+        ca-certificates \
+        gnupg \
+    && mkdir -p /etc/apt/keyrings \
+    && curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key \
+        | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg \
+    && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_20.x nodistro main" \
+        > /etc/apt/sources.list.d/nodesource.list \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends nodejs \
+    && rm -rf /var/lib/apt/lists/* \
+    && npm install -g --no-audit --no-fund convex@^1.18.0 \
+    && npm cache clean --force
+
+# Non-root user. uid/gid 10001 so it doesn't collide with any base-image UIDs.
+RUN groupadd --system --gid 10001 appio \
+    && useradd --system --uid 10001 --gid appio --home-dir /home/appio --create-home appio
+
+# Copy installed packages from builder stage.
+COPY --from=builder /install /install
+COPY --from=builder /src /src
+
+# Editable installs in the builder used absolute paths under /src, so
+# copying /src keeps the same layout.  All imports under apps.api.* work
+# unchanged.
+WORKDIR /src
+
+USER appio
+
+EXPOSE 8000
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
+    CMD curl -fsS http://localhost:8000/health || exit 1
+
+CMD ["uvicorn", "apps.api.main:app", \
+     "--host", "0.0.0.0", \
+     "--port", "8000", \
+     "--timeout-keep-alive", "75", \
+     "--no-server-header"]

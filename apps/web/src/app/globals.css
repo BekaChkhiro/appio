@@ -1,0 +1,250 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+/* Source packages/ui for Tailwind class scanning */
+@source "../../../../packages/ui/src/**/*.{ts,tsx}";
+
+/*
+ * Appio Design System — Lovable-inspired theme
+ * CSS variables in HSL format for shadcn/ui compatibility
+ */
+
+@theme inline {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  --font-sans: "General Sans", "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", ui-monospace, monospace;
+  --font-display: "Fraunces", Georgia, serif;
+
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+
+  @keyframes accordion-down {
+    from { height: 0; }
+    to { height: var(--radix-accordion-content-height); }
+  }
+  @keyframes accordion-up {
+    from { height: var(--radix-accordion-content-height); }
+    to { height: 0; }
+  }
+}
+
+/* Light theme */
+:root {
+  --background: 0 0% 100%;
+  --foreground: 240 10% 4%;
+  --card: 0 0% 100%;
+  --card-foreground: 240 10% 4%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 240 10% 4%;
+  --primary: 262 83% 58%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 240 5% 96%;
+  --secondary-foreground: 240 6% 10%;
+  --muted: 240 5% 96%;
+  --muted-foreground: 240 4% 46%;
+  --accent: 240 5% 96%;
+  --accent-foreground: 240 6% 10%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 240 6% 90%;
+  --input: 240 6% 90%;
+  --ring: 262 83% 58%;
+  --radius: 0.625rem;
+}
+
+/* Dark theme (default for Appio) */
+.dark {
+  --background: 240 10% 4%;
+  --foreground: 0 0% 98%;
+  --card: 240 10% 6%;
+  --card-foreground: 0 0% 98%;
+  --popover: 240 10% 6%;
+  --popover-foreground: 0 0% 98%;
+  --primary: 262 83% 58%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 240 4% 16%;
+  --secondary-foreground: 0 0% 98%;
+  --muted: 240 4% 16%;
+  --muted-foreground: 240 5% 65%;
+  --accent: 240 4% 16%;
+  --accent-foreground: 0 0% 98%;
+  --destructive: 0 63% 31%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 240 4% 16%;
+  --input: 240 4% 16%;
+  --ring: 262 83% 58%;
+}
+
+/* ---------- Appio Design Reference Tokens ---------- */
+/* These align the dark theme with the design reference */
+.dark {
+  --surface-0: #0B0B0F;
+  --surface-1: #141418;
+  --surface-2: #1E1E24;
+  --surface-3: #2A2A32;
+
+  --text-primary: #F5F3EE;
+  --text-muted:   #8A8794;
+  --text-subtle:  #5A5865;
+
+  --accent-token: #7C5CFF;
+  --accent-hover: #9179ff;
+  --accent-soft: #2A2140;
+  --accent-ink:  #E7DEFF;
+
+  --rhythm: #F5A524;
+  --rhythm-soft: #3A2A12;
+
+  --success: #4ADE80;
+  --success-soft: #10321E;
+  --warning: #F5A524;
+  --warning-soft: #3A2A12;
+  --danger:  #F43F5E;
+  --danger-soft: #3A1220;
+
+  --hair:   rgba(255,255,255,0.06);
+  --strong: rgba(255,255,255,0.12);
+  --glow:   rgba(124, 92, 255, 0.14);
+
+  --shadow-card: 0 1px 0 rgba(255,255,255,0.04) inset, 0 8px 24px -12px rgba(0,0,0,0.6);
+  --shadow-modal: 0 40px 80px -30px rgba(0,0,0,0.8), 0 1px 0 rgba(255,255,255,0.06) inset;
+  --shadow-accent: 0 0 0 1px rgba(124,92,255,0.35), 0 10px 30px -10px rgba(124,92,255,0.45);
+}
+
+[data-theme="light"] {
+  --surface-0: #F7F5F0;
+  --surface-1: #FFFFFF;
+  --surface-2: #F0EDE5;
+  --surface-3: #E5E1D6;
+
+  --text-primary: #0B0B0F;
+  --text-muted:   #4A4852;
+  --text-subtle:  #7A7885;
+
+  --accent-token: #5D3DFF;
+  --accent-hover: #4A2BE8;
+  --accent-soft: #ECE6FF;
+  --accent-ink:  #2A1A6A;
+
+  --rhythm: #B5721A;
+  --rhythm-soft: #F5E6D0;
+
+  --success-soft: #DCF5E4;
+  --warning-soft: #FBEAD0;
+  --danger-soft: #FBDDE3;
+
+  --hair:   rgba(11,11,15,0.08);
+  --strong: rgba(11,11,15,0.16);
+  --glow:   rgba(93, 61, 255, 0.10);
+
+  --shadow-card: 0 1px 0 rgba(255,255,255,0.6) inset, 0 8px 24px -14px rgba(11,11,15,0.2);
+  --shadow-modal: 0 40px 80px -30px rgba(11,11,15,0.25);
+}
+
+/* ---------- Typography ---------- */
+.t-display-xl { font-family: var(--font-display); font-size: clamp(36px, 5vw, 64px); line-height: 1.02; letter-spacing: -0.03em; font-weight: 600; }
+.t-display-lg { font-family: var(--font-display); font-size: clamp(28px, 4vw, 48px); line-height: 1.05; letter-spacing: -0.025em; font-weight: 600; }
+.t-display    { font-family: var(--font-display); font-size: clamp(24px, 3.5vw, 40px); line-height: 1.1;  letter-spacing: -0.02em;  font-weight: 600; }
+.t-title      { font-family: var(--font-display); font-size: 28px; line-height: 1.2;  letter-spacing: -0.015em; font-weight: 600; }
+.t-h3         { font-size: 20px; line-height: 1.3; letter-spacing: -0.01em; font-weight: 600; }
+.t-h4         { font-size: 16px; line-height: 1.35; font-weight: 600; }
+.t-body       { font-size: 14px; line-height: 1.55; font-weight: 400; }
+.t-body-lg    { font-size: 16px; line-height: 1.55; font-weight: 400; }
+.t-caption    { font-size: 12px; line-height: 1.4; font-weight: 500; color: var(--text-muted); }
+.t-overline   { font-size: 11px; line-height: 1; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 600; color: var(--text-muted); }
+.t-mono       { font-family: var(--font-mono); font-size: 13px; }
+.t-mono-sm    { font-family: var(--font-mono); font-size: 11px; }
+
+.muted  { color: var(--text-muted); }
+.subtle { color: var(--text-subtle); }
+
+/* Base styles */
+@layer base {
+  * {
+    border-color: theme(--color-border);
+  }
+
+  body {
+    background-color: theme(--color-background);
+    color: theme(--color-foreground);
+    font-family: theme(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: 'ss01' on, 'cv11' on;
+  }
+
+  button, input, textarea, select { font: inherit; color: inherit; }
+  ::selection { background: var(--accent-token); color: #fff; }
+}
+
+/* ---------- Motion keyframes ---------- */
+@keyframes pulseDot {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+@keyframes diffIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes streamBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.2; }
+}
+
+/* ---------- Scrollbar ---------- */
+.scroll::-webkit-scrollbar { width: 10px; height: 10px; }
+.scroll::-webkit-scrollbar-track { background: transparent; }
+.scroll::-webkit-scrollbar-thumb { background: var(--surface-2); border-radius: 10px; border: 3px solid var(--surface-0); }
+.scroll::-webkit-scrollbar-thumb:hover { background: var(--surface-3); }
+
+/* Utility: hide scrollbar but keep scrolling */
+@layer utilities {
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* ---------- AppSidebar visibility ---------- */
+.app-sidebar {
+  display: none !important;
+}
+@media (min-width: 768px) {
+  .app-sidebar {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+}

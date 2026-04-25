@@ -1,0 +1,1772 @@
+[
+  {
+    "category": "component_library",
+    "title": "Screen component — root container",
+    "content": "Always wrap the entire app in `<Screen>`. It clamps to `max-w-[430px]`, centers on desktop, and sets the dark/light background.\n\n```tsx\nimport { Screen } from \"./components/ui\";\n\n<Screen>\n  <AppBar title=\"My App\" />\n  <main className=\"flex-1 overflow-y-auto px-5 pb-32 space-y-4\">\n    {/* content */}\n  </main>\n</Screen>\n```\n\nThe `<main>` element inside Screen should have `px-5` for edge padding and `pb-32` to clear FAB/TabBar.",
+    "tags": [
+      "screen",
+      "layout",
+      "container",
+      "root"
+    ]
+  },
+  {
+    "category": "component_library",
+    "title": "AppBar — iOS-style top navigation",
+    "content": "Large-title iOS-style app bar that sits at the top inside `<Screen>`.\n\n```tsx\nimport { AppBar, IconButton, MoonIcon, SunIcon } from \"./components/ui\";\n\n<AppBar\n  title=\"Tasks\"\n  subtitle=\"3 remaining\"\n  trailing={<IconButton onClick={toggleTheme}><MoonIcon/></IconButton>}\n/>\n```\n\nProps: `title` (string), `subtitle` (string, optional), `trailing` (ReactNode, optional — use for dark mode toggle or settings icon).",
+    "tags": [
+      "appbar",
+      "navigation",
+      "header",
+      "ios"
+    ]
+  },
+  {
+    "category": "component_library",
+    "title": "TabBar — bottom navigation with 3-5 tabs",
+    "content": "Bottom tab navigation, iOS-style. Place at the end inside `<Screen>`, after the main content area.\n\n```tsx\nimport { TabBar, HomeIcon, SearchIcon, SettingsIcon } from \"./components/ui\";\n\nconst [activeTab, setActiveTab] = useState(\"home\");\n\n<TabBar\n  tabs={[\n    { value: \"home\", label: \"Home\", icon: <HomeIcon/> },\n    { value: \"search\", label: \"Search\", icon: <SearchIcon/> },\n    { value: \"settings\", label: \"Settings\", icon: <SettingsIcon/> },\n  ]}\n  value={activeTab}\n  onChange={setActiveTab}\n/>\n```\n\nLimit to 3-5 tabs. When using TabBar with FAB, set `<FAB bottom=\"tabBar\">` so the FAB clears the tabs.",
+    "tags": [
+      "tabbar",
+      "navigation",
+      "tabs",
+      "bottom-nav"
+    ]
+  },
+  {
+    "category": "component_library",
+    "title": "Button variants and sizes",
+    "content": "Use the pre-built `<Button>` for ALL buttons. Never create custom `<button>` elements with Tailwind classes.\n\n```tsx\nimport { Button, PlusIcon } from \"./components/ui\";\n\n<Button>Save</Button>                           // primary (default)\n<Button variant=\"secondary\">Cancel</Button>\n<Button variant=\"ghost\" size=\"sm\">Skip</Button>\n<Button variant=\"danger\" fullWidth>Delete</Button>\n<Button leading={<PlusIcon/>}>Add Item</Button>\n```\n\nProps: `variant` (\"primary\"|\"secondary\"|\"ghost\"|\"danger\"), `size` (\"sm\"|\"md\"|\"lg\"), `fullWidth` (boolean), `leading` (ReactNode for left icon).",
+    "tags": [
+      "button",
+      "action",
+      "click",
+      "submit"
+    ]
+  },
+  {
+    "category": "component_library",
+    "title": "IconButton — round icon-only button",
+    "content": "Use `<IconButton>` for icon-only actions (settings, theme toggle, close).\n\n```tsx\nimport { IconButton, SettingsIcon, XIcon } from \"./components/ui\";\n\n<IconButton onClick={onSettings} aria-label=\"Settings\">\n  <SettingsIcon/>\n</IconButton>\n\n<IconButton onClick={onClose} aria-label=\"Close\">\n  <XIcon/>\n</IconButton>\n```\n\nAlways include `aria-label` for accessibility. Override icon size with `className=\"w-5 h-5\"` on the icon if needed.",
+    "tags": [
+      "iconbutton",
+      "icon",
+      "action",
+      "toggle"
+    ]
+  },
+  {
+    "category": "component_library",
+    "title": "Card — rounded surface container",
+    "content": "Use `<Card>` for grouped content with subtle elevation.\n\n```tsx\nimport { Card } from \"./components/ui\";\n\n// Standard card with default padding\n<Card>\n  <h3 className=\"font-semibold\">Summary</h3>\n  <p className=\"text-sm text-gray-500 dark:text-gray-400\">Total: $1,234</p>\n</Card>\n\n// Card with no padding (for ListItems)\n<Card padding=\"none\">\n  <ListItem title=\"Item 1\" />\n  <ListItem title=\"Item 2\" />\n</Card>\n```\n\nUse `padding=\"none\"` when nesting `<ListItem>` components — they have their own internal padding.",
+    "tags": [
+      "card",
+      "surface",
+      "container",
+      "group"
+    ]
+  },
+  {
+    "category": "component_library",
+    "title": "ListItem — iOS-style row component",
+    "content": "iOS-style list row with optional leading icon, title, subtitle, trailing content, and chevron.\n\n```tsx\nimport { Card, ListItem, UserIcon, CheckIcon } from \"./components/ui\";\n\n<Card padding=\"none\">\n  <ListItem\n    leading={<UserIcon/>}\n    title=\"John Doe\"\n    subtitle=\"Last seen 2 min ago\"\n    trailing={<span className=\"text-sm text-gray-400\">2m</span>}\n    showChevron\n    onClick={() => navigate(\"profile\")}\n  />\n  <ListItem\n    leading={<CheckIcon className=\"text-green-500\"/>}\n    title=\"Completed task\"\n    subtitle=\"Done yesterday\"\n  />\n</Card>\n```\n\nAlways wrap multiple ListItems in `<Card padding=\"none\">`. Props: `leading`, `title`, `subtitle`, `trailing`, `showChevron`, `onClick`.",
+    "tags": [
+      "listitem",
+      "list",
+      "row",
+      "ios",
+      "cell"
+    ]
+  },
+  {
+    "category": "component_library",
+    "title": "BottomSheet — modal form container",
+    "content": "ALL forms MUST go inside `<BottomSheet>`, triggered by FAB or button. NEVER render forms inline on the page.\n\n```tsx\nimport { BottomSheet, Input, TextArea, Button } from \"./components/ui\";\n\nconst [open, setOpen] = useState(false);\n\n<BottomSheet open={open} onClose={() => setOpen(false)} title=\"New Task\">\n  <div className=\"space-y-3\">\n    <Input\n      placeholder=\"Task name\"\n      value={name}\n      onChange={(e) => setName(e.target.value)}\n      autoFocus\n    />\n    <TextArea placeholder=\"Notes\" rows={3} />\n    <Button fullWidth onClick={handleSave}>Save</Button>\n  </div>\n</BottomSheet>\n```\n\nKey rules:\n- BottomSheet starts `open={false}` — user must tap FAB to open\n- Content inside uses `space-y-3` for spacing\n- Button at bottom should be `fullWidth`",
+    "tags": [
+      "bottomsheet",
+      "modal",
+      "form",
+      "sheet",
+      "dialog"
+    ]
+  },
+  {
+    "category": "component_library",
+    "title": "Input and TextArea — form fields",
+    "content": "Use `<Input>` and `<TextArea>` from the library for all text inputs.\n\n```tsx\nimport { Input, TextArea } from \"./components/ui\";\n\n<Input\n  placeholder=\"Email address\"\n  type=\"email\"\n  value={email}\n  onChange={(e) => setEmail(e.target.value)}\n  autoFocus\n/>\n\n<TextArea\n  placeholder=\"Describe your goal...\"\n  rows={3}\n  value={description}\n  onChange={(e) => setDescription(e.target.value)}\n/>\n```\n\nNever create custom `<input className=\"border...\">` elements — always use the library components.",
+    "tags": [
+      "input",
+      "textarea",
+      "form",
+      "field",
+      "text"
+    ]
+  },
+  {
+    "category": "component_library",
+    "title": "FAB — floating action button",
+    "content": "The FAB is the primary way to trigger actions (adding items, creating new entries).\n\n```tsx\nimport { FAB, PlusIcon } from \"./components/ui\";\n\n// Standard FAB\n<FAB onClick={() => setOpen(true)} label=\"New item\">\n  <PlusIcon/>\n</FAB>\n\n// With TabBar — add bottom=\"tabBar\" so FAB doesn't overlap\n<FAB onClick={() => setOpen(true)} bottom=\"tabBar\">\n  <PlusIcon/>\n</FAB>\n```\n\nThe FAB opens a `<BottomSheet>` — it should NEVER perform an action directly. The flow is: tap FAB → BottomSheet opens → fill form → save → close.",
+    "tags": [
+      "fab",
+      "floating",
+      "action",
+      "add",
+      "create"
+    ]
+  },
+  {
+    "category": "component_library",
+    "title": "SegmentedControl — filter pills",
+    "content": "Use `<SegmentedControl>` for filtering lists or switching views. Supports optional badge counts.\n\n```tsx\nimport { SegmentedControl } from \"./components/ui\";\n\nconst [filter, setFilter] = useState(\"all\");\n\n<SegmentedControl\n  segments={[\n    { value: \"all\", label: \"All\", badge: items.length },\n    { value: \"active\", label: \"Active\", badge: activeCount },\n    { value: \"done\", label: \"Done\", badge: doneCount },\n  ]}\n  value={filter}\n  onChange={setFilter}\n/>\n```\n\nPlace above the list it filters. Works great with Zustand computed selectors.",
+    "tags": [
+      "segmentedcontrol",
+      "filter",
+      "tabs",
+      "pills",
+      "segment"
+    ]
+  },
+  {
+    "category": "component_library",
+    "title": "EmptyState — zero-data fallback",
+    "content": "Always show `<EmptyState>` when a list has no items. Never leave a blank screen.\n\n```tsx\nimport { EmptyState, InboxIcon } from \"./components/ui\";\n\n{items.length === 0 ? (\n  <EmptyState\n    icon={<InboxIcon/>}\n    title=\"No tasks yet\"\n    description=\"Tap the + button to create your first task.\"\n  />\n) : (\n  <div className=\"space-y-3\">\n    {items.map(item => <Card key={item.id}>...</Card>)}\n  </div>\n)}\n```\n\nChoose an appropriate icon: `InboxIcon` (empty lists), `SearchIcon` (no search results), `CalendarIcon` (no events), `StarIcon` (no favorites).",
+    "tags": [
+      "emptystate",
+      "empty",
+      "placeholder",
+      "zero",
+      "blank"
+    ]
+  },
+  {
+    "category": "component_library",
+    "title": "ThemeProvider and dark mode toggle",
+    "content": "Wrap the entire app in `<ThemeProvider>` and provide a dark mode toggle.\n\n```tsx\nimport { ThemeProvider, useTheme, IconButton, SunIcon, MoonIcon } from \"./components/ui\";\n\nexport default function App() {\n  return (\n    <ThemeProvider>\n      <Screen>\n        <AppBar title=\"My App\" trailing={<DarkToggle/>} />\n        {/* content */}\n      </Screen>\n    </ThemeProvider>\n  );\n}\n\nfunction DarkToggle() {\n  const dark = useTheme((s) => s.dark);\n  const toggle = useTheme((s) => s.toggle);\n  return (\n    <IconButton onClick={toggle} aria-label=\"Toggle theme\">\n      {dark ? <SunIcon/> : <MoonIcon/>}\n    </IconButton>\n  );\n}\n```\n\nThe ThemeProvider adds/removes the `dark` class on `<html>`. All `dark:` Tailwind variants activate automatically.",
+    "tags": [
+      "theme",
+      "dark",
+      "light",
+      "toggle",
+      "provider"
+    ]
+  },
+  {
+    "category": "component_library",
+    "title": "Available SVG icons list",
+    "content": "20 icons available from the UI library. Import only what you need.\n\n```tsx\nimport {\n  PlusIcon,          // + symbol — add/create actions\n  CheckIcon,         // checkmark — completion, success\n  XIcon,             // × symbol — close, cancel, delete\n  TrashIcon,         // trash can — delete\n  SunIcon,           // sun — light mode\n  MoonIcon,          // moon — dark mode\n  ChevronRightIcon,  // > — navigation, \"go to\"\n  ChevronLeftIcon,   // < — back navigation\n  HomeIcon,          // house — home tab\n  SearchIcon,        // magnifying glass — search\n  SettingsIcon,      // gear — settings tab\n  UserIcon,          // person — profile, account\n  HeartIcon,         // heart — favorites, likes\n  StarIcon,          // star — ratings, bookmarks\n  ClockIcon,         // clock — time, history\n  CalendarIcon,      // calendar — dates, events\n  BellIcon,          // bell — notifications, reminders\n  InboxIcon,         // inbox — empty states, messages\n  MenuIcon,          // hamburger — menu (avoid — prefer tabs)\n  MoreIcon,          // three dots — overflow menu\n} from \"./components/ui\";\n```\n\nOverride size: `<PlusIcon className=\"w-5 h-5\" />`.",
+    "tags": [
+      "icons",
+      "svg",
+      "plus",
+      "check",
+      "trash",
+      "settings"
+    ]
+  },
+  {
+    "category": "tailwind_v4",
+    "title": "Tailwind v4 — CSS-first configuration",
+    "content": "Tailwind v4 uses CSS-first configuration. There is NO `tailwind.config.js` file.\n\nKey differences from v3:\n- Configuration is in CSS (`global.css`), not JavaScript\n- No `@apply` needed (and it breaks outside `@layer`) — just use classes inline\n- The `@theme` directive replaces `theme.extend` in the JS config\n- All colors, spacing, and utilities work out of the box\n\n```css\n/* global.css — already configured, DO NOT MODIFY */\n@import \"tailwindcss\";\n```\n\nJust use Tailwind classes in your JSX. No config files needed.",
+    "tags": [
+      "tailwind",
+      "v4",
+      "config",
+      "css-first",
+      "setup"
+    ]
+  },
+  {
+    "category": "tailwind_v4",
+    "title": "Tailwind v4 — dark mode with class strategy",
+    "content": "Dark mode uses the class-based strategy. The `dark` class on `<html>` activates all `dark:` variants.\n\n```tsx\n// Light and dark backgrounds\n<div className=\"bg-white dark:bg-gray-900\">\n\n// Light and dark text\n<p className=\"text-gray-900 dark:text-white\">\n<p className=\"text-gray-500 dark:text-gray-400\">\n\n// Dark borders\n<div className=\"border border-gray-200 dark:border-gray-700\">\n\n// Dark card surfaces\n<div className=\"bg-gray-50 dark:bg-gray-800\">\n```\n\nEvery color class should have a `dark:` counterpart. Common pairings:\n- `bg-white` / `dark:bg-gray-900` (page background)\n- `bg-gray-50` / `dark:bg-gray-800` (card surface)\n- `text-gray-900` / `dark:text-white` (primary text)\n- `text-gray-500` / `dark:text-gray-400` (secondary text)\n- `border-gray-200` / `dark:border-gray-700` (borders)",
+    "tags": [
+      "tailwind",
+      "dark-mode",
+      "class",
+      "theme",
+      "colors"
+    ]
+  },
+  {
+    "category": "tailwind_v4",
+    "title": "Tailwind v4 — opacity modifiers",
+    "content": "Use the `/` opacity modifier syntax. The v3 `bg-opacity-*`, `text-opacity-*`, and `border-opacity-*` utilities are REMOVED.\n\n```tsx\n// ✅ Correct v4 syntax\n<div className=\"bg-indigo-500/80\">       // 80% opacity background\n<div className=\"bg-black/50\">             // 50% opacity overlay\n<p className=\"text-white/70\">             // 70% opacity text\n<div className=\"border-gray-300/50\">      // 50% opacity border\n\n// ❌ WRONG — removed in v4\n<div className=\"bg-indigo-500 bg-opacity-80\">\n<p className=\"text-white text-opacity-70\">\n```\n\nThe `/` modifier works with any color utility: `bg-`, `text-`, `border-`, `ring-`, `shadow-`, etc.",
+    "tags": [
+      "tailwind",
+      "opacity",
+      "alpha",
+      "transparent",
+      "v4"
+    ]
+  },
+  {
+    "category": "tailwind_v4",
+    "title": "Tailwind v4 — spacing and sizing utilities",
+    "content": "Common spacing patterns for mobile apps:\n\n```tsx\n// Screen edge padding\n<main className=\"px-5\">                    // 20px horizontal padding\n\n// Vertical spacing between elements\n<div className=\"space-y-3\">                // 12px gap — cards in list\n<div className=\"space-y-4\">                // 16px gap — sections\n<div className=\"space-y-6\">                // 24px gap — major sections\n\n// Card internal padding\n<div className=\"p-4\">                      // 16px all sides\n\n// Bottom padding to clear FAB/TabBar\n<main className=\"pb-32\">                   // 128px bottom clearance\n\n// Flex with gap\n<div className=\"flex items-center gap-3\">  // horizontal row with 12px gap\n<div className=\"flex flex-col gap-2\">      // vertical stack with 8px gap\n```\n\nNever use arbitrary values unless necessary — the design scale is: 1(4px), 2(8px), 3(12px), 4(16px), 5(20px), 6(24px), 8(32px).",
+    "tags": [
+      "tailwind",
+      "spacing",
+      "padding",
+      "margin",
+      "gap"
+    ]
+  },
+  {
+    "category": "tailwind_v4",
+    "title": "Tailwind v4 — common color patterns for mobile",
+    "content": "Mobile-friendly color patterns that work in both light and dark modes:\n\n```tsx\n// Primary action colors\nclassName=\"bg-indigo-500 text-white\"                    // primary button\nclassName=\"bg-indigo-500/10 text-indigo-600 dark:text-indigo-400\"  // subtle tag\n\n// Success / completion\nclassName=\"text-green-500\"                              // completed status\nclassName=\"bg-green-500/10 text-green-600 dark:text-green-400\"    // success badge\n\n// Warning / pending\nclassName=\"text-amber-500\"                              // warning status\nclassName=\"bg-amber-500/10 text-amber-600 dark:text-amber-400\"   // pending badge\n\n// Danger / delete\nclassName=\"text-red-500\"                                // error/delete\nclassName=\"bg-red-500/10 text-red-600 dark:text-red-400\"          // danger badge\n\n// Neutral surfaces\nclassName=\"bg-gray-50 dark:bg-gray-800\"                 // subtle surface\nclassName=\"bg-gray-100 dark:bg-gray-800/50\"             // input background\n```",
+    "tags": [
+      "tailwind",
+      "colors",
+      "theme",
+      "primary",
+      "palette"
+    ]
+  },
+  {
+    "category": "tailwind_v4",
+    "title": "Tailwind v4 — text and typography",
+    "content": "Typography scale for mobile apps:\n\n```tsx\n// Heading hierarchy\n<h1 className=\"text-2xl font-bold text-gray-900 dark:text-white\">    // page title\n<h2 className=\"text-lg font-semibold text-gray-900 dark:text-white\"> // section title\n<h3 className=\"text-base font-medium text-gray-900 dark:text-white\"> // card title\n\n// Body text\n<p className=\"text-sm text-gray-600 dark:text-gray-300\">             // body\n<p className=\"text-xs text-gray-500 dark:text-gray-400\">             // caption\n\n// Numeric/data text\n<span className=\"text-3xl font-bold tabular-nums\">{count}</span>     // big number\n<span className=\"text-sm font-medium tabular-nums\">{price}</span>   // inline number\n\n// Truncation\n<p className=\"truncate\">Long text that might overflow...</p>\n<p className=\"line-clamp-2\">Text limited to 2 lines...</p>\n```\n\nUse `tabular-nums` for numbers that change (counters, prices) so they don't jitter.",
+    "tags": [
+      "tailwind",
+      "text",
+      "typography",
+      "font",
+      "heading"
+    ]
+  },
+  {
+    "category": "tailwind_v4",
+    "title": "Tailwind v4 — flexbox patterns for mobile",
+    "content": "Common flexbox patterns used in mobile layouts:\n\n```tsx\n// Horizontal row — icon + text + trailing\n<div className=\"flex items-center gap-3\">\n  <Icon/>\n  <div className=\"flex-1 min-w-0\">\n    <p className=\"font-medium truncate\">{title}</p>\n    <p className=\"text-sm text-gray-500\">{subtitle}</p>\n  </div>\n  <span className=\"text-sm text-gray-400 shrink-0\">{time}</span>\n</div>\n\n// Center everything (empty states, loading)\n<div className=\"flex flex-col items-center justify-center h-64 gap-3\">\n  <Icon className=\"w-12 h-12 text-gray-300\"/>\n  <p className=\"text-gray-500\">No items</p>\n</div>\n\n// Space between (header with action)\n<div className=\"flex items-center justify-between\">\n  <h2 className=\"text-lg font-semibold\">Recent</h2>\n  <Button variant=\"ghost\" size=\"sm\">See all</Button>\n</div>\n\n// Wrap layout (tags, chips)\n<div className=\"flex flex-wrap gap-2\">\n  {tags.map(tag => <span className=\"px-3 py-1 rounded-full bg-gray-100\">...)}\n</div>\n```\n\nKey: `flex-1 min-w-0` on the middle element allows truncation. `shrink-0` on trailing prevents squishing.",
+    "tags": [
+      "tailwind",
+      "flex",
+      "flexbox",
+      "layout",
+      "row"
+    ]
+  },
+  {
+    "category": "tailwind_v4",
+    "title": "Tailwind v4 — rounded corners and shadows",
+    "content": "Standard border radius and shadow patterns:\n\n```tsx\n// Rounded corners\nclassName=\"rounded-xl\"      // 12px — cards, modals\nclassName=\"rounded-lg\"      // 8px — buttons, inputs  \nclassName=\"rounded-full\"    // pill shape — tags, avatars\nclassName=\"rounded-2xl\"     // 16px ��� hero cards\n\n// Shadows\nclassName=\"shadow-sm\"       // subtle lift — cards\nclassName=\"shadow\"          // standard elevation\nclassName=\"shadow-lg\"       // prominent — modals, FAB\n\n// Combined card pattern\n<div className=\"rounded-xl bg-white dark:bg-gray-800 shadow-sm p-4\">\n```\n\nPrefer `rounded-xl` for cards and `rounded-lg` for interactive elements (buttons, inputs).",
+    "tags": [
+      "tailwind",
+      "rounded",
+      "shadow",
+      "border-radius",
+      "elevation"
+    ]
+  },
+  {
+    "category": "tailwind_v4",
+    "title": "Tailwind v4 — transitions and animations",
+    "content": "Smooth transitions for mobile interactions:\n\n```tsx\n// Basic color/opacity transition\nclassName=\"transition-colors duration-200\"\n\n// Transform transition (for active press effect)\nclassName=\"transition-transform active:scale-95\"\n\n// Opacity fade\nclassName=\"transition-opacity duration-300\"\n\n// Combined hover/active states\nclassName=\"transition-all duration-200 hover:bg-gray-50 active:scale-95\"\n\n// Conditional opacity\nclassName={`transition-opacity duration-300 ${show ? 'opacity-100' : 'opacity-0'}`}\n```\n\nNote: The pre-built components already have `active:scale-*` feedback. Only add transitions to custom elements.",
+    "tags": [
+      "tailwind",
+      "transition",
+      "animation",
+      "active",
+      "hover"
+    ]
+  },
+  {
+    "category": "mobile_patterns",
+    "title": "Things app — task management pattern",
+    "content": "Inspired by Things 3 (Cultured Code). Clean task management with minimal chrome.\n\nKey patterns:\n- **Single-purpose screens**: one list per tab, not nested navigation\n- **Swipe to complete**: visual feedback on task completion (strikethrough + green check)\n- **Grouped by date**: \"Today\", \"Upcoming\", \"Anytime\" sections\n- **Subtle categories**: small colored dot next to task, not full colored cards\n- **Quick entry**: FAB opens bottom sheet with single input + optional fields\n\n```tsx\n// Task row pattern (Things-style)\n<div className=\"flex items-center gap-3 py-3\">\n  <button\n    onClick={() => toggle(id)}\n    className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0\n      ${done ? 'bg-green-500 border-green-500' : 'border-gray-300 dark:border-gray-600'}`}\n  >\n    {done && <CheckIcon className=\"w-3 h-3 text-white\" />}\n  </button>\n  <span className={`flex-1 ${done ? 'line-through text-gray-400' : 'text-gray-900 dark:text-white'}`}>\n    {title}\n  </span>\n</div>\n```\n\nApply to: to-do apps, task trackers, checklists, goal trackers.",
+    "tags": [
+      "things",
+      "tasks",
+      "todo",
+      "checklist",
+      "completion"
+    ]
+  },
+  {
+    "category": "mobile_patterns",
+    "title": "Streaks app — habit tracking pattern",
+    "content": "Inspired by Streaks (Crunchy Bagel). Circular progress, daily completion, streak counts.\n\nKey patterns:\n- **Circular progress ring**: each habit has a completion circle\n- **Daily grid view**: 7-day row showing completion status per day\n- **Streak counter**: prominent number showing consecutive days\n- **Color coding**: each habit gets a distinct accent color\n- **Tap to complete**: single tap toggles today's completion\n\n```tsx\n// Habit card with streak (Streaks-style)\n<Card>\n  <div className=\"flex items-center justify-between\">\n    <div className=\"flex items-center gap-3\">\n      <div className={`w-10 h-10 rounded-full flex items-center justify-center\n        ${completed ? 'bg-green-500' : 'bg-gray-200 dark:bg-gray-700'}`}>\n        <CheckIcon className={`w-5 h-5 ${completed ? 'text-white' : 'text-gray-400'}`}/>\n      </div>\n      <div>\n        <p className=\"font-medium\">{name}</p>\n        <p className=\"text-xs text-gray-500\">{streak} day streak</p>\n      </div>\n    </div>\n    <span className=\"text-2xl font-bold tabular-nums text-indigo-500\">{streak}</span>\n  </div>\n</Card>\n```\n\nApply to: habit trackers, daily routines, goal streaks, fitness logs.",
+    "tags": [
+      "streaks",
+      "habit",
+      "streak",
+      "daily",
+      "progress",
+      "ring"
+    ]
+  },
+  {
+    "category": "mobile_patterns",
+    "title": "Linear app — project/issue tracking pattern",
+    "content": "Inspired by Linear (Linear Inc). Minimal, fast, keyboard-driven feel even on mobile.\n\nKey patterns:\n- **Status pills**: compact colored badges (Backlog, Todo, In Progress, Done)\n- **Priority indicators**: colored dots or icons (Urgent, High, Medium, Low)\n- **Flat list with grouping**: group by status or project, collapsible sections\n- **Quick actions**: swipe or long-press for status change\n- **Search-first**: prominent search bar at top\n\n```tsx\n// Status badge pattern (Linear-style)\nconst STATUS_STYLES = {\n  backlog: \"bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400\",\n  todo: \"bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400\",\n  in_progress: \"bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400\",\n  done: \"bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400\",\n};\n\n<span className={`px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_STYLES[status]}`}>\n  {label}\n</span>\n```\n\nApply to: project managers, issue trackers, kanban boards, work logs.",
+    "tags": [
+      "linear",
+      "project",
+      "issue",
+      "status",
+      "kanban",
+      "tracker"
+    ]
+  },
+  {
+    "category": "mobile_patterns",
+    "title": "iOS Settings pattern — grouped list with sections",
+    "content": "Classic iOS Settings-style grouped list layout.\n\n```tsx\n// Section with heading and grouped items\n<div className=\"space-y-6\">\n  {/* Section 1 */}\n  <div className=\"space-y-1\">\n    <h3 className=\"text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 px-1\">\n      Account\n    </h3>\n    <Card padding=\"none\">\n      <ListItem leading={<UserIcon/>} title=\"Profile\" showChevron onClick={...} />\n      <ListItem leading={<BellIcon/>} title=\"Notifications\" showChevron onClick={...} />\n    </Card>\n  </div>\n\n  {/* Section 2 */}\n  <div className=\"space-y-1\">\n    <h3 className=\"text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 px-1\">\n      Preferences\n    </h3>\n    <Card padding=\"none\">\n      <ListItem leading={<MoonIcon/>} title=\"Dark Mode\" trailing={<DarkToggle/>} />\n      <ListItem leading={<SettingsIcon/>} title=\"Advanced\" showChevron onClick={...} />\n    </Card>\n  </div>\n</div>\n```\n\nApply to: settings screens, profile pages, preference panels.",
+    "tags": [
+      "settings",
+      "ios",
+      "grouped",
+      "list",
+      "preferences",
+      "profile"
+    ]
+  },
+  {
+    "category": "mobile_patterns",
+    "title": "Dashboard pattern — stats cards + recent list",
+    "content": "Common dashboard layout: summary stats at top, recent activity below.\n\n```tsx\n// Stats row — 2 or 3 cards in a horizontal grid\n<div className=\"grid grid-cols-2 gap-3\">\n  <Card>\n    <p className=\"text-xs text-gray-500 dark:text-gray-400\">Total</p>\n    <p className=\"text-2xl font-bold tabular-nums\">{total}</p>\n  </Card>\n  <Card>\n    <p className=\"text-xs text-gray-500 dark:text-gray-400\">This Week</p>\n    <p className=\"text-2xl font-bold tabular-nums text-indigo-500\">{weekly}</p>\n  </Card>\n</div>\n\n// For 3 stats on one row\n<div className=\"grid grid-cols-3 gap-2\">\n  <Card className=\"text-center\">\n    <p className=\"text-xl font-bold\">{val}</p>\n    <p className=\"text-xs text-gray-500\">Label</p>\n  </Card>\n  ...\n</div>\n```\n\nPlace stats grid above the main list. Works well with `SegmentedControl` below stats for filtering the list.",
+    "tags": [
+      "dashboard",
+      "stats",
+      "summary",
+      "grid",
+      "metrics",
+      "overview"
+    ]
+  },
+  {
+    "category": "mobile_patterns",
+    "title": "Search pattern — filter list in real-time",
+    "content": "Real-time search filtering pattern for lists.\n\n```tsx\nconst [search, setSearch] = useState(\"\");\n\nconst filtered = items.filter(item =>\n  item.name.toLowerCase().includes(search.toLowerCase())\n);\n\n// In the main content:\n<div className=\"relative\">\n  <SearchIcon className=\"absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400\" />\n  <input\n    type=\"text\"\n    placeholder=\"Search...\"\n    value={search}\n    onChange={(e) => setSearch(e.target.value)}\n    className=\"w-full pl-10 pr-4 py-2.5 rounded-lg bg-gray-100 dark:bg-gray-800\n      text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50\"\n  />\n</div>\n\n{filtered.length === 0 ? (\n  <EmptyState icon={<SearchIcon/>} title=\"No results\" description={`No matches for \"${search}\"`} />\n) : (\n  <div className=\"space-y-3\">\n    {filtered.map(item => ...)}\n  </div>\n)}\n```\n\nNote: Search input can be a plain styled `<input>` since it's not a form field (it's a filter). Always show EmptyState for zero results.",
+    "tags": [
+      "search",
+      "filter",
+      "find",
+      "query",
+      "realtime"
+    ]
+  },
+  {
+    "category": "mobile_patterns",
+    "title": "Swipe-to-delete pattern",
+    "content": "Simple swipe-to-delete UX without a library — use button-based delete instead.\n\nSince we don't have a swipe gesture library, use a visible delete button:\n\n```tsx\n// Option 1: Trailing delete button in ListItem\n<ListItem\n  title={item.name}\n  trailing={\n    <IconButton\n      onClick={(e) => { e.stopPropagation(); remove(item.id); }}\n      aria-label=\"Delete\"\n    >\n      <TrashIcon className=\"w-4 h-4 text-red-500\" />\n    </IconButton>\n  }\n/>\n\n// Option 2: Delete action in BottomSheet details\n<BottomSheet open={selected !== null} onClose={close} title=\"Task Details\">\n  <div className=\"space-y-3\">\n    <p>{selected?.name}</p>\n    <Button variant=\"danger\" fullWidth onClick={() => remove(selected.id)}>\n      Delete Task\n    </Button>\n  </div>\n</BottomSheet>\n```\n\nPrefer Option 2 (confirmation via BottomSheet) for destructive actions.",
+    "tags": [
+      "delete",
+      "remove",
+      "swipe",
+      "destructive",
+      "trash"
+    ]
+  },
+  {
+    "category": "mobile_patterns",
+    "title": "Timer/countdown pattern",
+    "content": "Pattern for building timer or countdown features (meditation, pomodoro, workout).\n\n```tsx\nimport { useState, useEffect, useRef } from \"react\";\n\nfunction useTimer(initialSeconds: number) {\n  const [seconds, setSeconds] = useState(initialSeconds);\n  const [running, setRunning] = useState(false);\n  const intervalRef = useRef<number | null>(null);\n\n  useEffect(() => {\n    if (running && seconds > 0) {\n      intervalRef.current = window.setInterval(() => {\n        setSeconds(s => {\n          if (s <= 1) { setRunning(false); return 0; }\n          return s - 1;\n        });\n      }, 1000);\n    }\n    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };\n  }, [running, seconds]);\n\n  const mm = String(Math.floor(seconds / 60)).padStart(2, \"0\");\n  const ss = String(seconds % 60).padStart(2, \"0\");\n\n  return { seconds, display: `${mm}:${ss}`, running, start: () => setRunning(true),\n    pause: () => setRunning(false), reset: () => { setRunning(false); setSeconds(initialSeconds); } };\n}\n\n// Display\n<div className=\"flex flex-col items-center justify-center py-16 gap-6\">\n  <p className=\"text-6xl font-bold tabular-nums tracking-tight\">{timer.display}</p>\n  <div className=\"flex gap-3\">\n    <Button onClick={timer.running ? timer.pause : timer.start}>\n      {timer.running ? \"Pause\" : \"Start\"}\n    </Button>\n    <Button variant=\"secondary\" onClick={timer.reset}>Reset</Button>\n  </div>\n</div>\n```",
+    "tags": [
+      "timer",
+      "countdown",
+      "pomodoro",
+      "meditation",
+      "stopwatch"
+    ]
+  },
+  {
+    "category": "mobile_patterns",
+    "title": "Category/tag selection pattern",
+    "content": "Reusable pattern for selecting categories or tags.\n\n```tsx\nconst CATEGORIES = [\n  { id: \"work\", label: \"Work\", color: \"bg-blue-500\" },\n  { id: \"personal\", label: \"Personal\", color: \"bg-green-500\" },\n  { id: \"health\", label: \"Health\", color: \"bg-red-500\" },\n  { id: \"finance\", label: \"Finance\", color: \"bg-amber-500\" },\n];\n\n// Inside BottomSheet form\n<div className=\"space-y-2\">\n  <label className=\"text-sm font-medium text-gray-700 dark:text-gray-300\">Category</label>\n  <div className=\"flex flex-wrap gap-2\">\n    {CATEGORIES.map(cat => (\n      <button\n        key={cat.id}\n        onClick={() => setCategory(cat.id)}\n        className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors\n          ${category === cat.id\n            ? `${cat.color} text-white`\n            : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'}`}\n      >\n        {cat.label}\n      </button>\n    ))}\n  </div>\n</div>\n```\n\nUseful for: expense categories, task labels, mood selection, workout types.",
+    "tags": [
+      "category",
+      "tag",
+      "select",
+      "pill",
+      "chip",
+      "label"
+    ]
+  },
+  {
+    "category": "mobile_patterns",
+    "title": "Pull-down summary card pattern",
+    "content": "A hero card at the top of the screen showing key metrics — common in finance and health apps.\n\n```tsx\n// Summary hero card\n<Card className=\"bg-indigo-500 dark:bg-indigo-600\">\n  <div className=\"text-white\">\n    <p className=\"text-sm text-white/70\">Total Balance</p>\n    <p className=\"text-3xl font-bold tabular-nums mt-1\">\n      ${balance.toLocaleString(\"en-US\", { minimumFractionDigits: 2 })}\n    </p>\n    <div className=\"flex gap-4 mt-3\">\n      <div>\n        <p className=\"text-xs text-white/60\">Income</p>\n        <p className=\"text-sm font-medium\">+${income}</p>\n      </div>\n      <div>\n        <p className=\"text-xs text-white/60\">Expenses</p>\n        <p className=\"text-sm font-medium\">-${expenses}</p>\n      </div>\n    </div>\n  </div>\n</Card>\n```\n\nWorks for: budget trackers, expense apps, portfolio summaries, workout totals.",
+    "tags": [
+      "summary",
+      "hero",
+      "card",
+      "balance",
+      "total",
+      "finance"
+    ]
+  },
+  {
+    "category": "mobile_patterns",
+    "title": "Date-grouped list pattern",
+    "content": "Group list items by date with sticky section headers.\n\n```tsx\nfunction groupByDate(items: Item[]): Record<string, Item[]> {\n  const groups: Record<string, Item[]> = {};\n  for (const item of items) {\n    const key = new Date(item.date).toLocaleDateString(\"en-US\", {\n      weekday: \"long\", month: \"short\", day: \"numeric\"\n    });\n    (groups[key] ??= []).push(item);\n  }\n  return groups;\n}\n\n// Render\nconst grouped = groupByDate(items);\n\n<div className=\"space-y-6\">\n  {Object.entries(grouped).map(([date, group]) => (\n    <div key={date} className=\"space-y-2\">\n      <h3 className=\"text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 px-1\">\n        {date}\n      </h3>\n      <div className=\"space-y-2\">\n        {group.map(item => <Card key={item.id}>...</Card>)}\n      </div>\n    </div>\n  ))}\n</div>\n```\n\nApply to: transaction history, activity logs, journal entries, event timelines.",
+    "tags": [
+      "date",
+      "group",
+      "section",
+      "timeline",
+      "history",
+      "sorted"
+    ]
+  },
+  {
+    "category": "state_management",
+    "title": "Zustand store with localStorage persistence",
+    "content": "Standard pattern for creating a Zustand store with localStorage persistence.\n\n```ts\n// src/store/appStore.ts\nimport { create } from \"zustand\";\n\ninterface AppState {\n  items: Item[];\n  addItem: (item: Omit<Item, \"id\">) => void;\n  removeItem: (id: string) => void;\n  toggleItem: (id: string) => void;\n}\n\ninterface Item {\n  id: string;\n  name: string;\n  done: boolean;\n  createdAt: number;\n}\n\nconst STORAGE_KEY = \"myapp_data\";\n\nconst loadInitial = (): Partial<AppState> => {\n  try {\n    const raw = localStorage.getItem(STORAGE_KEY);\n    return raw ? JSON.parse(raw) : {};\n  } catch {\n    return {};\n  }\n};\n\nconst saved = loadInitial();\n\nexport const useAppStore = create<AppState>((set) => ({\n  items: (saved.items as Item[]) ?? [],\n\n  addItem: (data) => set((s) => ({\n    items: [...s.items, { ...data, id: crypto.randomUUID(), createdAt: Date.now() }],\n  })),\n\n  removeItem: (id) => set((s) => ({\n    items: s.items.filter((i) => i.id !== id),\n  })),\n\n  toggleItem: (id) => set((s) => ({\n    items: s.items.map((i) => i.id === id ? { ...i, done: !i.done } : i),\n  })),\n}));\n\n// Persist on every change\nuseAppStore.subscribe((state) => {\n  try {\n    localStorage.setItem(STORAGE_KEY, JSON.stringify({ items: state.items }));\n  } catch {}\n});\n```\n\nKey: only persist data fields (items), not actions. Use `crypto.randomUUID()` for IDs.",
+    "tags": [
+      "zustand",
+      "store",
+      "state",
+      "localstorage",
+      "persist"
+    ]
+  },
+  {
+    "category": "state_management",
+    "title": "Zustand computed selectors",
+    "content": "Derive filtered/sorted data from the store using selectors — don't duplicate state.\n\n```ts\n// In the store file — add computed getters:\nexport const useAppStore = create<AppState>((set, get) => ({\n  items: [],\n  filter: \"all\" as \"all\" | \"active\" | \"done\",\n  setFilter: (f: \"all\" | \"active\" | \"done\") => set({ filter: f }),\n  // ... other actions\n}));\n\n// In components — use selectors:\nconst items = useAppStore((s) => s.items);\nconst filter = useAppStore((s) => s.filter);\n\n// Computed in component (simple and clear)\nconst filtered = items.filter(item => {\n  if (filter === \"active\") return !item.done;\n  if (filter === \"done\") return item.done;\n  return true;\n});\n\nconst activeCount = items.filter(i => !i.done).length;\nconst doneCount = items.filter(i => i.done).length;\n```\n\nCompute derived values in the component, not in the store. Keep the store flat and simple.",
+    "tags": [
+      "zustand",
+      "selector",
+      "computed",
+      "filter",
+      "derived"
+    ]
+  },
+  {
+    "category": "state_management",
+    "title": "Zustand store for expense/finance tracking",
+    "content": "Store pattern for financial tracking apps with categories and totals.\n\n```ts\nimport { create } from \"zustand\";\n\ninterface Transaction {\n  id: string;\n  amount: number;      // positive = income, negative = expense\n  category: string;\n  description: string;\n  date: number;        // timestamp\n}\n\ninterface FinanceState {\n  transactions: Transaction[];\n  addTransaction: (t: Omit<Transaction, \"id\" | \"date\">) => void;\n  removeTransaction: (id: string) => void;\n}\n\nconst STORAGE_KEY = \"finance_data\";\nconst saved = (() => {\n  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || \"null\"); }\n  catch { return null; }\n})();\n\nexport const useFinanceStore = create<FinanceState>((set) => ({\n  transactions: saved?.transactions ?? [],\n\n  addTransaction: (t) => set((s) => ({\n    transactions: [\n      { ...t, id: crypto.randomUUID(), date: Date.now() },\n      ...s.transactions,\n    ],\n  })),\n\n  removeTransaction: (id) => set((s) => ({\n    transactions: s.transactions.filter((t) => t.id !== id),\n  })),\n}));\n\nuseFinanceStore.subscribe((s) => {\n  try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ transactions: s.transactions })); } catch {}\n});\n\n// Computed helpers (use in components)\nexport function getBalance(txns: Transaction[]) {\n  return txns.reduce((sum, t) => sum + t.amount, 0);\n}\nexport function getByCategory(txns: Transaction[]) {\n  const map: Record<string, number> = {};\n  txns.forEach(t => { map[t.category] = (map[t.category] ?? 0) + Math.abs(t.amount); });\n  return Object.entries(map).map(([name, value]) => ({ name, value })).sort((a, b) => b.value - a.value);\n}\n```",
+    "tags": [
+      "zustand",
+      "finance",
+      "expense",
+      "budget",
+      "transaction",
+      "money"
+    ]
+  },
+  {
+    "category": "state_management",
+    "title": "Zustand store for habit tracking",
+    "content": "Store pattern for habit tracking with daily completions and streaks.\n\n```ts\nimport { create } from \"zustand\";\n\ninterface Habit {\n  id: string;\n  name: string;\n  color: string;\n  completions: Record<string, boolean>;  // \"2026-04-11\" → true\n}\n\ninterface HabitState {\n  habits: Habit[];\n  addHabit: (name: string, color: string) => void;\n  removeHabit: (id: string) => void;\n  toggleDay: (habitId: string, date: string) => void;\n}\n\nconst todayKey = () => new Date().toISOString().slice(0, 10);\n\nconst STORAGE_KEY = \"habits_data\";\nconst saved = (() => {\n  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || \"null\"); } catch { return null; }\n})();\n\nexport const useHabitStore = create<HabitState>((set) => ({\n  habits: saved?.habits ?? [],\n\n  addHabit: (name, color) => set((s) => ({\n    habits: [...s.habits, { id: crypto.randomUUID(), name, color, completions: {} }],\n  })),\n\n  removeHabit: (id) => set((s) => ({\n    habits: s.habits.filter((h) => h.id !== id),\n  })),\n\n  toggleDay: (habitId, date) => set((s) => ({\n    habits: s.habits.map((h) =>\n      h.id === habitId\n        ? { ...h, completions: { ...h.completions, [date]: !h.completions[date] } }\n        : h\n    ),\n  })),\n}));\n\nuseHabitStore.subscribe((s) => {\n  try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ habits: s.habits })); } catch {}\n});\n\n// Streak calculator\nexport function getStreak(completions: Record<string, boolean>): number {\n  let streak = 0;\n  const d = new Date();\n  while (true) {\n    const key = d.toISOString().slice(0, 10);\n    if (!completions[key]) break;\n    streak++;\n    d.setDate(d.getDate() - 1);\n  }\n  return streak;\n}\n```",
+    "tags": [
+      "zustand",
+      "habit",
+      "streak",
+      "daily",
+      "completion",
+      "tracking"
+    ]
+  },
+  {
+    "category": "state_management",
+    "title": "Zustand store for notes/journal app",
+    "content": "Store pattern for notes or journal entries with search and folders.\n\n```ts\nimport { create } from \"zustand\";\n\ninterface Note {\n  id: string;\n  title: string;\n  body: string;\n  folder: string;\n  updatedAt: number;\n  createdAt: number;\n}\n\ninterface NotesState {\n  notes: Note[];\n  addNote: (title: string, body: string, folder?: string) => void;\n  updateNote: (id: string, updates: Partial<Pick<Note, \"title\" | \"body\" | \"folder\">>) => void;\n  removeNote: (id: string) => void;\n}\n\nconst STORAGE_KEY = \"notes_data\";\nconst saved = (() => {\n  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || \"null\"); } catch { return null; }\n})();\n\nexport const useNotesStore = create<NotesState>((set) => ({\n  notes: saved?.notes ?? [],\n\n  addNote: (title, body, folder = \"General\") => set((s) => ({\n    notes: [{\n      id: crypto.randomUUID(), title, body, folder,\n      createdAt: Date.now(), updatedAt: Date.now(),\n    }, ...s.notes],\n  })),\n\n  updateNote: (id, updates) => set((s) => ({\n    notes: s.notes.map((n) =>\n      n.id === id ? { ...n, ...updates, updatedAt: Date.now() } : n\n    ),\n  })),\n\n  removeNote: (id) => set((s) => ({\n    notes: s.notes.filter((n) => n.id !== id),\n  })),\n}));\n\nuseNotesStore.subscribe((s) => {\n  try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ notes: s.notes })); } catch {}\n});\n```",
+    "tags": [
+      "zustand",
+      "notes",
+      "journal",
+      "text",
+      "folder",
+      "editor"
+    ]
+  },
+  {
+    "category": "state_management",
+    "title": "Tab navigation state pattern",
+    "content": "Pattern for managing tab-based navigation with content switching.\n\n```tsx\nimport { useState } from \"react\";\nimport { Screen, AppBar, TabBar, HomeIcon, StarIcon, SettingsIcon } from \"./components/ui\";\n\ntype Tab = \"home\" | \"favorites\" | \"settings\";\n\nexport default function App() {\n  const [tab, setTab] = useState<Tab>(\"home\");\n\n  return (\n    <ThemeProvider>\n      <Screen>\n        <AppBar title={tab === \"home\" ? \"Home\" : tab === \"favorites\" ? \"Favorites\" : \"Settings\"} />\n\n        <main className=\"flex-1 overflow-y-auto px-5 pb-32 space-y-4\">\n          {tab === \"home\" && <HomeScreen />}\n          {tab === \"favorites\" && <FavoritesScreen />}\n          {tab === \"settings\" && <SettingsScreen />}\n        </main>\n\n        <TabBar\n          tabs={[\n            { value: \"home\", label: \"Home\", icon: <HomeIcon/> },\n            { value: \"favorites\", label: \"Favorites\", icon: <StarIcon/> },\n            { value: \"settings\", label: \"Settings\", icon: <SettingsIcon/> },\n          ]}\n          value={tab}\n          onChange={(v) => setTab(v as Tab)}\n        />\n      </Screen>\n    </ThemeProvider>\n  );\n}\n```\n\nEach screen is a separate component. Tab state is simple `useState` — no router needed for 3-5 screens.",
+    "tags": [
+      "tabs",
+      "navigation",
+      "screen",
+      "switch",
+      "routing"
+    ]
+  },
+  {
+    "category": "charts",
+    "title": "Recharts — bar chart for weekly/monthly data",
+    "content": "Use Recharts for data visualization. Style to match the app theme.\n\n```tsx\nimport { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, CartesianGrid } from \"recharts\";\n\nconst data = [\n  { day: \"Mon\", value: 12 },\n  { day: \"Tue\", value: 8 },\n  { day: \"Wed\", value: 15 },\n  { day: \"Thu\", value: 6 },\n  { day: \"Fri\", value: 20 },\n  { day: \"Sat\", value: 14 },\n  { day: \"Sun\", value: 10 },\n];\n\n<Card>\n  <h3 className=\"text-sm font-medium text-gray-500 dark:text-gray-400 mb-3\">This Week</h3>\n  <div className=\"h-48\">\n    <ResponsiveContainer width=\"100%\" height=\"100%\">\n      <BarChart data={data}>\n        <XAxis dataKey=\"day\" tick={{ fontSize: 12 }} axisLine={false} tickLine={false} />\n        <Bar dataKey=\"value\" fill=\"#6366f1\" radius={[4, 4, 0, 0]} />\n      </BarChart>\n    </ResponsiveContainer>\n  </div>\n</Card>\n```\n\nKey styling: no `<CartesianGrid>`, no `<YAxis>` (cleaner on mobile), `radius` for rounded bar tops, `#6366f1` (indigo-500) as default fill color.",
+    "tags": [
+      "recharts",
+      "bar",
+      "chart",
+      "weekly",
+      "graph",
+      "data"
+    ]
+  },
+  {
+    "category": "charts",
+    "title": "Recharts — line chart for trends",
+    "content": "Line chart pattern for showing trends over time.\n\n```tsx\nimport { LineChart, Line, XAxis, ResponsiveContainer, Tooltip } from \"recharts\";\n\nconst data = [\n  { date: \"Apr 1\", value: 45 },\n  { date: \"Apr 2\", value: 52 },\n  { date: \"Apr 3\", value: 48 },\n  { date: \"Apr 4\", value: 61 },\n  { date: \"Apr 5\", value: 55 },\n];\n\n<Card>\n  <h3 className=\"text-sm font-medium text-gray-500 dark:text-gray-400 mb-3\">Progress</h3>\n  <div className=\"h-40\">\n    <ResponsiveContainer width=\"100%\" height=\"100%\">\n      <LineChart data={data}>\n        <XAxis dataKey=\"date\" tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />\n        <Tooltip\n          contentStyle={{\n            backgroundColor: \"#1f2937\",\n            border: \"none\",\n            borderRadius: \"8px\",\n            color: \"#fff\",\n            fontSize: 12,\n          }}\n        />\n        <Line\n          type=\"monotone\"\n          dataKey=\"value\"\n          stroke=\"#6366f1\"\n          strokeWidth={2}\n          dot={false}\n          activeDot={{ r: 4 }}\n        />\n      </LineChart>\n    </ResponsiveContainer>\n  </div>\n</Card>\n```\n\nUse `dot={false}` for cleaner lines. `type=\"monotone\"` gives smooth curves. Style tooltip to match dark theme.",
+    "tags": [
+      "recharts",
+      "line",
+      "chart",
+      "trend",
+      "graph",
+      "time-series"
+    ]
+  },
+  {
+    "category": "charts",
+    "title": "Recharts — pie/donut chart for categories",
+    "content": "Donut chart for showing category breakdown (expenses, time allocation).\n\n```tsx\nimport { PieChart, Pie, Cell, ResponsiveContainer } from \"recharts\";\n\nconst COLORS = [\"#6366f1\", \"#f59e0b\", \"#10b981\", \"#ef4444\", \"#8b5cf6\"];\n\nconst data = [\n  { name: \"Food\", value: 400 },\n  { name: \"Transport\", value: 300 },\n  { name: \"Shopping\", value: 200 },\n  { name: \"Bills\", value: 500 },\n];\n\n<Card>\n  <div className=\"h-48 relative\">\n    <ResponsiveContainer width=\"100%\" height=\"100%\">\n      <PieChart>\n        <Pie\n          data={data}\n          cx=\"50%\"\n          cy=\"50%\"\n          innerRadius={50}\n          outerRadius={70}\n          paddingAngle={2}\n          dataKey=\"value\"\n        >\n          {data.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}\n        </Pie>\n      </PieChart>\n    </ResponsiveContainer>\n    {/* Center label */}\n    <div className=\"absolute inset-0 flex items-center justify-center\">\n      <div className=\"text-center\">\n        <p className=\"text-2xl font-bold tabular-nums\">${total}</p>\n        <p className=\"text-xs text-gray-500\">Total</p>\n      </div>\n    </div>\n  </div>\n  {/* Legend */}\n  <div className=\"flex flex-wrap gap-3 mt-3\">\n    {data.map((d, i) => (\n      <div key={d.name} className=\"flex items-center gap-1.5\">\n        <div className=\"w-2.5 h-2.5 rounded-full\" style={{ backgroundColor: COLORS[i % COLORS.length] }} />\n        <span className=\"text-xs text-gray-600 dark:text-gray-400\">{d.name}</span>\n      </div>\n    ))}\n  </div>\n</Card>\n```",
+    "tags": [
+      "recharts",
+      "pie",
+      "donut",
+      "chart",
+      "category",
+      "breakdown"
+    ]
+  },
+  {
+    "category": "charts",
+    "title": "Weekly completion grid — no chart library",
+    "content": "A 7-day completion grid (like GitHub contribution graph) without Recharts.\n\n```tsx\nconst DAYS = [\"Mon\", \"Tue\", \"Wed\", \"Thu\", \"Fri\", \"Sat\", \"Sun\"];\n\nfunction WeekGrid({ completions }: { completions: Record<string, boolean> }) {\n  const today = new Date();\n  const days = Array.from({ length: 7 }, (_, i) => {\n    const d = new Date(today);\n    d.setDate(d.getDate() - (6 - i));\n    return d.toISOString().slice(0, 10);\n  });\n\n  return (\n    <div className=\"flex gap-1.5 justify-between\">\n      {days.map((date, i) => (\n        <div key={date} className=\"flex flex-col items-center gap-1\">\n          <span className=\"text-[10px] text-gray-400\">{DAYS[(today.getDay() + i - 6 + 7) % 7]?.slice(0, 1)}</span>\n          <div\n            className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-medium\n              ${completions[date]\n                ? 'bg-green-500 text-white'\n                : 'bg-gray-100 dark:bg-gray-800 text-gray-400'}`}\n          >\n            {new Date(date).getDate()}\n          </div>\n        </div>\n      ))}\n    </div>\n  );\n}\n```\n\nCompact visual showing last 7 days. Green = completed, gray = missed. Works great inside habit cards.",
+    "tags": [
+      "grid",
+      "week",
+      "completion",
+      "calendar",
+      "heatmap",
+      "habit"
+    ]
+  },
+  {
+    "category": "common_bugs",
+    "title": "BUG: Cards touching each other — missing space-y",
+    "content": "THE MOST COMMON BUG. When rendering multiple Cards as siblings, the parent MUST have `space-y-3` or `space-y-4`.\n\n```tsx\n// ❌ BUG — cards will touch with no gap\n<div>\n  {items.map(item => <Card key={item.id}>...</Card>)}\n</div>\n\n// ✅ FIX — always add space-y\n<div className=\"space-y-3\">\n  {items.map(item => <Card key={item.id}>...</Card>)}\n</div>\n```\n\nThis applies to ANY siblings that should have vertical spacing: Cards, ListItems in separate Cards, section blocks.",
+    "tags": [
+      "bug",
+      "spacing",
+      "space-y",
+      "gap",
+      "cards",
+      "touch"
+    ]
+  },
+  {
+    "category": "common_bugs",
+    "title": "BUG: Content touching screen edges — missing px-5",
+    "content": "Content must never touch the phone screen edges. The `<main>` element needs horizontal padding.\n\n```tsx\n// ❌ BUG — content touches screen edges\n<main className=\"flex-1 overflow-y-auto\">\n  <Card>...</Card>\n</main>\n\n// ✅ FIX — add px-5 for edge padding\n<main className=\"flex-1 overflow-y-auto px-5 pb-32 space-y-4\">\n  <Card>...</Card>\n</main>\n```\n\nAlways include: `px-5` (edge padding), `pb-32` (FAB/TabBar clearance), `space-y-4` (section spacing).",
+    "tags": [
+      "bug",
+      "padding",
+      "edges",
+      "px-5",
+      "overflow"
+    ]
+  },
+  {
+    "category": "common_bugs",
+    "title": "BUG: Form inline instead of BottomSheet",
+    "content": "Forms MUST be inside `<BottomSheet>`, NEVER rendered inline at the bottom of the page.\n\n```tsx\n// ❌ BUG — form visible at bottom of page\n<main>\n  <TaskList />\n  <h2>Add Task</h2>\n  <Input placeholder=\"Task name\" />\n  <Button>Save</Button>\n</main>\n\n// ✅ FIX — form in BottomSheet, opened by FAB\n<main>\n  <TaskList />\n</main>\n<FAB onClick={() => setOpen(true)}><PlusIcon/></FAB>\n<BottomSheet open={open} onClose={() => setOpen(false)} title=\"Add Task\">\n  <div className=\"space-y-3\">\n    <Input placeholder=\"Task name\" autoFocus />\n    <Button fullWidth onClick={save}>Save</Button>\n  </div>\n</BottomSheet>\n```",
+    "tags": [
+      "bug",
+      "form",
+      "bottomsheet",
+      "inline",
+      "fab"
+    ]
+  },
+  {
+    "category": "common_bugs",
+    "title": "BUG: Custom button/input instead of library components",
+    "content": "NEVER create custom `<button>` or `<input>` elements with Tailwind classes when the library has them.\n\n```tsx\n// ❌ BUG — custom button\n<button className=\"bg-blue-500 text-white px-4 py-2 rounded-lg\">Save</button>\n\n// ✅ FIX — use library Button\nimport { Button } from \"./components/ui\";\n<Button>Save</Button>\n\n// ❌ BUG — custom input\n<input className=\"border rounded p-2 w-full\" placeholder=\"Name\" />\n\n// ✅ FIX — use library Input\nimport { Input } from \"./components/ui\";\n<Input placeholder=\"Name\" />\n```\n\nThe library components have proper dark mode support, active states, and consistent styling. Custom elements break the design.",
+    "tags": [
+      "bug",
+      "button",
+      "input",
+      "custom",
+      "library",
+      "component"
+    ]
+  },
+  {
+    "category": "common_bugs",
+    "title": "BUG: Blank screen when list is empty — missing EmptyState",
+    "content": "Always handle the zero-state with `<EmptyState>`. A blank screen confuses users.\n\n```tsx\n// ❌ BUG — blank when no items\n<div className=\"space-y-3\">\n  {items.map(item => <Card key={item.id}>...</Card>)}\n</div>\n\n// ✅ FIX — EmptyState fallback\n{items.length === 0 ? (\n  <EmptyState\n    icon={<InboxIcon />}\n    title=\"No items yet\"\n    description=\"Tap the + button to add your first item.\"\n  />\n) : (\n  <div className=\"space-y-3\">\n    {items.map(item => <Card key={item.id}>...</Card>)}\n  </div>\n)}\n```",
+    "tags": [
+      "bug",
+      "empty",
+      "blank",
+      "emptystate",
+      "zero"
+    ]
+  },
+  {
+    "category": "common_bugs",
+    "title": "BUG: Missing ThemeProvider wrapper",
+    "content": "The app MUST be wrapped in `<ThemeProvider>` for dark mode to work.\n\n```tsx\n// ❌ BUG — no ThemeProvider\nexport default function App() {\n  return (\n    <Screen>\n      <AppBar title=\"My App\" />\n      ...\n    </Screen>\n  );\n}\n\n// ✅ FIX — wrap in ThemeProvider\nexport default function App() {\n  return (\n    <ThemeProvider>\n      <Screen>\n        <AppBar title=\"My App\" trailing={<DarkToggle />} />\n        ...\n      </Screen>\n    </ThemeProvider>\n  );\n}\n```\n\nAlso provide a dark mode toggle somewhere accessible (AppBar trailing is the standard location).",
+    "tags": [
+      "bug",
+      "theme",
+      "provider",
+      "dark",
+      "wrapper"
+    ]
+  },
+  {
+    "category": "common_bugs",
+    "title": "BUG: Tailwind v3 syntax in v4 project",
+    "content": "Common v3 patterns that are BROKEN in Tailwind v4:\n\n```tsx\n// ❌ BROKEN — removed in v4\nclassName=\"bg-opacity-50\"          // use bg-black/50\nclassName=\"text-opacity-75\"        // use text-white/75\nclassName=\"border-opacity-25\"      // use border-gray-300/25\n\n// ❌ BROKEN — no config file in v4\ntailwind.config.js                 // does not exist\n\n// ❌ BROKEN — @apply outside @layer\n.my-class { @apply bg-blue-500; }  // don't use @apply at all\n\n// ✅ CORRECT v4 alternatives\nclassName=\"bg-black/50\"            // opacity modifier\nclassName=\"text-white/75\"          // opacity modifier  \nclassName=\"border-gray-300/25\"     // opacity modifier\n// No config file needed — CSS-first\n// Use inline classes instead of @apply\n```",
+    "tags": [
+      "bug",
+      "tailwind",
+      "v3",
+      "v4",
+      "migration",
+      "opacity"
+    ]
+  },
+  {
+    "category": "common_bugs",
+    "title": "BUG: FAB overlapping TabBar",
+    "content": "When using both FAB and TabBar, the FAB must have `bottom=\"tabBar\"` to position correctly.\n\n```tsx\n// ❌ BUG — FAB overlaps the TabBar\n<FAB onClick={() => setOpen(true)}><PlusIcon/></FAB>\n<TabBar tabs={...} value={tab} onChange={setTab} />\n\n// ✅ FIX — FAB clears TabBar\n<FAB onClick={() => setOpen(true)} bottom=\"tabBar\"><PlusIcon/></FAB>\n<TabBar tabs={...} value={tab} onChange={setTab} />\n```\n\nAlso ensure the main content has `pb-32` to clear both the FAB and TabBar at the bottom.",
+    "tags": [
+      "bug",
+      "fab",
+      "tabbar",
+      "overlap",
+      "position"
+    ]
+  },
+  {
+    "category": "common_bugs",
+    "title": "BUG: Missing dark mode on custom elements",
+    "content": "Every custom-styled element MUST include `dark:` variants for colors.\n\n```tsx\n// ❌ BUG — no dark mode\n<div className=\"bg-white border border-gray-200\">\n  <p className=\"text-gray-900\">Title</p>\n  <p className=\"text-gray-500\">Subtitle</p>\n</div>\n\n// ✅ FIX — dark variants on every color\n<div className=\"bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700\">\n  <p className=\"text-gray-900 dark:text-white\">Title</p>\n  <p className=\"text-gray-500 dark:text-gray-400\">Subtitle</p>\n</div>\n```\n\nRule: if you write a `bg-`, `text-`, or `border-` class, add the `dark:` counterpart.",
+    "tags": [
+      "bug",
+      "dark",
+      "theme",
+      "variants",
+      "colors"
+    ]
+  },
+  {
+    "category": "common_bugs",
+    "title": "BUG: BottomSheet open by default",
+    "content": "BottomSheet must always start closed. It opens only on user interaction.\n\n```tsx\n// ❌ BUG — sheet open by default\nconst [open, setOpen] = useState(true);\n\n// ✅ FIX — start closed\nconst [open, setOpen] = useState(false);\n```\n\nThe FAB or a button triggers `setOpen(true)`. The BottomSheet's `onClose` triggers `setOpen(false)`. After saving, close it: `setOpen(false)`.",
+    "tags": [
+      "bug",
+      "bottomsheet",
+      "open",
+      "default",
+      "state"
+    ]
+  },
+  {
+    "category": "layout_patterns",
+    "title": "Standard app layout — Screen + AppBar + main + FAB",
+    "content": "The standard Appio app layout structure:\n\n```tsx\nimport {\n  ThemeProvider, Screen, AppBar, FAB, BottomSheet,\n  PlusIcon, useTheme, IconButton, SunIcon, MoonIcon\n} from \"./components/ui\";\n\nexport default function App() {\n  const [sheetOpen, setSheetOpen] = useState(false);\n\n  return (\n    <ThemeProvider>\n      <Screen>\n        {/* 1. AppBar — always at top */}\n        <AppBar title=\"My App\" trailing={<DarkToggle />} />\n\n        {/* 2. Main content — scrollable area */}\n        <main className=\"flex-1 overflow-y-auto px-5 pb-32 space-y-4\">\n          {/* SegmentedControl, stats, lists go here */}\n        </main>\n\n        {/* 3. FAB — triggers BottomSheet */}\n        <FAB onClick={() => setSheetOpen(true)}><PlusIcon /></FAB>\n\n        {/* 4. BottomSheet — contains forms */}\n        <BottomSheet open={sheetOpen} onClose={() => setSheetOpen(false)} title=\"Add Item\">\n          {/* form fields */}\n        </BottomSheet>\n      </Screen>\n    </ThemeProvider>\n  );\n}\n```\n\nThis is the skeleton for 90% of apps. Variations: add TabBar, swap FAB for inline buttons, add SegmentedControl.",
+    "tags": [
+      "layout",
+      "structure",
+      "skeleton",
+      "template",
+      "standard"
+    ]
+  },
+  {
+    "category": "layout_patterns",
+    "title": "Tab-based app layout with multiple screens",
+    "content": "For apps with 3-5 distinct views, use TabBar navigation.\n\n```tsx\nexport default function App() {\n  const [tab, setTab] = useState(\"home\");\n  const [sheetOpen, setSheetOpen] = useState(false);\n\n  return (\n    <ThemeProvider>\n      <Screen>\n        <AppBar title={TAB_TITLES[tab]} trailing={<DarkToggle />} />\n\n        <main className=\"flex-1 overflow-y-auto px-5 pb-32 space-y-4\">\n          {tab === \"home\" && <HomeContent />}\n          {tab === \"stats\" && <StatsContent />}\n          {tab === \"settings\" && <SettingsContent />}\n        </main>\n\n        <FAB onClick={() => setSheetOpen(true)} bottom=\"tabBar\"><PlusIcon /></FAB>\n\n        <TabBar\n          tabs={[\n            { value: \"home\", label: \"Home\", icon: <HomeIcon /> },\n            { value: \"stats\", label: \"Stats\", icon: <StarIcon /> },\n            { value: \"settings\", label: \"Settings\", icon: <SettingsIcon /> },\n          ]}\n          value={tab}\n          onChange={setTab}\n        />\n\n        <BottomSheet open={sheetOpen} onClose={() => setSheetOpen(false)} title=\"Add\">\n          {/* form */}\n        </BottomSheet>\n      </Screen>\n    </ThemeProvider>\n  );\n}\n```\n\nKey: `FAB bottom=\"tabBar\"` to clear tabs. Each screen is a separate component for clarity.",
+    "tags": [
+      "layout",
+      "tabs",
+      "multi-screen",
+      "navigation",
+      "tabbar"
+    ]
+  },
+  {
+    "category": "layout_patterns",
+    "title": "List + detail pattern with BottomSheet",
+    "content": "Pattern for lists where tapping an item shows details in a BottomSheet.\n\n```tsx\nconst [selected, setSelected] = useState<Item | null>(null);\n\n// List\n<div className=\"space-y-3\">\n  {items.map(item => (\n    <Card key={item.id} onClick={() => setSelected(item)}>\n      <div className=\"flex items-center gap-3\">\n        <div className=\"flex-1\">\n          <p className=\"font-medium\">{item.name}</p>\n          <p className=\"text-sm text-gray-500\">{item.subtitle}</p>\n        </div>\n        <ChevronRightIcon className=\"w-4 h-4 text-gray-400\" />\n      </div>\n    </Card>\n  ))}\n</div>\n\n// Detail sheet\n<BottomSheet\n  open={selected !== null}\n  onClose={() => setSelected(null)}\n  title={selected?.name ?? \"\"}\n>\n  {selected && (\n    <div className=\"space-y-4\">\n      <p className=\"text-gray-600 dark:text-gray-300\">{selected.description}</p>\n      <div className=\"flex gap-3\">\n        <Button variant=\"secondary\" fullWidth onClick={() => edit(selected)}>Edit</Button>\n        <Button variant=\"danger\" fullWidth onClick={() => remove(selected.id)}>Delete</Button>\n      </div>\n    </div>\n  )}\n</BottomSheet>\n```",
+    "tags": [
+      "layout",
+      "list",
+      "detail",
+      "bottomsheet",
+      "master-detail"
+    ]
+  },
+  {
+    "category": "layout_patterns",
+    "title": "Grid layout for cards (2 columns)",
+    "content": "Two-column grid for compact card displays (recipes, categories, products).\n\n```tsx\n<div className=\"grid grid-cols-2 gap-3\">\n  {items.map(item => (\n    <Card key={item.id} onClick={() => setSelected(item)}>\n      <div className=\"aspect-square bg-gray-100 dark:bg-gray-800 rounded-lg mb-2 flex items-center justify-center\">\n        <span className=\"text-3xl\">{item.emoji}</span>\n      </div>\n      <p className=\"font-medium text-sm truncate\">{item.name}</p>\n      <p className=\"text-xs text-gray-500\">{item.detail}</p>\n    </Card>\n  ))}\n</div>\n```\n\nGood for: recipe cards, product catalogs, category browsers, image galleries. Use `aspect-square` for consistent card heights.",
+    "tags": [
+      "layout",
+      "grid",
+      "columns",
+      "cards",
+      "gallery"
+    ]
+  },
+  {
+    "category": "data_patterns",
+    "title": "CRUD operations pattern",
+    "content": "Complete Create/Read/Update/Delete pattern using Zustand + BottomSheet.\n\n```tsx\n// State for form\nconst [sheetOpen, setSheetOpen] = useState(false);\nconst [editing, setEditing] = useState<Item | null>(null);\nconst [name, setName] = useState(\"\");\n\n// Open for create\nconst openCreate = () => {\n  setEditing(null);\n  setName(\"\");\n  setSheetOpen(true);\n};\n\n// Open for edit\nconst openEdit = (item: Item) => {\n  setEditing(item);\n  setName(item.name);\n  setSheetOpen(true);\n};\n\n// Save (create or update)\nconst handleSave = () => {\n  if (editing) {\n    updateItem(editing.id, { name });\n  } else {\n    addItem({ name });\n  }\n  setSheetOpen(false);\n};\n\n// In JSX:\n<BottomSheet\n  open={sheetOpen}\n  onClose={() => setSheetOpen(false)}\n  title={editing ? \"Edit Item\" : \"New Item\"}\n>\n  <div className=\"space-y-3\">\n    <Input value={name} onChange={(e) => setName(e.target.value)} placeholder=\"Name\" autoFocus />\n    <Button fullWidth onClick={handleSave}>{editing ? \"Update\" : \"Add\"}</Button>\n  </div>\n</BottomSheet>\n```\n\nReuse one BottomSheet for both create and edit — switch title and behavior based on `editing` state.",
+    "tags": [
+      "crud",
+      "create",
+      "update",
+      "delete",
+      "form",
+      "edit"
+    ]
+  },
+  {
+    "category": "data_patterns",
+    "title": "Sort and filter pattern",
+    "content": "Combined sorting and filtering for lists.\n\n```tsx\nconst items = useStore((s) => s.items);\nconst [filter, setFilter] = useState(\"all\");\nconst [sortBy, setSortBy] = useState<\"date\" | \"name\">(\"date\");\n\nconst filtered = items\n  .filter(item => {\n    if (filter === \"active\") return !item.done;\n    if (filter === \"done\") return item.done;\n    return true;\n  })\n  .sort((a, b) => {\n    if (sortBy === \"name\") return a.name.localeCompare(b.name);\n    return b.createdAt - a.createdAt; // newest first\n  });\n\n// UI\n<SegmentedControl\n  segments={[\n    { value: \"all\", label: \"All\", badge: items.length },\n    { value: \"active\", label: \"Active\", badge: items.filter(i => !i.done).length },\n    { value: \"done\", label: \"Done\", badge: items.filter(i => i.done).length },\n  ]}\n  value={filter}\n  onChange={setFilter}\n/>\n```\n\nFilter in the component, not in the store. SegmentedControl is perfect for 2-4 filter options.",
+    "tags": [
+      "sort",
+      "filter",
+      "segmented",
+      "order",
+      "list"
+    ]
+  },
+  {
+    "category": "data_patterns",
+    "title": "Date formatting utilities",
+    "content": "Lightweight date formatting without external libraries.\n\n```ts\n// Relative time (\"2 hours ago\", \"Yesterday\")\nexport function timeAgo(timestamp: number): string {\n  const seconds = Math.floor((Date.now() - timestamp) / 1000);\n  if (seconds < 60) return \"Just now\";\n  const minutes = Math.floor(seconds / 60);\n  if (minutes < 60) return `${minutes}m ago`;\n  const hours = Math.floor(minutes / 60);\n  if (hours < 24) return `${hours}h ago`;\n  const days = Math.floor(hours / 24);\n  if (days === 1) return \"Yesterday\";\n  if (days < 7) return `${days}d ago`;\n  return new Date(timestamp).toLocaleDateString(\"en-US\", { month: \"short\", day: \"numeric\" });\n}\n\n// Short date (\"Apr 11\")\nexport function shortDate(timestamp: number): string {\n  return new Date(timestamp).toLocaleDateString(\"en-US\", { month: \"short\", day: \"numeric\" });\n}\n\n// Today's date key for habit tracking (\"2026-04-11\")\nexport function todayKey(): string {\n  return new Date().toISOString().slice(0, 10);\n}\n\n// Format currency\nexport function formatCurrency(amount: number): string {\n  return amount.toLocaleString(\"en-US\", { style: \"currency\", currency: \"USD\" });\n}\n```",
+    "tags": [
+      "date",
+      "time",
+      "format",
+      "relative",
+      "currency",
+      "utility"
+    ]
+  },
+  {
+    "category": "data_patterns",
+    "title": "UUID generation and unique IDs",
+    "content": "Use `crypto.randomUUID()` for generating unique IDs. Available in all modern browsers.\n\n```ts\n// Generate a unique ID\nconst id = crypto.randomUUID(); // \"f47ac10b-58cc-4372-a567-0e02b2c3d479\"\n\n// In Zustand store actions\naddItem: (data) => set((s) => ({\n  items: [...s.items, {\n    ...data,\n    id: crypto.randomUUID(),\n    createdAt: Date.now(),\n  }],\n})),\n```\n\nNever use `Math.random()` for IDs. `crypto.randomUUID()` is cryptographically random and collision-free.",
+    "tags": [
+      "uuid",
+      "id",
+      "unique",
+      "random",
+      "crypto"
+    ]
+  },
+  {
+    "category": "data_patterns",
+    "title": "Number formatting for display",
+    "content": "Format numbers for display in dashboards and stats.\n\n```tsx\n// Large numbers with commas\n{count.toLocaleString()}  // 1,234,567\n\n// Currency\n{amount.toLocaleString(\"en-US\", { style: \"currency\", currency: \"USD\" })}  // $1,234.56\n\n// Percentage\n{(ratio * 100).toFixed(0)}%  // 85%\n\n// Compact (1.2K, 3.4M)\nfunction compact(n: number): string {\n  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;\n  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;\n  return n.toString();\n}\n\n// In JSX — use tabular-nums for stable layout\n<span className=\"text-3xl font-bold tabular-nums\">{count}</span>\n<span className=\"text-sm font-medium tabular-nums\">{formatCurrency(price)}</span>\n```\n\nAlways use `tabular-nums` class for numbers that change (counters, prices) to prevent layout jitter.",
+    "tags": [
+      "number",
+      "format",
+      "currency",
+      "compact",
+      "tabular"
+    ]
+  },
+  {
+    "category": "mobile_patterns",
+    "title": "Progress bar / completion indicator",
+    "content": "Visual progress indicator for goals, quizzes, or multi-step flows.\n\n```tsx\n// Simple progress bar\nfunction ProgressBar({ value, max }: { value: number; max: number }) {\n  const pct = Math.min(100, Math.round((value / max) * 100));\n  return (\n    <div className=\"w-full\">\n      <div className=\"flex items-center justify-between mb-1\">\n        <span className=\"text-sm font-medium\">{value}/{max}</span>\n        <span className=\"text-sm text-gray-500\">{pct}%</span>\n      </div>\n      <div className=\"h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden\">\n        <div\n          className=\"h-full bg-indigo-500 rounded-full transition-all duration-500\"\n          style={{ width: `${pct}%` }}\n        />\n      </div>\n    </div>\n  );\n}\n```\n\nUse for: quiz progress, daily goal completion, reading progress, workout sets.",
+    "tags": [
+      "progress",
+      "bar",
+      "completion",
+      "percentage",
+      "goal"
+    ]
+  },
+  {
+    "category": "mobile_patterns",
+    "title": "Toggle switch pattern",
+    "content": "iOS-style toggle switch for boolean settings.\n\n```tsx\nfunction Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean) => void }) {\n  return (\n    <button\n      role=\"switch\"\n      aria-checked={checked}\n      onClick={() => onChange(!checked)}\n      className={`relative inline-flex h-7 w-12 shrink-0 rounded-full transition-colors duration-200\n        ${checked ? 'bg-indigo-500' : 'bg-gray-300 dark:bg-gray-600'}`}\n    >\n      <span\n        className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow-sm\n          transform transition-transform duration-200 mt-1\n          ${checked ? 'translate-x-6 ml-0.5' : 'translate-x-1'}`}\n      />\n    </button>\n  );\n}\n\n// Usage in settings\n<ListItem\n  title=\"Dark Mode\"\n  leading={<MoonIcon />}\n  trailing={<Toggle checked={dark} onChange={toggle} />}\n/>\n```",
+    "tags": [
+      "toggle",
+      "switch",
+      "boolean",
+      "settings",
+      "on-off"
+    ]
+  },
+  {
+    "category": "mobile_patterns",
+    "title": "Confirmation dialog pattern",
+    "content": "Use BottomSheet as a confirmation dialog for destructive actions.\n\n```tsx\nconst [confirmDelete, setConfirmDelete] = useState<string | null>(null);\n\n// Trigger\nconst onDeletePress = (id: string) => setConfirmDelete(id);\n\n// Confirmation BottomSheet\n<BottomSheet\n  open={confirmDelete !== null}\n  onClose={() => setConfirmDelete(null)}\n  title=\"Delete Item?\"\n>\n  <div className=\"space-y-3\">\n    <p className=\"text-gray-600 dark:text-gray-300\">\n      This action cannot be undone.\n    </p>\n    <Button\n      variant=\"danger\"\n      fullWidth\n      onClick={() => {\n        removeItem(confirmDelete!);\n        setConfirmDelete(null);\n      }}\n    >\n      Delete\n    </Button>\n    <Button variant=\"secondary\" fullWidth onClick={() => setConfirmDelete(null)}>\n      Cancel\n    </Button>\n  </div>\n</BottomSheet>\n```",
+    "tags": [
+      "confirm",
+      "dialog",
+      "delete",
+      "destructive",
+      "warning"
+    ]
+  },
+  {
+    "category": "mobile_patterns",
+    "title": "Rating/star selection pattern",
+    "content": "Star rating selector for reviews, feedback, or mood tracking.\n\n```tsx\nfunction StarRating({ value, onChange }: { value: number; onChange: (v: number) => void }) {\n  return (\n    <div className=\"flex gap-1\">\n      {[1, 2, 3, 4, 5].map(star => (\n        <button key={star} onClick={() => onChange(star)} className=\"p-1\">\n          <StarIcon\n            className={`w-8 h-8 transition-colors ${\n              star <= value ? 'text-amber-400' : 'text-gray-300 dark:text-gray-600'\n            }`}\n          />\n        </button>\n      ))}\n    </div>\n  );\n}\n\n// Usage\nconst [rating, setRating] = useState(0);\n<StarRating value={rating} onChange={setRating} />\n```\n\nUsable for: product reviews, mood tracking (1-5), difficulty rating, satisfaction surveys.",
+    "tags": [
+      "rating",
+      "stars",
+      "review",
+      "feedback",
+      "score"
+    ]
+  },
+  {
+    "category": "mobile_patterns",
+    "title": "Numeric stepper pattern",
+    "content": "Increment/decrement stepper for quantities, servings, or counts.\n\n```tsx\nfunction Stepper({ value, onChange, min = 0, max = 99 }: {\n  value: number; onChange: (v: number) => void; min?: number; max?: number;\n}) {\n  return (\n    <div className=\"flex items-center gap-3\">\n      <IconButton\n        onClick={() => onChange(Math.max(min, value - 1))}\n        aria-label=\"Decrease\"\n      >\n        <span className=\"text-lg font-bold\">−</span>\n      </IconButton>\n      <span className=\"text-xl font-bold tabular-nums w-8 text-center\">{value}</span>\n      <IconButton\n        onClick={() => onChange(Math.min(max, value + 1))}\n        aria-label=\"Increase\"\n      >\n        <PlusIcon />\n      </IconButton>\n    </div>\n  );\n}\n```\n\nUse for: quantity selectors, serving sizes, rep counters, timer duration.",
+    "tags": [
+      "stepper",
+      "counter",
+      "increment",
+      "quantity",
+      "number"
+    ]
+  },
+  {
+    "category": "mobile_patterns",
+    "title": "Color picker / theme selector pattern",
+    "content": "Simple color picker for theme or category colors.\n\n```tsx\nconst COLORS = [\n  \"#6366f1\", \"#8b5cf6\", \"#ec4899\", \"#ef4444\",\n  \"#f59e0b\", \"#10b981\", \"#06b6d4\", \"#3b82f6\",\n];\n\nfunction ColorPicker({ value, onChange }: { value: string; onChange: (c: string) => void }) {\n  return (\n    <div className=\"flex gap-2 flex-wrap\">\n      {COLORS.map(color => (\n        <button\n          key={color}\n          onClick={() => onChange(color)}\n          className={`w-8 h-8 rounded-full transition-transform ${\n            value === color ? 'scale-125 ring-2 ring-offset-2 ring-gray-400 dark:ring-offset-gray-900' : ''\n          }`}\n          style={{ backgroundColor: color }}\n        />\n      ))}\n    </div>\n  );\n}\n```\n\nUseful for: habit color coding, category colors, theme customization, label colors.",
+    "tags": [
+      "color",
+      "picker",
+      "palette",
+      "theme",
+      "customize"
+    ]
+  },
+  {
+    "category": "mobile_patterns",
+    "title": "Onboarding / welcome screen pattern",
+    "content": "Simple welcome screen shown once on first launch.\n\n```tsx\nconst [showWelcome, setShowWelcome] = useState(() => {\n  return !localStorage.getItem(\"onboarded\");\n});\n\nconst dismiss = () => {\n  localStorage.setItem(\"onboarded\", \"true\");\n  setShowWelcome(false);\n};\n\n{showWelcome ? (\n  <div className=\"flex flex-col items-center justify-center h-full px-8 text-center gap-6\">\n    <div className=\"text-6xl\">🎯</div>\n    <h1 className=\"text-2xl font-bold\">Welcome to MyApp</h1>\n    <p className=\"text-gray-500 dark:text-gray-400\">\n      Track your daily habits and build streaks.\n    </p>\n    <Button fullWidth onClick={dismiss}>Get Started</Button>\n  </div>\n) : (\n  <MainApp />\n)}\n```",
+    "tags": [
+      "onboarding",
+      "welcome",
+      "first-launch",
+      "intro",
+      "tutorial"
+    ]
+  },
+  {
+    "category": "data_patterns",
+    "title": "Zustand store for quiz/trivia app",
+    "content": "Store pattern for quiz apps with scoring and progress tracking.\n\n```ts\nimport { create } from \"zustand\";\n\ninterface Question {\n  id: string;\n  question: string;\n  options: string[];\n  correctIndex: number;\n}\n\ninterface QuizState {\n  questions: Question[];\n  currentIndex: number;\n  score: number;\n  answers: Record<string, number>;  // questionId → selected index\n  answer: (questionId: string, selectedIndex: number) => void;\n  next: () => void;\n  reset: () => void;\n}\n\nexport const useQuizStore = create<QuizState>((set, get) => ({\n  questions: QUIZ_DATA,  // imported from a data file\n  currentIndex: 0,\n  score: 0,\n  answers: {},\n\n  answer: (questionId, selectedIndex) => {\n    const q = get().questions.find(q => q.id === questionId);\n    const isCorrect = q ? selectedIndex === q.correctIndex : false;\n    set(s => ({\n      answers: { ...s.answers, [questionId]: selectedIndex },\n      score: isCorrect ? s.score + 1 : s.score,\n    }));\n  },\n\n  next: () => set(s => ({ currentIndex: s.currentIndex + 1 })),\n\n  reset: () => set({ currentIndex: 0, score: 0, answers: {} }),\n}));\n```\n\nPersist high scores in localStorage separately. Don't persist quiz progress (restart on app reopen).",
+    "tags": [
+      "quiz",
+      "trivia",
+      "score",
+      "question",
+      "game"
+    ]
+  },
+  {
+    "category": "mobile_patterns",
+    "title": "Animated number counter",
+    "content": "Smooth animated number transition for stats and counters.\n\n```tsx\nimport { useEffect, useState } from \"react\";\n\nfunction AnimatedNumber({ value, duration = 500 }: { value: number; duration?: number }) {\n  const [display, setDisplay] = useState(value);\n\n  useEffect(() => {\n    const start = display;\n    const diff = value - start;\n    if (diff === 0) return;\n\n    const startTime = Date.now();\n    const frame = () => {\n      const elapsed = Date.now() - startTime;\n      const progress = Math.min(elapsed / duration, 1);\n      // Ease-out\n      const eased = 1 - Math.pow(1 - progress, 3);\n      setDisplay(Math.round(start + diff * eased));\n      if (progress < 1) requestAnimationFrame(frame);\n    };\n    requestAnimationFrame(frame);\n  }, [value]);\n\n  return <span className=\"tabular-nums\">{display.toLocaleString()}</span>;\n}\n\n// Usage\n<p className=\"text-3xl font-bold\">\n  <AnimatedNumber value={totalScore} />\n</p>\n```",
+    "tags": [
+      "animation",
+      "counter",
+      "number",
+      "transition",
+      "stats"
+    ]
+  },
+  {
+    "category": "mobile_patterns",
+    "title": "Notification badge pattern",
+    "content": "Small notification badge/dot for icons or tabs.\n\n```tsx\nfunction Badge({ count }: { count: number }) {\n  if (count === 0) return null;\n  return (\n    <span className=\"absolute -top-1 -right-1 min-w-[18px] h-[18px] flex items-center justify-center\n      rounded-full bg-red-500 text-white text-[10px] font-bold px-1\">\n      {count > 99 ? \"99+\" : count}\n    </span>\n  );\n}\n\n// Usage on an icon\n<div className=\"relative\">\n  <BellIcon />\n  <Badge count={3} />\n</div>\n\n// Usage in TabBar — put badge in the icon slot\ntabs={[\n  {\n    value: \"inbox\",\n    label: \"Inbox\",\n    icon: (\n      <div className=\"relative\">\n        <InboxIcon />\n        <Badge count={unread} />\n      </div>\n    ),\n  },\n]}\n```",
+    "tags": [
+      "badge",
+      "notification",
+      "count",
+      "dot",
+      "alert"
+    ]
+  },
+  {
+    "category": "mobile_patterns",
+    "title": "Skeleton loading placeholder",
+    "content": "Animated skeleton placeholder while data loads.\n\n```tsx\nfunction Skeleton({ className }: { className?: string }) {\n  return (\n    <div className={`animate-pulse bg-gray-200 dark:bg-gray-700 rounded-lg ${className ?? ''}`} />\n  );\n}\n\n// Card skeleton\nfunction CardSkeleton() {\n  return (\n    <Card>\n      <div className=\"space-y-3\">\n        <Skeleton className=\"h-4 w-3/4\" />\n        <Skeleton className=\"h-3 w-1/2\" />\n      </div>\n    </Card>\n  );\n}\n\n// Usage\n{loading ? (\n  <div className=\"space-y-3\">\n    <CardSkeleton />\n    <CardSkeleton />\n    <CardSkeleton />\n  </div>\n) : (\n  <ItemList items={items} />\n)}\n```\n\nNote: Since generated PWAs use localStorage (no network), loading states are rare. Use for initial render or heavy computation.",
+    "tags": [
+      "skeleton",
+      "loading",
+      "placeholder",
+      "pulse",
+      "shimmer"
+    ]
+  },
+  {
+    "category": "data_patterns",
+    "title": "Drag-to-reorder pattern (simple)",
+    "content": "Simple reorder without a drag library — use move up/down buttons.\n\n```tsx\nconst moveItem = (index: number, direction: \"up\" | \"down\") => {\n  const newItems = [...items];\n  const targetIndex = direction === \"up\" ? index - 1 : index + 1;\n  if (targetIndex < 0 || targetIndex >= newItems.length) return;\n  [newItems[index], newItems[targetIndex]] = [newItems[targetIndex], newItems[index]];\n  setItems(newItems);\n};\n\n// In list rendering\n{items.map((item, i) => (\n  <Card key={item.id}>\n    <div className=\"flex items-center gap-3\">\n      <div className=\"flex flex-col gap-0.5\">\n        <button\n          onClick={() => moveItem(i, \"up\")}\n          disabled={i === 0}\n          className=\"text-gray-400 disabled:opacity-30\"\n        >\n          <ChevronLeftIcon className=\"w-4 h-4 rotate-90\" />\n        </button>\n        <button\n          onClick={() => moveItem(i, \"down\")}\n          disabled={i === items.length - 1}\n          className=\"text-gray-400 disabled:opacity-30\"\n        >\n          <ChevronRightIcon className=\"w-4 h-4 rotate-90\" />\n        </button>\n      </div>\n      <span className=\"flex-1\">{item.name}</span>\n    </div>\n  </Card>\n))}\n```",
+    "tags": [
+      "reorder",
+      "sort",
+      "move",
+      "drag",
+      "priority"
+    ]
+  },
+  {
+    "category": "common_bugs",
+    "title": "BUG: Manifest not updated with app name",
+    "content": "Always update `manifest.json` with the actual app name and theme color.\n\n```tsx\n// write_file(\"manifest.json\", ...)\n{\n  \"name\": \"My Habit Tracker\",\n  \"short_name\": \"Habits\",\n  \"theme_color\": \"#6366f1\",\n  \"background_color\": \"#ffffff\",\n  \"display\": \"standalone\",\n  \"start_url\": \"/\",\n  \"icons\": [\n    { \"src\": \"icon.svg\", \"sizes\": \"any\", \"type\": \"image/svg+xml\" }\n  ]\n}\n```\n\nMatch `theme_color` to the app's primary color. Match `name` to what appears in the AppBar.",
+    "tags": [
+      "bug",
+      "manifest",
+      "pwa",
+      "name",
+      "theme-color"
+    ]
+  },
+  {
+    "category": "common_bugs",
+    "title": "BUG: Missing overflow-y-auto on main content",
+    "content": "The main content area MUST scroll when content exceeds the viewport.\n\n```tsx\n// ❌ BUG — content overflows without scrolling\n<main className=\"px-5 space-y-4\">\n  {longList}\n</main>\n\n// ✅ FIX — add flex-1 overflow-y-auto\n<main className=\"flex-1 overflow-y-auto px-5 pb-32 space-y-4\">\n  {longList}\n</main>\n```\n\nThe full pattern for `<main>` inside `<Screen>`:\n- `flex-1` — fill remaining vertical space\n- `overflow-y-auto` — enable scrolling\n- `px-5` — edge padding\n- `pb-32` — clear FAB/TabBar\n- `space-y-4` — section spacing",
+    "tags": [
+      "bug",
+      "scroll",
+      "overflow",
+      "main",
+      "content"
+    ]
+  },
+  {
+    "category": "mobile_patterns",
+    "title": "Meal/recipe card pattern",
+    "content": "Card layout for food, recipe, or meal tracking apps.\n\n```tsx\n<Card>\n  <div className=\"flex gap-3\">\n    {/* Food image/emoji placeholder */}\n    <div className=\"w-16 h-16 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center shrink-0\">\n      <span className=\"text-2xl\">{meal.emoji}</span>\n    </div>\n    <div className=\"flex-1 min-w-0\">\n      <p className=\"font-medium truncate\">{meal.name}</p>\n      <p className=\"text-sm text-gray-500 dark:text-gray-400\">{meal.category}</p>\n      <div className=\"flex gap-3 mt-1\">\n        <span className=\"text-xs text-gray-400\">{meal.calories} kcal</span>\n        <span className=\"text-xs text-gray-400\">{meal.protein}g protein</span>\n      </div>\n    </div>\n  </div>\n</Card>\n```\n\nApply to: meal trackers, recipe collections, restaurant menus, grocery lists.",
+    "tags": [
+      "meal",
+      "recipe",
+      "food",
+      "nutrition",
+      "calories"
+    ]
+  },
+  {
+    "category": "mobile_patterns",
+    "title": "Workout/exercise tracking pattern",
+    "content": "Pattern for workout logging with sets, reps, and weight.\n\n```tsx\n// Exercise card with sets\n<Card>\n  <div className=\"flex items-center justify-between mb-3\">\n    <h3 className=\"font-semibold\">{exercise.name}</h3>\n    <span className=\"text-xs text-gray-500\">{exercise.sets.length} sets</span>\n  </div>\n  <div className=\"space-y-2\">\n    {exercise.sets.map((set, i) => (\n      <div key={i} className=\"flex items-center gap-4 text-sm\">\n        <span className=\"w-6 text-gray-400 tabular-nums\">{i + 1}</span>\n        <span className=\"flex-1\">{set.weight} kg</span>\n        <span className=\"text-gray-600 dark:text-gray-300\">{set.reps} reps</span>\n        <button onClick={() => toggleSet(exercise.id, i)}>\n          <CheckIcon className={`w-5 h-5 ${set.done ? 'text-green-500' : 'text-gray-300'}`} />\n        </button>\n      </div>\n    ))}\n  </div>\n</Card>\n```\n\nApply to: workout trackers, gym logs, exercise planners, fitness apps.",
+    "tags": [
+      "workout",
+      "exercise",
+      "fitness",
+      "sets",
+      "reps",
+      "gym"
+    ]
+  },
+  {
+    "category": "mobile_patterns",
+    "title": "Reading/book list pattern",
+    "content": "Pattern for book tracking, reading lists, or media collections.\n\n```tsx\n<Card>\n  <div className=\"flex gap-3\">\n    {/* Book cover placeholder */}\n    <div className=\"w-12 h-16 rounded-lg bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center shrink-0\">\n      <span className=\"text-lg\">📚</span>\n    </div>\n    <div className=\"flex-1 min-w-0\">\n      <p className=\"font-medium truncate\">{book.title}</p>\n      <p className=\"text-sm text-gray-500 dark:text-gray-400 truncate\">{book.author}</p>\n      <div className=\"mt-2\">\n        <div className=\"flex items-center justify-between text-xs text-gray-400 mb-1\">\n          <span>Page {book.currentPage}/{book.totalPages}</span>\n          <span>{Math.round((book.currentPage / book.totalPages) * 100)}%</span>\n        </div>\n        <div className=\"h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full\">\n          <div\n            className=\"h-full bg-indigo-500 rounded-full\"\n            style={{ width: `${(book.currentPage / book.totalPages) * 100}%` }}\n          />\n        </div>\n      </div>\n    </div>\n  </div>\n</Card>\n```\n\nApply to: reading trackers, movie watchlists, podcast queues, course progress.",
+    "tags": [
+      "book",
+      "reading",
+      "list",
+      "progress",
+      "media",
+      "collection"
+    ]
+  },
+  {
+    "category": "mobile_patterns",
+    "title": "Plant/pet care tracker pattern",
+    "content": "Pattern for care schedules with last-watered/fed indicators.\n\n```tsx\nfunction daysSince(timestamp: number): number {\n  return Math.floor((Date.now() - timestamp) / 86400000);\n}\n\n<Card>\n  <div className=\"flex items-center gap-3\">\n    <div className=\"w-12 h-12 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center\">\n      <span className=\"text-xl\">{plant.emoji}</span>\n    </div>\n    <div className=\"flex-1\">\n      <p className=\"font-medium\">{plant.name}</p>\n      <p className=\"text-xs text-gray-500\">{plant.species}</p>\n    </div>\n    <div className=\"text-right\">\n      {daysSince(plant.lastWatered) === 0 ? (\n        <span className=\"text-xs text-green-500 font-medium\">Watered today ✓</span>\n      ) : (\n        <div>\n          <p className={`text-sm font-bold tabular-nums ${\n            daysSince(plant.lastWatered) > plant.waterDays\n              ? 'text-red-500' : 'text-gray-600 dark:text-gray-300'\n          }`}>\n            {daysSince(plant.lastWatered)}d ago\n          </p>\n          <p className=\"text-[10px] text-gray-400\">every {plant.waterDays}d</p>\n        </div>\n      )}\n    </div>\n  </div>\n</Card>\n```\n\nApply to: plant trackers, pet care, medication reminders, maintenance schedules.",
+    "tags": [
+      "plant",
+      "pet",
+      "care",
+      "schedule",
+      "watering",
+      "reminder"
+    ]
+  },
+  {
+    "category": "mobile_patterns",
+    "title": "Tip calculator pattern",
+    "content": "Quick calculator layout for tip/split bill apps.\n\n```tsx\n<Card className=\"bg-indigo-500 dark:bg-indigo-600 text-white\">\n  <p className=\"text-sm text-white/70\">Total with Tip</p>\n  <p className=\"text-4xl font-bold tabular-nums mt-1\">\n    ${(bill * (1 + tipPercent / 100)).toFixed(2)}\n  </p>\n  <p className=\"text-sm text-white/60 mt-1\">\n    Tip: ${(bill * tipPercent / 100).toFixed(2)} • Per person: ${((bill * (1 + tipPercent / 100)) / split).toFixed(2)}\n  </p>\n</Card>\n\n{/* Tip percentage selector */}\n<div className=\"grid grid-cols-4 gap-2\">\n  {[10, 15, 18, 20].map(pct => (\n    <button\n      key={pct}\n      onClick={() => setTipPercent(pct)}\n      className={`py-3 rounded-xl text-sm font-medium transition-colors\n        ${tipPercent === pct\n          ? 'bg-indigo-500 text-white'\n          : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300'}`}\n    >\n      {pct}%\n    </button>\n  ))}\n</div>\n```",
+    "tags": [
+      "calculator",
+      "tip",
+      "split",
+      "bill",
+      "math"
+    ]
+  },
+  {
+    "category": "mobile_patterns",
+    "title": "Mood journal / emoji selector pattern",
+    "content": "Emoji-based mood selection for journal or wellness apps.\n\n```tsx\nconst MOODS = [\n  { emoji: \"😊\", label: \"Great\", color: \"bg-green-100 dark:bg-green-900/30\" },\n  { emoji: \"🙂\", label: \"Good\", color: \"bg-blue-100 dark:bg-blue-900/30\" },\n  { emoji: \"😐\", label: \"Okay\", color: \"bg-amber-100 dark:bg-amber-900/30\" },\n  { emoji: \"😔\", label: \"Low\", color: \"bg-orange-100 dark:bg-orange-900/30\" },\n  { emoji: \"😢\", label: \"Bad\", color: \"bg-red-100 dark:bg-red-900/30\" },\n];\n\n<div className=\"flex justify-between px-4\">\n  {MOODS.map(mood => (\n    <button\n      key={mood.label}\n      onClick={() => setSelectedMood(mood.label)}\n      className={`flex flex-col items-center gap-1 p-3 rounded-2xl transition-all\n        ${selectedMood === mood.label\n          ? `${mood.color} scale-110`\n          : 'opacity-60'}`}\n    >\n      <span className=\"text-3xl\">{mood.emoji}</span>\n      <span className=\"text-[10px] font-medium text-gray-600 dark:text-gray-400\">\n        {mood.label}\n      </span>\n    </button>\n  ))}\n</div>\n```",
+    "tags": [
+      "mood",
+      "emoji",
+      "journal",
+      "wellness",
+      "feeling",
+      "diary"
+    ]
+  },
+  {
+    "category": "layout_patterns",
+    "title": "Sticky header with scroll content",
+    "content": "Pattern where section headers stay visible while content scrolls.\n\n```tsx\n<Screen>\n  <AppBar title=\"My App\" />\n\n  {/* Sticky section — stays visible during scroll */}\n  <div className=\"sticky top-0 z-10 bg-white dark:bg-gray-900 px-5 py-3\">\n    <SegmentedControl\n      segments={[...filters]}\n      value={filter}\n      onChange={setFilter}\n    />\n  </div>\n\n  {/* Scrollable content */}\n  <main className=\"flex-1 overflow-y-auto px-5 pb-32 space-y-3\">\n    {filteredItems.map(item => ...)}\n  </main>\n</Screen>\n```\n\nUse `sticky top-0 z-10` with matching background color. Good for filters, search bars, or summary stats that should remain visible.",
+    "tags": [
+      "sticky",
+      "header",
+      "scroll",
+      "fixed",
+      "visible"
+    ]
+  },
+  {
+    "category": "data_patterns",
+    "title": "Local notification / reminder pattern",
+    "content": "Simple in-app notification banner (not push notifications — those require service worker).\n\n```tsx\nfunction Toast({ message, visible, onDismiss }: { message: string; visible: boolean; onDismiss: () => void }) {\n  useEffect(() => {\n    if (visible) {\n      const t = setTimeout(onDismiss, 3000);\n      return () => clearTimeout(t);\n    }\n  }, [visible]);\n\n  if (!visible) return null;\n\n  return (\n    <div className=\"fixed top-4 left-4 right-4 z-50 mx-auto max-w-[400px]\n      bg-gray-900 dark:bg-white text-white dark:text-gray-900\n      rounded-xl px-4 py-3 shadow-lg flex items-center gap-3\n      animate-in slide-in-from-top\">\n      <CheckIcon className=\"w-5 h-5 text-green-400 dark:text-green-600 shrink-0\" />\n      <p className=\"text-sm font-medium flex-1\">{message}</p>\n      <button onClick={onDismiss}><XIcon className=\"w-4 h-4 opacity-50\" /></button>\n    </div>\n  );\n}\n\n// Usage\nconst [toast, setToast] = useState(\"\");\nconst showToast = (msg: string) => setToast(msg);\n\n<Toast message={toast} visible={!!toast} onDismiss={() => setToast(\"\")} />\n```",
+    "tags": [
+      "toast",
+      "notification",
+      "alert",
+      "banner",
+      "feedback"
+    ]
+  },
+  {
+    "category": "mobile_patterns",
+    "title": "Flashcard / flip card pattern",
+    "content": "Pattern for study/flashcard apps with flip animation.\n\n```tsx\nconst [flipped, setFlipped] = useState(false);\n\n<button\n  onClick={() => setFlipped(!flipped)}\n  className=\"w-full min-h-[200px] perspective-1000\"\n>\n  <Card className=\"flex items-center justify-center p-8\">\n    {flipped ? (\n      <div className=\"text-center\">\n        <p className=\"text-xs text-gray-400 mb-2\">Answer</p>\n        <p className=\"text-lg font-medium text-indigo-600 dark:text-indigo-400\">{card.answer}</p>\n      </div>\n    ) : (\n      <div className=\"text-center\">\n        <p className=\"text-xs text-gray-400 mb-2\">Question</p>\n        <p className=\"text-lg font-medium\">{card.question}</p>\n      </div>\n    )}\n  </Card>\n</button>\n\n<div className=\"flex gap-3 mt-4\">\n  <Button variant=\"danger\" fullWidth onClick={() => markWrong(card.id)}>Wrong</Button>\n  <Button fullWidth onClick={() => markCorrect(card.id)}>Correct</Button>\n</div>\n```\n\nApply to: study apps, vocabulary builders, trivia, interview prep.",
+    "tags": [
+      "flashcard",
+      "study",
+      "flip",
+      "quiz",
+      "learning"
+    ]
+  },
+  {
+    "category": "mobile_patterns",
+    "title": "Shopping list / grocery pattern",
+    "content": "Pattern for checklist-style shopping or grocery lists.\n\n```tsx\n// Group by aisle/category\nconst grouped = items.reduce((acc, item) => {\n  (acc[item.category] ??= []).push(item);\n  return acc;\n}, {} as Record<string, Item[]>);\n\n<div className=\"space-y-6\">\n  {Object.entries(grouped).map(([category, items]) => (\n    <div key={category} className=\"space-y-1\">\n      <h3 className=\"text-xs font-medium uppercase tracking-wider text-gray-500 px-1\">\n        {category}\n      </h3>\n      <Card padding=\"none\">\n        {items.map(item => (\n          <ListItem\n            key={item.id}\n            title={item.name}\n            leading={\n              <button onClick={() => toggle(item.id)}>\n                <div className={\\}>\n                  {item.done && <CheckIcon className=\"w-3 h-3 text-white\" />}\n                </div>\n              </button>\n            }\n            trailing={<span className=\"text-xs text-gray-400\">{item.quantity}</span>}\n          />\n        ))}\n      </Card>\n    </div>\n  ))}\n</div>\n```",
+    "tags": [
+      "shopping",
+      "grocery",
+      "checklist",
+      "list",
+      "buy"
+    ]
+  },
+  {
+    "category": "mobile_patterns",
+    "title": "Countdown to event pattern",
+    "content": "Pattern for event countdown (birthday, holiday, deadline).\n\n```tsx\nfunction daysUntil(dateStr: string): number {\n  const target = new Date(dateStr + \"T00:00:00\");\n  const now = new Date();\n  return Math.ceil((target.getTime() - now.getTime()) / 86400000);\n}\n\n<Card className=\"bg-indigo-500 text-white\">\n  <div className=\"text-center py-4\">\n    <p className=\"text-sm text-white/70\">{event.name}</p>\n    <p className=\"text-5xl font-bold tabular-nums mt-2\">{daysUntil(event.date)}</p>\n    <p className=\"text-sm text-white/70 mt-1\">days remaining</p>\n    <p className=\"text-xs text-white/50 mt-2\">\n      {new Date(event.date).toLocaleDateString(\"en-US\", { weekday: \"long\", month: \"long\", day: \"numeric\", year: \"numeric\" })}\n    </p>\n  </div>\n</Card>\n```",
+    "tags": [
+      "countdown",
+      "event",
+      "date",
+      "days",
+      "deadline"
+    ]
+  },
+  {
+    "category": "tailwind_v4",
+    "title": "Tailwind v4 — gradient backgrounds",
+    "content": "Gradient patterns for hero cards and buttons.\n\n```tsx\n// Linear gradient\nclassName=\"bg-gradient-to-r from-indigo-500 to-purple-500 text-white\"\n\n// Diagonal gradient\nclassName=\"bg-gradient-to-br from-blue-500 to-cyan-400\"\n\n// Subtle gradient surface\nclassName=\"bg-gradient-to-b from-gray-50 to-white dark:from-gray-800 dark:to-gray-900\"\n\n// Gradient text\nclassName=\"bg-gradient-to-r from-indigo-500 to-purple-500 bg-clip-text text-transparent font-bold\"\n\n// Usage in hero card\n<Card className=\"bg-gradient-to-br from-indigo-500 to-purple-600\">\n  <div className=\"text-white text-center py-4\">\n    <p className=\"text-4xl font-bold\">{value}</p>\n    <p className=\"text-sm text-white/70\">{label}</p>\n  </div>\n</Card>\n```",
+    "tags": [
+      "tailwind",
+      "gradient",
+      "background",
+      "hero",
+      "color"
+    ]
+  },
+  {
+    "category": "tailwind_v4",
+    "title": "Tailwind v4 — ring and focus styles",
+    "content": "Focus rings and outline patterns for interactive elements.\n\n```tsx\n// Focus ring (for custom interactive elements)\nclassName=\"focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:ring-offset-2\"\n\n// Dark mode focus ring offset\nclassName=\"focus:ring-offset-white dark:focus:ring-offset-gray-900\"\n\n// Ring as border alternative\nclassName=\"ring-1 ring-gray-200 dark:ring-gray-700\"\n\n// Selected state with ring\nclassName={selected ? \"ring-2 ring-indigo-500\" : \"ring-1 ring-gray-200 dark:ring-gray-700\"}\n```\n\nNote: library components already handle focus states. Only add focus rings to custom interactive elements.",
+    "tags": [
+      "tailwind",
+      "ring",
+      "focus",
+      "outline",
+      "border"
+    ]
+  },
+  {
+    "category": "data_patterns",
+    "title": "Zustand store for workout/fitness app",
+    "content": "Store pattern for workout tracking with exercises, sets, and history.\n\n```ts\nimport { create } from \"zustand\";\n\ninterface WorkoutSet {\n  weight: number;\n  reps: number;\n  done: boolean;\n}\n\ninterface Exercise {\n  id: string;\n  name: string;\n  sets: WorkoutSet[];\n}\n\ninterface Workout {\n  id: string;\n  date: number;\n  exercises: Exercise[];\n}\n\ninterface FitnessState {\n  workouts: Workout[];\n  currentWorkout: Workout | null;\n  startWorkout: () => void;\n  addExercise: (name: string) => void;\n  addSet: (exerciseId: string) => void;\n  updateSet: (exerciseId: string, setIndex: number, data: Partial<WorkoutSet>) => void;\n  finishWorkout: () => void;\n}\n\nconst STORAGE_KEY = \"fitness_data\";\nconst saved = (() => {\n  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || \"null\"); } catch { return null; }\n})();\n\nexport const useFitnessStore = create<FitnessState>((set, get) => ({\n  workouts: saved?.workouts ?? [],\n  currentWorkout: null,\n\n  startWorkout: () => set({\n    currentWorkout: { id: crypto.randomUUID(), date: Date.now(), exercises: [] },\n  }),\n\n  addExercise: (name) => set((s) => ({\n    currentWorkout: s.currentWorkout ? {\n      ...s.currentWorkout,\n      exercises: [...s.currentWorkout.exercises, {\n        id: crypto.randomUUID(), name, sets: [{ weight: 0, reps: 0, done: false }],\n      }],\n    } : null,\n  })),\n\n  addSet: (exerciseId) => set((s) => ({\n    currentWorkout: s.currentWorkout ? {\n      ...s.currentWorkout,\n      exercises: s.currentWorkout.exercises.map(e =>\n        e.id === exerciseId ? { ...e, sets: [...e.sets, { weight: 0, reps: 0, done: false }] } : e\n      ),\n    } : null,\n  })),\n\n  updateSet: (exerciseId, setIndex, data) => set((s) => ({\n    currentWorkout: s.currentWorkout ? {\n      ...s.currentWorkout,\n      exercises: s.currentWorkout.exercises.map(e =>\n        e.id === exerciseId\n          ? { ...e, sets: e.sets.map((set, i) => i === setIndex ? { ...set, ...data } : set) }\n          : e\n      ),\n    } : null,\n  })),\n\n  finishWorkout: () => set((s) => ({\n    workouts: s.currentWorkout ? [s.currentWorkout, ...s.workouts] : s.workouts,\n    currentWorkout: null,\n  })),\n}));\n\nuseFitnessStore.subscribe((s) => {\n  try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ workouts: s.workouts })); } catch {}\n});\n```",
+    "tags": [
+      "zustand",
+      "workout",
+      "fitness",
+      "exercise",
+      "gym",
+      "tracking"
+    ]
+  },
+  {
+    "category": "mobile_patterns",
+    "title": "Expandable/collapsible section pattern",
+    "content": "Accordion-style collapsible sections for FAQ, settings groups, or long lists.\n\n```tsx\nfunction Collapsible({ title, children, defaultOpen = false }: {\n  title: string; children: React.ReactNode; defaultOpen?: boolean;\n}) {\n  const [open, setOpen] = useState(defaultOpen);\n\n  return (\n    <div>\n      <button\n        onClick={() => setOpen(!open)}\n        className=\"flex items-center justify-between w-full py-3 px-1\"\n      >\n        <h3 className=\"text-sm font-semibold text-gray-900 dark:text-white\">{title}</h3>\n        <ChevronRightIcon\n          className={\\}\n        />\n      </button>\n      {open && <div className=\"pb-3\">{children}</div>}\n    </div>\n  );\n}\n\n// Usage\n<Card padding=\"none\">\n  <div className=\"divide-y divide-gray-100 dark:divide-gray-800 px-4\">\n    <Collapsible title=\"General\" defaultOpen>\n      <div className=\"space-y-2\">{/* items */}</div>\n    </Collapsible>\n    <Collapsible title=\"Advanced\">\n      <div className=\"space-y-2\">{/* items */}</div>\n    </Collapsible>\n  </div>\n</Card>\n```",
+    "tags": [
+      "collapsible",
+      "accordion",
+      "expand",
+      "section",
+      "faq"
+    ]
+  },
+  {
+    "category": "mobile_patterns",
+    "title": "Circular progress ring pattern",
+    "content": "SVG-based circular progress indicator (like Apple's Activity rings).\n\n```tsx\nfunction ProgressRing({ progress, size = 80, strokeWidth = 6, color = \"#6366f1\" }: {\n  progress: number; size?: number; strokeWidth?: number; color?: string;\n}) {\n  const radius = (size - strokeWidth) / 2;\n  const circumference = radius * 2 * Math.PI;\n  const offset = circumference - (Math.min(progress, 1) * circumference);\n\n  return (\n    <svg width={size} height={size} className=\"-rotate-90\">\n      <circle\n        cx={size / 2} cy={size / 2} r={radius}\n        fill=\"none\" stroke=\"currentColor\"\n        className=\"text-gray-200 dark:text-gray-700\"\n        strokeWidth={strokeWidth}\n      />\n      <circle\n        cx={size / 2} cy={size / 2} r={radius}\n        fill=\"none\" stroke={color}\n        strokeWidth={strokeWidth}\n        strokeDasharray={circumference}\n        strokeDashoffset={offset}\n        strokeLinecap=\"round\"\n        className=\"transition-all duration-500\"\n      />\n    </svg>\n  );\n}\n\n// Usage with center label\n<div className=\"relative inline-flex items-center justify-center\">\n  <ProgressRing progress={0.75} />\n  <span className=\"absolute text-lg font-bold tabular-nums\">75%</span>\n</div>\n```",
+    "tags": [
+      "progress",
+      "ring",
+      "circular",
+      "svg",
+      "activity"
+    ]
+  },
+  {
+    "category": "common_bugs",
+    "title": "BUG: Using responsive breakpoints on mobile-only app",
+    "content": "DO NOT use responsive breakpoints. The app is phone-only at max 430px.\n\n```tsx\n// ❌ WRONG — breakpoints do nothing on mobile\nclassName=\"sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4\"\nclassName=\"hidden md:block\"\nclassName=\"text-sm md:text-base lg:text-lg\"\n\n// ✅ CORRECT — design for one fixed mobile width\nclassName=\"grid grid-cols-2\"  // if you want 2 columns, just use it\nclassName=\"block\"            // always visible\nclassName=\"text-sm\"          // one size fits all\n```\n\nThe Screen component clamps to max-w-[430px]. There is no tablet or desktop layout.",
+    "tags": [
+      "bug",
+      "responsive",
+      "breakpoint",
+      "mobile",
+      "sm",
+      "md"
+    ]
+  },
+  {
+    "category": "common_bugs",
+    "title": "BUG: Using deprecated Tailwind v3 @apply",
+    "content": "Do NOT use  in Tailwind v4. It breaks outside of . Use inline classes.\n\n```tsx\n// ❌ WRONG — will cause build errors\n// In a .css file:\n.my-button {\n  @apply bg-blue-500 text-white rounded-lg px-4 py-2;\n}\n\n// ✅ CORRECT — inline classes\n<Button>Save</Button>  // use the library component\n// Or if you must style a custom element:\n<button className=\"bg-blue-500 text-white rounded-lg px-4 py-2\">Save</button>\n```\n\nYou should NOT need to write any CSS files. All styling is done with Tailwind utility classes inline in JSX.",
+    "tags": [
+      "bug",
+      "tailwind",
+      "apply",
+      "css",
+      "v4",
+      "deprecated"
+    ]
+  },
+  {
+    "category": "layout_patterns",
+    "title": "Full-screen centered content (login, loading, welcome)",
+    "content": "Pattern for screens with centered content (onboarding, error pages).\n\n```tsx\n<Screen>\n  <main className=\"flex-1 flex flex-col items-center justify-center px-8 text-center gap-6\">\n    <div className=\"text-6xl\">🎯</div>\n    <div>\n      <h1 className=\"text-2xl font-bold text-gray-900 dark:text-white\">Welcome</h1>\n      <p className=\"text-gray-500 dark:text-gray-400 mt-2\">\n        Some description text here.\n      </p>\n    </div>\n    <Button fullWidth onClick={action}>Get Started</Button>\n  </main>\n</Screen>\n```\n\nUse  on main to vertically center. Good for: welcome screens, empty app states, error pages, loading screens.",
+    "tags": [
+      "layout",
+      "center",
+      "fullscreen",
+      "welcome",
+      "login"
+    ]
+  },
+  {
+    "category": "mobile_patterns",
+    "title": "Swipeable tab content pattern",
+    "content": "Use SegmentedControl (not actual swipe) for switching content panels.\n\n```tsx\nconst TABS = [\"Overview\", \"Details\", \"History\"] as const;\ntype Tab = (typeof TABS)[number];\nconst [tab, setTab] = useState<Tab>(\"Overview\");\n\n<SegmentedControl\n  segments={TABS.map(t => ({ value: t, label: t }))}\n  value={tab}\n  onChange={(v) => setTab(v as Tab)}\n/>\n\n<div className=\"mt-4\">\n  {tab === \"Overview\" && <OverviewPanel />}\n  {tab === \"Details\" && <DetailsPanel />}\n  {tab === \"History\" && <HistoryPanel />}\n</div>\n```\n\nUse SegmentedControl for in-page content switching. Use TabBar for app-level navigation (3-5 sections).",
+    "tags": [
+      "tabs",
+      "panel",
+      "switch",
+      "segmented",
+      "content"
+    ]
+  },
+  {
+    "category": "data_patterns",
+    "title": "LocalStorage helper for simple key-value",
+    "content": "Lightweight helper for storing individual values (not full Zustand stores).\n\n```ts\nexport function loadValue<T>(key: string, fallback: T): T {\n  try {\n    const raw = localStorage.getItem(key);\n    return raw !== null ? JSON.parse(raw) : fallback;\n  } catch {\n    return fallback;\n  }\n}\n\nexport function saveValue(key: string, value: unknown): void {\n  try {\n    localStorage.setItem(key, JSON.stringify(value));\n  } catch {}\n}\n\n// Usage\nconst [highScore, setHighScore] = useState(() => loadValue(\"highScore\", 0));\n\nconst updateScore = (score: number) => {\n  if (score > highScore) {\n    setHighScore(score);\n    saveValue(\"highScore\", score);\n  }\n};\n```\n\nUse for: high scores, onboarding flags, user preferences, last-viewed state.",
+    "tags": [
+      "localstorage",
+      "persist",
+      "save",
+      "load",
+      "preference"
+    ]
+  },
+  {
+    "category": "mobile_patterns",
+    "title": "Water intake / daily goal tracker pattern",
+    "content": "Pattern for tracking daily intake against a goal (water, steps, calories).\n\n```tsx\nconst goal = 8; // glasses\nconst current = useStore(s => s.todayGlasses);\nconst progress = Math.min(current / goal, 1);\n\n<Card>\n  <div className=\"flex items-center gap-4\">\n    <div className=\"relative\">\n      <ProgressRing progress={progress} size={64} color=\"#06b6d4\" />\n      <span className=\"absolute inset-0 flex items-center justify-center text-sm font-bold tabular-nums\">\n        {current}\n      </span>\n    </div>\n    <div className=\"flex-1\">\n      <p className=\"font-semibold\">Water Intake</p>\n      <p className=\"text-sm text-gray-500\">{current} of {goal} glasses</p>\n    </div>\n    <Button size=\"sm\" onClick={addGlass}>\n      <PlusIcon className=\"w-4 h-4\" />\n    </Button>\n  </div>\n</Card>\n```\n\nApply to: water tracking, step counting, calorie intake, reading goals.",
+    "tags": [
+      "water",
+      "intake",
+      "goal",
+      "daily",
+      "tracking",
+      "progress"
+    ]
+  },
+  {
+    "category": "mobile_patterns",
+    "title": "Multi-step form / wizard pattern",
+    "content": "Pattern for breaking long forms into steps.\n\n```tsx\nconst STEPS = [\"Basic Info\", \"Details\", \"Review\"];\nconst [step, setStep] = useState(0);\n\n// Progress indicator\n<div className=\"flex items-center gap-2 px-1 mb-4\">\n  {STEPS.map((label, i) => (\n    <div key={label} className=\"flex items-center gap-2 flex-1\">\n      <div className={\\}>\n        {i < step ? <CheckIcon className=\"w-3 h-3\" /> : i + 1}\n      </div>\n      {i < STEPS.length - 1 && (\n        <div className={\\} />\n      )}\n    </div>\n  ))}\n</div>\n\n// Step content\n{step === 0 && <Step1 />}\n{step === 1 && <Step2 />}\n{step === 2 && <ReviewStep />}\n\n// Navigation\n<div className=\"flex gap-3 mt-4\">\n  {step > 0 && <Button variant=\"secondary\" fullWidth onClick={() => setStep(s => s - 1)}>Back</Button>}\n  <Button fullWidth onClick={() => step < STEPS.length - 1 ? setStep(s => s + 1) : submit()}>\n    {step < STEPS.length - 1 ? \"Next\" : \"Submit\"}\n  </Button>\n</div>\n```",
+    "tags": [
+      "wizard",
+      "stepper",
+      "multi-step",
+      "form",
+      "flow"
+    ]
+  },
+  {
+    "category": "component_library",
+    "title": "Firebase Auth integration with useAuth + LoginScreen",
+    "content": "Use `useAuth` hook + `<LoginScreen>` for apps that need user accounts. Firebase config is pre-injected at `src/config/firebase.ts`.\n\n```tsx\nimport { useAuth, LoginScreen, Screen, AppBar } from \"./components/ui\";\nimport { firebaseConfig } from \"./config/firebase\";\n\nexport default function App() {\n  const { user, loading, signInWithEmail, signUpWithEmail, signInWithGoogle, signOut } = useAuth(firebaseConfig);\n  const [authError, setAuthError] = useState(\"\");\n  const [authLoading, setAuthLoading] = useState(false);\n\n  if (loading) return <Screen><main className=\"flex-1 flex items-center justify-center\"><p className=\"text-gray-400\">Loading...</p></main></Screen>;\n\n  if (!user) return (\n    <LoginScreen\n      appName=\"My App\"\n      tagline=\"Your tagline\"\n      logo={<span className=\"text-4xl\">icon</span>}\n      error={authError}\n      loading={authLoading}\n      onEmailAuth={async (email, password, mode) => {\n        setAuthError(\"\"); setAuthLoading(true);\n        try {\n          if (mode === \"login\") await signInWithEmail(email, password);\n          else await signUpWithEmail(email, password);\n        } catch (err: any) { setAuthError(err?.message || \"Authentication failed\"); }\n        finally { setAuthLoading(false); }\n      }}\n      onGoogleSignIn={signInWithGoogle}\n    />\n  );\n\n  // Authenticated app content\n  return <Screen><AppBar title=\"Home\" trailing={<button onClick={signOut}>Sign Out</button>} />...</Screen>;\n}\n```\n\n`useAuth(config)` returns: `{ user, loading, signInWithEmail, signUpWithEmail, signInWithGoogle, signInWithApple, signOut }`. The `user` object has: `{ uid, email, displayName, photoURL }`. Auth state persists across sessions. Trigger when prompt mentions: accounts, login, sign in, authentication, users, register.",
+    "tags": [
+      "auth",
+      "login",
+      "firebase",
+      "authentication",
+      "sign-in",
+      "register",
+      "accounts",
+      "users",
+      "useAuth",
+      "LoginScreen"
+    ]
+  },
+  {
+    "category": "component_library",
+    "title": "NotificationPermission — push notification opt-in",
+    "content": "Use `<NotificationPermission>` to add push notification support. The component handles the full flow: permission request, VAPID subscription, and backend registration. The service worker already has push handlers built in.\n\n```tsx\nimport { NotificationPermission } from \"./components/ui\";\n\n// Simple banner prompt:\n<NotificationPermission\n  message=\"Get daily reminders for your habits!\"\n  buttonLabel=\"Turn on reminders\"\n/>\n\n// Custom render for more control:\n<NotificationPermission>\n  {({ permission, requesting, requestPermission }) => (\n    permission === \"default\" ? (\n      <Button onClick={requestPermission} disabled={requesting}>\n        {requesting ? \"Enabling...\" : \"Enable Notifications\"}\n      </Button>\n    ) : permission === \"granted\" ? (\n      <p className=\"text-sm text-green-500\">Notifications enabled ✓</p>\n    ) : null\n  )}\n</NotificationPermission>\n```\n\nPlace contextually (e.g. after the user creates their first item), not on app load. The component self-hides if permission is already granted, denied, or dismissed.",
+    "tags": [
+      "notification",
+      "push",
+      "reminder",
+      "alert",
+      "notify",
+      "permission",
+      "NotificationPermission"
+    ]
+  },
+  {
+    "category": "component_library",
+    "title": "PaywallScreen — pricing plans with Stripe + Capacitor IAP",
+    "content": "Use `<PaywallScreen>` when the user wants pricing, subscriptions, premium features, or in-app purchases. Supports monthly/annual toggle, multiple plan tiers, feature comparison, and restore purchases.\n\n```tsx\nimport { PaywallScreen } from \"./components/ui\";\n\nconst [showPaywall, setShowPaywall] = useState(false);\nconst [currentPlan, setCurrentPlan] = useState(\"free\");\nconst [error, setError] = useState(\"\");\nconst [loading, setLoading] = useState(false);\n\n{showPaywall && (\n  <PaywallScreen\n    appName=\"My App Pro\"\n    tagline=\"Unlock all features\"\n    logo={<span className=\"text-4xl\">⭐</span>}\n    currentPlanId={currentPlan}\n    error={error}\n    loading={loading}\n    plans={[\n      { id: \"free\", name: \"Free\", price: 0, features: [\"5 items\", \"Basic themes\", \"✗ Cloud sync\"] },\n      { id: \"pro\", name: \"Pro\", price: 4.99, annualPrice: 39.99, featured: true, features: [\"Unlimited items\", \"All themes\", \"Cloud sync\", \"Priority support\"] },\n    ]}\n    onSubscribe={async (planId, frequency) => {\n      setError(\"\"); setLoading(true);\n      try { setCurrentPlan(planId); setShowPaywall(false); }\n      catch (err: any) { setError(err?.message || \"Payment failed\"); }\n      finally { setLoading(false); }\n    }}\n    onRestore={async () => { /* Restore purchases */ }}\n  />\n)}\n```\n\nProps: `appName`, `tagline`, `logo`, `plans` (array with id/name/price/annualPrice?/currency?/description?/features/featured?/badge?), `currentPlanId`, `onSubscribe(planId, frequency)`, `onRestore()`, `loading`, `error`, `hideFrequencyToggle`, `footer`. Prefix features with `\"✗ \"` to show as excluded. The component handles frequency toggle, savings calculation, and current plan badge internally.",
+    "tags": [
+      "payment",
+      "paywall",
+      "pricing",
+      "subscription",
+      "premium",
+      "upgrade",
+      "in-app-purchase",
+      "stripe",
+      "monetize",
+      "plans",
+      "iap",
+      "billing",
+      "capacitor",
+      "PaywallScreen"
+    ]
+  },
+  {
+    "category": "data_patterns",
+    "title": "Convex schema — multi-tenant table with by_tenant index",
+    "content": "Every multi-tenant Convex table MUST: (1) declare `tenantId: v.string()` (= Firebase uid); (2) define an index whose name starts with `by_tenant`. The pre-build scanner rejects any query that doesn't filter through this index.\n\n```ts\n// convex/schema.ts\nimport { defineSchema, defineTable } from \"convex/server\";\nimport { v } from \"convex/values\";\n\nexport default defineSchema({\n  tasks: defineTable({\n    tenantId: v.string(),          // Firebase uid — required on every row\n    title: v.string(),\n    completed: v.boolean(),\n    createdAt: v.number(),\n  })\n    .index(\"by_tenant\", [\"tenantId\"])\n    .index(\"by_tenant_and_completed\", [\"tenantId\", \"completed\"]),\n});\n```\n\nComposite indexes (`by_tenant_and_X`) cover common filter combinations. Timestamps are `v.number()` (ms since epoch), not `Date`. IDs are opaque (`v.id(\"tasks\")`) and unguessable.",
+    "tags": [
+      "convex",
+      "schema",
+      "tenant",
+      "index",
+      "multi-tenant",
+      "by_tenant"
+    ]
+  },
+  {
+    "category": "data_patterns",
+    "title": "Convex tenantQuery and tenantMutation helpers",
+    "content": "Use `tenantQuery` / `tenantMutation` from `convex/_helpers.ts` instead of raw `query` / `mutation`. They resolve the Firebase identity once and expose `ctx.tenantId` in the handler.\n\n```ts\n// convex/tasks.ts\nimport { v } from \"convex/values\";\nimport { tenantQuery, tenantMutation } from \"./_helpers\";\n\nexport const listTasks = tenantQuery({\n  args: {},\n  handler: async (ctx) =>\n    ctx.db\n      .query(\"tasks\")\n      .withIndex(\"by_tenant\", (q) => q.eq(\"tenantId\", ctx.tenantId))\n      .order(\"desc\")\n      .collect(),\n});\n\nexport const createTask = tenantMutation({\n  args: { title: v.string() },\n  handler: async (ctx, { title }) =>\n    ctx.db.insert(\"tasks\", {\n      tenantId: ctx.tenantId,                   // ALWAYS stamp on insert\n      title,\n      completed: false,\n      createdAt: Date.now(),\n    }),\n});\n```\n\nInside the handler you still call `ctx.db.query(...).withIndex(\"by_tenant...\")` — the helper wraps identity resolution, not query construction. Never call raw `query()` / `mutation()` on tenant tables.",
+    "tags": [
+      "convex",
+      "tenantQuery",
+      "tenantMutation",
+      "helper",
+      "handler",
+      "identity"
+    ]
+  },
+  {
+    "category": "data_patterns",
+    "title": "Convex query with withIndex — single and composite",
+    "content": "Read tenant data ONLY via `.withIndex(\"by_tenant…\")`. `.filter()` is rejected because it scans the whole table; composite indexes handle every extra filter condition. Use one composite index per common dashboard slice — e.g., \"this month's transactions by category\" needs `by_tenant_and_category` with a time-bounded scan, \"open tasks only\" needs `by_tenant_and_completed`, \"pinned notes first\" needs `by_tenant_and_pinned`.\n\n```ts\n// Single-key: all tasks for this user\nconst all = await ctx.db\n  .query(\"tasks\")\n  .withIndex(\"by_tenant\", (q) => q.eq(\"tenantId\", ctx.tenantId))\n  .collect();\n\n// Composite: open tasks only (index covers the extra .eq)\nconst open = await ctx.db\n  .query(\"tasks\")\n  .withIndex(\"by_tenant_and_completed\", (q) =>\n    q.eq(\"tenantId\", ctx.tenantId).eq(\"completed\", false))\n  .collect();\n\n// Ordered + bounded read\nconst recent = await ctx.db\n  .query(\"tasks\")\n  .withIndex(\"by_tenant\", (q) => q.eq(\"tenantId\", ctx.tenantId))\n  .order(\"desc\")\n  .take(20);\n```\n\nPrefer `.take(n)` or `.paginate(opts)` over `.collect()` for large tables. Every additional `.eq()` narrows via the index — define a composite index for each common filter combo.",
+    "tags": [
+      "convex",
+      "query",
+      "withIndex",
+      "filter",
+      "composite",
+      "read"
+    ]
+  },
+  {
+    "category": "data_patterns",
+    "title": "Convex mutation — create, update, delete with ownership guard",
+    "content": "`ctx.db.get(id)` is allowed without a tenant filter (IDs are opaque). But before mutating, always verify `doc.tenantId === ctx.tenantId` to defend against reused IDs and URL-injected IDs.\n\n```ts\nexport const toggleTask = tenantMutation({\n  args: { id: v.id(\"tasks\") },\n  handler: async (ctx, { id }) => {\n    const task = await ctx.db.get(id);\n    if (task === null) throw new Error(\"not found\");\n    if (task.tenantId !== ctx.tenantId) throw new Error(\"not authorised\");\n    await ctx.db.patch(id, { completed: !task.completed });\n  },\n});\n\nexport const updateTask = tenantMutation({\n  args: { id: v.id(\"tasks\"), title: v.string() },\n  handler: async (ctx, { id, title }) => {\n    const task = await ctx.db.get(id);\n    if (task === null) throw new Error(\"not found\");\n    if (task.tenantId !== ctx.tenantId) throw new Error(\"not authorised\");\n    await ctx.db.patch(id, { title: title.trim() });\n  },\n});\n\nexport const deleteTask = tenantMutation({\n  args: { id: v.id(\"tasks\") },\n  handler: async (ctx, { id }) => {\n    const task = await ctx.db.get(id);\n    if (task === null) return;                          // idempotent delete\n    if (task.tenantId !== ctx.tenantId) throw new Error(\"not authorised\");\n    await ctx.db.delete(id);\n  },\n});\n```\n\nUse `ctx.db.patch(id, partial)` (not replace). Trim and validate inputs before writing.",
+    "tags": [
+      "convex",
+      "mutation",
+      "patch",
+      "delete",
+      "ownership",
+      "guard"
+    ]
+  },
+  {
+    "category": "data_patterns",
+    "title": "Convex schema — related tables with Id references",
+    "content": "Relate tables via `v.id(\"otherTable\")`. Each related table still needs its own `tenantId` + `by_tenant` index; cross-references are checked in the handler.\n\n```ts\n// convex/schema.ts\nexport default defineSchema({\n  folders: defineTable({\n    tenantId: v.string(),\n    name: v.string(),\n  }).index(\"by_tenant\", [\"tenantId\"]),\n\n  notes: defineTable({\n    tenantId: v.string(),\n    title: v.string(),\n    folderId: v.optional(v.id(\"folders\")),     // nullable FK\n    createdAt: v.number(),\n  })\n    .index(\"by_tenant\", [\"tenantId\"])\n    .index(\"by_tenant_and_folder\", [\"tenantId\", \"folderId\"]),\n});\n```\n\nWhen inserting with a foreign key, verify the parent belongs to the same tenant:\n\n```ts\nexport const createNote = tenantMutation({\n  args: { title: v.string(), folderId: v.optional(v.id(\"folders\")) },\n  handler: async (ctx, { title, folderId }) => {\n    if (folderId !== undefined) {\n      const folder = await ctx.db.get(folderId);\n      if (folder === null || folder.tenantId !== ctx.tenantId) {\n        throw new Error(\"folder not found\");\n      }\n    }\n    return ctx.db.insert(\"notes\", {\n      tenantId: ctx.tenantId, title, folderId, createdAt: Date.now(),\n    });\n  },\n});\n```",
+    "tags": [
+      "convex",
+      "schema",
+      "relation",
+      "foreign-key",
+      "reference",
+      "id"
+    ]
+  },
+  {
+    "category": "data_patterns",
+    "title": "Convex pagination — paginate() with usePaginatedQuery",
+    "content": "For lists that can grow beyond a few hundred rows, use `.paginate()` on the backend and `usePaginatedQuery` on the frontend. Load more on scroll.\n\n```ts\n// convex/messages.ts\nimport { paginationOptsValidator } from \"convex/server\";\n\nexport const listMessages = tenantQuery({\n  args: { paginationOpts: paginationOptsValidator },\n  handler: async (ctx, { paginationOpts }) =>\n    ctx.db\n      .query(\"messages\")\n      .withIndex(\"by_tenant\", (q) => q.eq(\"tenantId\", ctx.tenantId))\n      .order(\"desc\")\n      .paginate(paginationOpts),\n});\n```\n\n```tsx\n// components/MessageList.tsx\nimport { usePaginatedQuery } from \"convex/react\";\nimport { api } from \"../convex/_generated/api\";\n\nconst { results, status, loadMore } = usePaginatedQuery(\n  api.messages.listMessages,\n  {},\n  { initialNumItems: 20 },\n);\n\n// status: \"CanLoadMore\" | \"LoadingFirstPage\" | \"LoadingMore\" | \"Exhausted\"\n<Button onClick={() => loadMore(20)} disabled={status !== \"CanLoadMore\"}>\n  Load more\n</Button>\n```\n\nNever `collect()` unbounded tables — read cost scales with total rows returned, not page size.",
+    "tags": [
+      "convex",
+      "paginate",
+      "pagination",
+      "loadMore",
+      "infinite",
+      "scroll"
+    ]
+  },
+  {
+    "category": "data_patterns",
+    "title": "Convex scheduled function — cron jobs and delayed tasks",
+    "content": "Use `crons.ts` for periodic jobs and `ctx.scheduler.runAfter(ms, ref, args)` inside a mutation for one-off delayed work.\n\n```ts\n// convex/crons.ts\nimport { cronJobs } from \"convex/server\";\nimport { internal } from \"./_generated/api\";\n\nconst crons = cronJobs();\n\n// Runs every day at 09:00 UTC\ncrons.daily(\n  \"send daily reminder\",\n  { hourUTC: 9, minuteUTC: 0 },\n  internal.reminders.sendReminders,\n);\n\n// Runs every 15 minutes\ncrons.interval(\"cleanup expired\", { minutes: 15 }, internal.cleanup.purge);\n\nexport default crons;\n```\n\n```ts\n// Delayed job enqueued from a mutation\nexport const queueFollowUp = tenantMutation({\n  args: { taskId: v.id(\"tasks\") },\n  handler: async (ctx, { taskId }) => {\n    await ctx.scheduler.runAfter(\n      24 * 60 * 60 * 1000,                           // 24h delay in ms\n      internal.tasks.sendFollowUp,\n      { taskId, tenantId: ctx.tenantId },\n    );\n  },\n});\n```\n\nCron handlers must be `internalMutation` or `internalAction` — they have no user identity. Use `tenantInternalMutation` when the job still reads tenant data (pass `tenantId` as an arg).",
+    "tags": [
+      "convex",
+      "cron",
+      "schedule",
+      "scheduler",
+      "job",
+      "internal"
+    ]
+  },
+  {
+    "category": "data_patterns",
+    "title": "Convex action — calling external APIs from the backend",
+    "content": "`action` is the only Convex handler type that can call `fetch()` or external SDKs. Queries and mutations run inside a deterministic transaction — no network access.\n\n```ts\n// convex/openai.ts\nimport { v } from \"convex/values\";\nimport { tenantAction } from \"./_helpers\";\nimport { api } from \"./_generated/api\";\n\nexport const summariseNote = tenantAction({\n  args: { noteId: v.id(\"notes\") },\n  handler: async (ctx, { noteId }) => {\n    // 1. Read via a query (actions can't touch ctx.db directly)\n    const note = await ctx.runQuery(api.notes.getNote, { id: noteId });\n    if (note === null) throw new Error(\"not found\");\n\n    // 2. Call the external service\n    const res = await fetch(\"https://api.openai.com/v1/chat/completions\", {\n      method: \"POST\",\n      headers: {\n        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,\n        \"Content-Type\": \"application/json\",\n      },\n      body: JSON.stringify({\n        model: \"gpt-4o-mini\",\n        messages: [{ role: \"user\", content: `Summarise: ${note.content}` }],\n      }),\n    });\n    const data = await res.json();\n    const summary = data.choices[0].message.content;\n\n    // 3. Write results via a mutation\n    await ctx.runMutation(api.notes.updateSummary, { id: noteId, summary });\n    return summary;\n  },\n});\n```\n\nActions are NOT reactive — they're one-shot. Read with `ctx.runQuery`, write with `ctx.runMutation`. Never put `fetch` in a mutation; the internal retry loop will cause duplicate side effects.",
+    "tags": [
+      "convex",
+      "action",
+      "fetch",
+      "external",
+      "api",
+      "runQuery"
+    ]
+  },
+  {
+    "category": "state_management",
+    "title": "useQuery — reactive Convex queries in React",
+    "content": "`useQuery(api.foo.list, args)` subscribes to the server result. The component re-renders automatically when any other user's mutation changes the underlying data — a real-time, live subscription with no polling or manual refetch. Ideal for live leaderboards, chat-like feeds, collaborative dashboards, and anything where multiple users see the same data update simultaneously. Returns `undefined` while loading.\n\n```tsx\nimport { useQuery } from \"convex/react\";\nimport { api } from \"../convex/_generated/api\";\n\nexport function TaskList() {\n  const tasks = useQuery(api.tasks.listTasks, {});\n\n  if (tasks === undefined) return <Skeleton />;\n  if (tasks.length === 0) return <EmptyState title=\"No tasks yet\" />;\n\n  return (\n    <div className=\"space-y-3\">\n      {tasks.map((t) => (\n        <Card key={t._id}>\n          <ListItem title={t.title} subtitle={timeAgo(t.createdAt)} />\n        </Card>\n      ))}\n    </div>\n  );\n}\n```\n\n- Pass the sentinel `\"skip\"` instead of args to pause the subscription: `useQuery(api.tasks.listTasks, user ? {} : \"skip\")`.\n- Results cache across renders — switching tabs and back is instant.\n- Type inference carries through from the server handler's return type; no manual generics.",
+    "tags": [
+      "useQuery",
+      "convex",
+      "react",
+      "reactive",
+      "subscribe",
+      "hook"
+    ]
+  },
+  {
+    "category": "state_management",
+    "title": "useMutation — Convex mutation with withOptimisticUpdate for instant UI",
+    "content": "`.withOptimisticUpdate(patch)` mutates the client-side query cache synchronously, so the UI renders the result before the network roundtrip completes. Critical for perceived performance and offline UX.\n\n```tsx\nimport { useMutation } from \"convex/react\";\nimport { api } from \"../convex/_generated/api\";\n\nexport function TaskItem({ task }: { task: Task }) {\n  const toggle = useMutation(api.tasks.toggleTask).withOptimisticUpdate(\n    (store, { id }) => {\n      const list = store.getQuery(api.tasks.listTasks, {});\n      if (list === undefined) return;\n      store.setQuery(\n        api.tasks.listTasks,\n        {},\n        list.map((t) =>\n          t._id === id ? { ...t, completed: !t.completed } : t,\n        ),\n      );\n    },\n  );\n\n  return (\n    <ListItem\n      title={task.title}\n      trailing={<Toggle checked={task.completed} onChange={() => toggle({ id: task._id })} />}\n    />\n  );\n}\n```\n\nApply the envelope to every mutation that changes a currently-visible query result. Skip it for fire-and-forget writes (analytics, background logs). The patch persists across disconnects — airplane-mode taps render instantly and replay on reconnect.",
+    "tags": [
+      "useMutation",
+      "convex",
+      "optimistic",
+      "withOptimisticUpdate",
+      "offline",
+      "instant"
+    ]
+  },
+  {
+    "category": "state_management",
+    "title": "useCollection — typed CRUD wrapper for Convex queries",
+    "content": "The `useCollection` hook from `@appio/ui/hooks` wraps a Convex list query plus its CRUD mutations in a single call. Type inference carries through from the function refs — no manual generics.\n\nThis is the default hook for any app that needs to persist data across devices and keep it in sync — habit trackers, todo lists, notes, shopping lists. The underlying Convex subscription means changes made on one device appear instantly on every other device the user is signed in on.\n\n```tsx\nimport { useCollection } from \"@appio/ui/hooks\";\nimport { api } from \"../convex/_generated/api\";\n\nexport function TaskList() {\n  const { data: tasks, loading, add, remove } = useCollection({\n    list: api.tasks.listTasks,\n    mutations: {\n      add: api.tasks.createTask,\n      remove: api.tasks.deleteTask,\n    },\n  });\n\n  if (loading) return <Skeleton />;\n\n  return (\n    <>\n      <div className=\"space-y-3\">\n        {tasks!.map((t) => (\n          <ListItem\n            key={t._id}\n            title={t.title}\n            trailing={<IconButton onClick={() => remove!({ id: t._id })}><XIcon/></IconButton>}\n          />\n        ))}\n      </div>\n      <FAB onClick={() => add!({ title: \"New task\" })}><PlusIcon/></FAB>\n    </>\n  );\n}\n```\n\nOnly configure the mutation slots (`add`, `update`, `remove`) you need — unconfigured slots return `undefined`. For optimistic UI, call `useMutation(ref).withOptimisticUpdate(...)` directly alongside `useCollection`.",
+    "tags": [
+      "useCollection",
+      "convex",
+      "crud",
+      "hook",
+      "typed",
+      "appio-ui",
+      "sync",
+      "persist",
+      "across-devices",
+      "tracker"
+    ]
+  },
+  {
+    "category": "state_management",
+    "title": "useConvexMode — detect sandbox vs published deployment",
+    "content": "Generated apps run against Appio's shared sandbox Convex during preview, then migrate to the user's own Convex account on publish. `useConvexMode` exposes the active mode so UI can reflect it (e.g., a \"Preview\" banner).\n\n```tsx\nimport { useConvexMode } from \"@appio/ui/hooks\";\n\nexport function PreviewBanner() {\n  const mode = useConvexMode();   // \"sandbox\" | \"published\"\n\n  if (mode === \"published\") return null;\n\n  return (\n    <div className=\"bg-amber-500/10 text-amber-900 dark:text-amber-200 text-xs py-1 text-center\">\n      Preview — data resets on publish\n    </div>\n  );\n}\n```\n\nThe mode is set by the template's `ConvexClientProvider` from `CONVEX_MODE` in `config/convex.ts`. On publish, the T3.6 migration flips it to `\"published\"`. The hook is a plain context read — safe to call anywhere.",
+    "tags": [
+      "convex",
+      "useConvexMode",
+      "sandbox",
+      "published",
+      "mode",
+      "banner"
+    ]
+  },
+  {
+    "category": "common_bugs",
+    "title": "BUG: Missing tenant filter on Convex query",
+    "content": "The #1 security bug in multi-tenant Convex code (team apps, collaboration tools, anything where each user should only see their own projects / tasks / notes): a query without `.withIndex(\"by_tenant…\")` reads EVERY user's rows. Catastrophic data leak — User A sees User B's private data. The pre-build scanner rejects it, but it's the most common pattern to catch in review.\n\n```ts\n// ❌ BUG — returns tasks for EVERY user on the sandbox. Build-time rejection.\nexport const listTasks = tenantQuery({\n  args: {},\n  handler: async (ctx) =>\n    ctx.db.query(\"tasks\").collect(),\n});\n\n// ❌ ALSO BUG — .filter() runs after the index scan; the engine still reads\n//              other tenants' rows (latency + cost scale with table size).\nexport const listTasks = tenantQuery({\n  args: {},\n  handler: async (ctx) =>\n    ctx.db\n      .query(\"tasks\")\n      .filter((q) => q.eq(q.field(\"tenantId\"), ctx.tenantId))\n      .collect(),\n});\n\n// ✅ CORRECT — the index restricts the scan to this tenant's rows only.\nexport const listTasks = tenantQuery({\n  args: {},\n  handler: async (ctx) =>\n    ctx.db\n      .query(\"tasks\")\n      .withIndex(\"by_tenant\", (q) => q.eq(\"tenantId\", ctx.tenantId))\n      .collect(),\n});\n```\n\nRule: EVERY `ctx.db.query(\"X\")` must chain `.withIndex(\"by_tenant…\")` with `tenantId` as the first `.eq()`. The scanner accepts both `by_tenant` and composite names like `by_tenant_and_completed`.",
+    "tags": [
+      "bug",
+      "convex",
+      "tenant",
+      "leak",
+      "security",
+      "withIndex"
+    ]
+  },
+  {
+    "category": "common_bugs",
+    "title": "BUG: Using .filter() instead of .withIndex() for tenantId",
+    "content": "`.filter()` feels ergonomic but is a performance and correctness trap on tenant-scoped tables. It runs AFTER the index scan, so the engine touches every row regardless of filter.\n\n```ts\n// ❌ BUG — scans the whole \"tasks\" table, filters in-memory. Scanner REJECTS.\nconst open = await ctx.db\n  .query(\"tasks\")\n  .filter((q) =>\n    q.and(\n      q.eq(q.field(\"tenantId\"), ctx.tenantId),\n      q.eq(q.field(\"completed\"), false),\n    ))\n  .collect();\n\n// ✅ CORRECT — composite index covers both conditions; scan is O(matching rows).\nconst open = await ctx.db\n  .query(\"tasks\")\n  .withIndex(\"by_tenant_and_completed\", (q) =>\n    q.eq(\"tenantId\", ctx.tenantId).eq(\"completed\", false))\n  .collect();\n```\n\nAdd the composite index to the schema:\n\n```ts\ntasks: defineTable({ /* ... */ })\n  .index(\"by_tenant\", [\"tenantId\"])\n  .index(\"by_tenant_and_completed\", [\"tenantId\", \"completed\"]),  // add this\n```\n\nRule of thumb: one composite index per common filter combo. Extra indexes cost a bit of write amplification but are cheap vs full table scans.",
+    "tags": [
+      "bug",
+      "convex",
+      "filter",
+      "withIndex",
+      "index",
+      "performance"
+    ]
+  },
+  {
+    "category": "common_bugs",
+    "title": "BUG: Missing ownership check before Convex mutation",
+    "content": "`ctx.db.get(id)` returns a row even if it belongs to another tenant — the ID is opaque but NOT permission-checked. Always verify `doc.tenantId === ctx.tenantId` before patching or deleting.\n\n```ts\n// ❌ BUG — user can delete any task whose ID they guess or steal from URL.\nexport const deleteTask = tenantMutation({\n  args: { id: v.id(\"tasks\") },\n  handler: async (ctx, { id }) => {\n    await ctx.db.delete(id);\n  },\n});\n\n// ❌ ALSO BUG — .get() returns the row, but no ownership check before patch.\nexport const toggleTask = tenantMutation({\n  args: { id: v.id(\"tasks\") },\n  handler: async (ctx, { id }) => {\n    const task = await ctx.db.get(id);\n    if (task === null) throw new Error(\"not found\");\n    await ctx.db.patch(id, { completed: !task.completed });\n  },\n});\n\n// ✅ CORRECT — always check tenantId before mutating.\nexport const toggleTask = tenantMutation({\n  args: { id: v.id(\"tasks\") },\n  handler: async (ctx, { id }) => {\n    const task = await ctx.db.get(id);\n    if (task === null) throw new Error(\"not found\");\n    if (task.tenantId !== ctx.tenantId) throw new Error(\"not authorised\");\n    await ctx.db.patch(id, { completed: !task.completed });\n  },\n});\n```\n\nThe scanner only checks query-time tenant filters; ownership checks inside mutations are the agent's responsibility — one of the few hard rules that lives in prompt guidance rather than static analysis.",
+    "tags": [
+      "bug",
+      "convex",
+      "ownership",
+      "mutation",
+      "authorization",
+      "security"
+    ]
+  },
+  {
+    "category": "common_bugs",
+    "title": "BUG: Building a parallel Zustand mutation queue alongside Convex",
+    "content": "The Convex React client already buffers mutations during disconnect and replays them on reconnect, in order. DO NOT add a Zustand/IndexedDB mutation queue that mirrors this — you'll get duplicate writes or race conditions with the framework's own buffer.\n\n```ts\n// ❌ BUG — mirrors Convex's internal queue; double-fires on reconnect.\nconst pendingWrites = useStore((s) => s.pendingWrites);\nuseEffect(() => {\n  if (!navigator.onLine) return;\n  pendingWrites.forEach((w) => {\n    createTask(w.args);              // Convex ALSO replays this mutation\n    clearPendingWrite(w.id);\n  });\n}, [pendingWrites]);\n\n// ❌ BUG — manual retry wrapper. Convex retries internally.\nconst retryCreateTask = async (args) => {\n  for (let i = 0; i < 3; i++) {\n    try { return await createTask(args); }\n    catch { await sleep(1000 * (i + 1)); }\n  }\n};\n\n// ✅ CORRECT — trust Convex. Optimistic update for instant UI, no queue.\nconst createTask = useMutation(api.tasks.createTask).withOptimisticUpdate(\n  (store, args) => { /* patch cache */ }\n);\n```\n\nWhat you CAN add: an audit log (observability, not durability) that tags writes with `localId` and records ack timestamps — useful for financial / healthcare apps. Convex still owns the queue.",
+    "tags": [
+      "bug",
+      "convex",
+      "zustand",
+      "queue",
+      "retry",
+      "offline"
+    ]
+  },
+  {
+    "category": "mobile_patterns",
+    "title": "Capacitor + Convex — refresh on app resume (appStateChange)",
+    "content": "Essential for iPhone and Android apps where the user might disconnect — airplane mode, subway, backgrounding the app for a few minutes — and return expecting fresh data. iOS aggressively suspends WebViews in the background; the Convex WebSocket drops during suspend. Touch the client on `appStateChange` to trigger an automatic reconnect — cheap and idempotent.\n\n```tsx\nimport { App } from \"@capacitor/app\";\nimport { useConvex } from \"convex/react\";\nimport { useEffect } from \"react\";\n\nexport function useConvexResume() {\n  const convex = useConvex();\n\n  useEffect(() => {\n    const sub = App.addListener(\"appStateChange\", ({ isActive }) => {\n      if (!isActive) return;\n      // Touching connectionState() triggers an internal reconnect check.\n      void convex.connectionState();\n    });\n    return () => { void sub.remove(); };\n  }, [convex]);\n}\n```\n\n```tsx\n// Usage at the app root, inside ConvexProvider\nfunction App() {\n  useConvexResume();\n  return <RestOfApp />;\n}\n```\n\nWithout this, returning from background shows stale UI for 1–5 s until the next user interaction nudges the client. With it, reconnect starts immediately and fresh data renders in ~500 ms (measured in ADR 002). For PWA-only apps, use `document.addEventListener(\"visibilitychange\", ...)` with the same body.",
+    "tags": [
+      "capacitor",
+      "convex",
+      "resume",
+      "appStateChange",
+      "websocket",
+      "ios"
+    ]
+  },
+  {
+    "category": "mobile_patterns",
+    "title": "Convex optimistic update — airplane-mode UX pattern",
+    "content": "Optimistic updates patch the client cache synchronously, so UI reflects the change BEFORE the network roundtrip. They persist across disconnects: a tap in airplane mode renders instantly and replays when the WebSocket reopens.\n\n```tsx\nimport { useMutation } from \"convex/react\";\nimport { api } from \"../convex/_generated/api\";\n\n// Rule: EVERY user-initiated mutation that changes a currently-rendered query\n//       should use withOptimisticUpdate. No exceptions.\nexport function useAddTask() {\n  return useMutation(api.tasks.createTask).withOptimisticUpdate(\n    (store, { title }) => {\n      const list = store.getQuery(api.tasks.listTasks, {});\n      if (list === undefined) return;\n      store.setQuery(api.tasks.listTasks, {}, [\n        {\n          _id: crypto.randomUUID() as any,        // temp id replaced on ack\n          _creationTime: Date.now(),\n          tenantId: \"\",                           // server fills the real value\n          title,\n          completed: false,\n          createdAt: Date.now(),\n        },\n        ...list,\n      ]);\n    },\n  );\n}\n```\n\nNEVER gate optimistic rendering on `navigator.onLine` — the user's intent is the same regardless of network state. The Convex client replaces the temp entry with the server's real row on ack, automatically.",
+    "tags": [
+      "convex",
+      "optimistic",
+      "offline",
+      "airplane",
+      "cache",
+      "sync"
+    ]
+  },
+  {
+    "category": "mobile_patterns",
+    "title": "Convex connection state UI — use connectionState() not navigator.onLine",
+    "content": "Don't use `navigator.onLine` for sync-status UI — it reports OS network state, not whether the Convex WebSocket is open. `useConvex().connectionState()` knows about both the socket AND in-flight mutations.\n\n```tsx\nimport { useConvex } from \"convex/react\";\nimport { useEffect, useState } from \"react\";\n\nexport function SyncBadge() {\n  const convex = useConvex();\n  const [state, setState] = useState(convex.connectionState());\n\n  useEffect(() => {\n    const id = setInterval(() => setState(convex.connectionState()), 1000);\n    return () => clearInterval(id);\n  }, [convex]);\n\n  const offline = !state.isWebSocketConnected;\n  const pending = state.inflightMutations > 0;\n\n  if (!offline && !pending) return null;\n\n  return (\n    <div className=\"fixed top-14 inset-x-5 z-10 bg-amber-500/90 text-white text-xs py-1.5 px-3 rounded-lg text-center\">\n      {offline ? \"Offline — changes will sync when back online\" : `Syncing ${pending} change(s)…`}\n    </div>\n  );\n}\n```\n\n`connectionState()` returns `{ isWebSocketConnected, inflightMutations, inflightActions }`. Never disable `useQuery` based on this — it returns cached data during disconnect, giving uninterrupted UI.",
+    "tags": [
+      "convex",
+      "connection",
+      "online",
+      "offline",
+      "sync",
+      "badge"
+    ]
+  },
+  {
+    "category": "component_library",
+    "title": "Convex — habit tracker schema with streak and daily check-ins",
+    "content": "Canonical Convex schema for habit / streak / daily-goal apps. Every habit and every check-in row is tenant-scoped; the streak is computed on read, not stored (stale-data-proof).\n\n```ts\n// convex/schema.ts\nimport { defineSchema, defineTable } from \"convex/server\";\nimport { v } from \"convex/values\";\n\nexport default defineSchema({\n  habits: defineTable({\n    tenantId: v.string(),\n    name: v.string(),\n    color: v.string(),\n    createdAt: v.number(),\n  }).index(\"by_tenant\", [\"tenantId\"]),\n\n  completions: defineTable({\n    tenantId: v.string(),\n    habitId: v.id(\"habits\"),\n    dateKey: v.string(),            // \"2026-04-21\"\n    createdAt: v.number(),\n  })\n    .index(\"by_tenant\", [\"tenantId\"])\n    .index(\"by_tenant_and_habit\", [\"tenantId\", \"habitId\"])\n    .index(\"by_tenant_habit_date\", [\"tenantId\", \"habitId\", \"dateKey\"]),\n});\n```\n\n```ts\n// convex/habits.ts — toggle today, read the streak\nimport { v } from \"convex/values\";\nimport { tenantQuery, tenantMutation } from \"./_helpers\";\n\nexport const toggleToday = tenantMutation({\n  args: { habitId: v.id(\"habits\") },\n  handler: async (ctx, { habitId }) => {\n    const dateKey = new Date().toISOString().slice(0, 10);\n    const existing = await ctx.db\n      .query(\"completions\")\n      .withIndex(\"by_tenant_habit_date\", (q) =>\n        q.eq(\"tenantId\", ctx.tenantId).eq(\"habitId\", habitId).eq(\"dateKey\", dateKey))\n      .unique();\n    if (existing) {\n      await ctx.db.delete(existing._id);\n    } else {\n      await ctx.db.insert(\"completions\", {\n        tenantId: ctx.tenantId, habitId, dateKey, createdAt: Date.now(),\n      });\n    }\n  },\n});\n\nexport const listHabitsWithStreaks = tenantQuery({\n  args: {},\n  handler: async (ctx) => {\n    const habits = await ctx.db\n      .query(\"habits\")\n      .withIndex(\"by_tenant\", (q) => q.eq(\"tenantId\", ctx.tenantId))\n      .collect();\n    return Promise.all(habits.map(async (h) => {\n      const done = await ctx.db\n        .query(\"completions\")\n        .withIndex(\"by_tenant_and_habit\", (q) =>\n          q.eq(\"tenantId\", ctx.tenantId).eq(\"habitId\", h._id))\n        .collect();\n      const keys = new Set(done.map((c) => c.dateKey));\n      let streak = 0;\n      const d = new Date();\n      while (keys.has(d.toISOString().slice(0, 10))) {\n        streak++;\n        d.setDate(d.getDate() - 1);\n      }\n      return { ...h, streak, doneToday: keys.has(new Date().toISOString().slice(0, 10)) };\n    }));\n  },\n});\n```\n\nStore one completion row per (habit, day) — never boolean flags on the habit row. This way edits are additive, history is queryable, and the streak query is O(completions per habit), not O(days since install).",
+    "tags": [
+      "convex",
+      "habit",
+      "tracker",
+      "streak",
+      "daily",
+      "completion",
+      "schema",
+      "persist",
+      "across-devices",
+      "goal"
+    ]
+  },
+  {
+    "category": "data_patterns",
+    "title": "Convex — expense tracker with monthly category aggregation",
+    "content": "Canonical Convex schema + query pattern for expense / finance / spending apps with dashboard rollups (e.g., \"this month's total spending broken down by category\").\n\n```ts\n// convex/schema.ts\nimport { defineSchema, defineTable } from \"convex/server\";\nimport { v } from \"convex/values\";\n\nexport default defineSchema({\n  transactions: defineTable({\n    tenantId: v.string(),\n    amount: v.number(),            // cents; positive = income, negative = expense\n    category: v.string(),          // \"food\", \"transport\", \"bills\"\n    description: v.string(),\n    date: v.number(),              // ms since epoch — day-of-transaction\n  })\n    .index(\"by_tenant\", [\"tenantId\"])\n    .index(\"by_tenant_and_date\", [\"tenantId\", \"date\"])\n    .index(\"by_tenant_and_category\", [\"tenantId\", \"category\"]),\n});\n```\n\n```ts\n// convex/transactions.ts — monthly totals grouped by category for the dashboard\nimport { v } from \"convex/values\";\nimport { tenantQuery, tenantMutation } from \"./_helpers\";\n\nexport const listForMonth = tenantQuery({\n  args: { year: v.number(), month: v.number() },    // month is 1..12\n  handler: async (ctx, { year, month }) => {\n    const start = new Date(Date.UTC(year, month - 1, 1)).getTime();\n    const end = new Date(Date.UTC(year, month, 1)).getTime();\n    return ctx.db\n      .query(\"transactions\")\n      .withIndex(\"by_tenant_and_date\", (q) =>\n        q.eq(\"tenantId\", ctx.tenantId).gte(\"date\", start).lt(\"date\", end))\n      .collect();\n  },\n});\n\nexport const spendingByCategoryThisMonth = tenantQuery({\n  args: {},\n  handler: async (ctx) => {\n    const now = new Date();\n    const start = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1);\n    const txns = await ctx.db\n      .query(\"transactions\")\n      .withIndex(\"by_tenant_and_date\", (q) =>\n        q.eq(\"tenantId\", ctx.tenantId).gte(\"date\", start))\n      .collect();\n    const byCat: Record<string, number> = {};\n    for (const t of txns) {\n      if (t.amount >= 0) continue;                // income excluded\n      byCat[t.category] = (byCat[t.category] ?? 0) + Math.abs(t.amount);\n    }\n    return Object.entries(byCat)\n      .map(([category, total]) => ({ category, total }))\n      .sort((a, b) => b.total - a.total);\n  },\n});\n```\n\nAggregation happens in the query handler (one tenant-scoped read, grouped in memory). For month / year boundaries use UTC epoch ms to stay deterministic across timezones. Feed the result directly into a `<Recharts>` pie or bar chart.",
+    "tags": [
+      "convex",
+      "expense",
+      "finance",
+      "dashboard",
+      "spending",
+      "category",
+      "aggregation",
+      "monthly",
+      "chart",
+      "budget"
+    ]
+  },
+  {
+    "category": "component_library",
+    "title": "Firebase Auth + Convex JWT bridge (ConvexProviderWithAuth)",
+    "content": "Firebase Auth handles OAuth providers (Google / Apple); Convex validates the ID token to authenticate queries. Wire the bridge once at the root, then every `useQuery` / `useMutation` runs as the signed-in user.\n\n```tsx\n// src/ConvexClientProvider.tsx\nimport { ConvexReactClient, ConvexProviderWithAuth } from \"convex/react\";\nimport { useAuth } from \"@appio/ui/hooks\";\n\nconst convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL);\n\nexport function ConvexClientProvider({ children }: { children: React.ReactNode }) {\n  return (\n    <ConvexProviderWithAuth client={convex} useAuth={useAuth}>\n      {children}\n    </ConvexProviderWithAuth>\n  );\n}\n```\n\n```tsx\n// src/index.tsx\nimport { AuthProvider } from \"@appio/ui/auth\";\nimport { ConvexClientProvider } from \"./ConvexClientProvider\";\n\n<AuthProvider firebaseConfig={FIREBASE_CONFIG}>\n  <ConvexClientProvider>\n    <App />\n  </ConvexClientProvider>\n</AuthProvider>\n```\n\nInside Convex handlers, `identity.subject` IS the Firebase uid. The `tenantQuery` / `tenantMutation` helpers resolve it once and expose `ctx.tenantId` (see the tenant isolation snippet). Convex's `auth.config.ts` validates the Firebase issuer URL — no deploy key is ever exposed to the browser.",
+    "tags": [
+      "firebase",
+      "auth",
+      "convex",
+      "jwt",
+      "oauth",
+      "identity"
+    ]
+  },
+  {
+    "category": "layout_blocks",
+    "title": "HeroCentered — centered marketing hero",
+    "content": "Full-width centered hero with eyebrow → headline → subheadline → CTA pair. Use when the user asks for a landing page, marketing hero, or homepage top section.\n\n```tsx\nimport { HeroCentered } from \"@appio/layout-blocks\";\n\n<HeroCentered\n  eyebrow=\"New\"\n  headline=\"Build apps by describing them\"\n  subheadline=\"Turn plain-English ideas into production PWAs.\"\n  primaryAction={{ label: \"Get started\", href: \"/signup\" }}\n  secondaryAction={{ label: \"Watch demo\", onClick: () => setOpen(true) }}\n/>\n```\n\nSizes: `compact` (secondary sections), `default`, `full` (80vh takeover). Animates in via `cardReveal` — do NOT wrap in another motion container.",
+    "tags": [
+      "hero-centered",
+      "landing-page",
+      "marketing",
+      "hero",
+      "cta",
+      "layout-blocks"
+    ]
+  },
+  {
+    "category": "layout_blocks",
+    "title": "HeroSplit — two-column hero with visual slot",
+    "content": "Copy on one side, visual (image/illustration/screenshot) on the other. Stacks on mobile — visual always lands below copy on small screens so the CTA stays above the fold.\n\n```tsx\nimport { HeroSplit } from \"@appio/layout-blocks\";\n\n<HeroSplit\n  headline=\"Your product in 30 seconds\"\n  subheadline=\"Show, don't tell.\"\n  primaryAction={{ label: \"Try it\", href: \"/app\" }}\n  visual={<img src=\"/screenshot.png\" alt=\"\" className=\"w-full\" />}\n  copySide=\"left\"\n/>\n```\n\nUse for product-focused marketing pages with a visual anchor. Animates via `cardReveal` + `listStagger` on the CTA group.",
+    "tags": [
+      "hero-split",
+      "landing-page",
+      "marketing",
+      "two-column",
+      "product",
+      "layout-blocks"
+    ]
+  },
+  {
+    "category": "layout_blocks",
+    "title": "FeatureGrid — responsive feature card grid",
+    "content": "Grid of icon + title + description cards. Use for \"what's included\" / benefits / capabilities sections.\n\n```tsx\nimport { FeatureGrid } from \"@appio/layout-blocks\";\nimport { Zap, Shield } from \"lucide-react\";\n\n<FeatureGrid\n  heading=\"Everything you need\"\n  columns={3}\n  items={[\n    { icon: <Zap className=\"h-5 w-5\"/>, title: \"Fast\", description: \"500ms builds.\" },\n    { icon: <Shield className=\"h-5 w-5\"/>, title: \"Secure\", description: \"Hardware isolation.\" },\n  ]}\n/>\n```\n\nColumns: 2, 3, or 4. Items stagger in via `listStagger`. Add `href` to make a whole card a link.",
+    "tags": [
+      "feature-grid",
+      "features",
+      "benefits",
+      "landing-page",
+      "grid",
+      "layout-blocks"
+    ]
+  },
+  {
+    "category": "layout_blocks",
+    "title": "Testimonials — quote card grid",
+    "content": "Grid of testimonial cards — quote + author + role + optional avatar. Typography uses the persona's heading font for the quote itself so editorial personas render proper pullquotes.\n\n```tsx\nimport { Testimonials } from \"@appio/layout-blocks\";\n\n<Testimonials\n  heading=\"Loved by teams\"\n  items={[\n    { quote: \"Game-changing.\", authorName: \"Alex Chen\", authorRole: \"CTO, Acme\" },\n    { quote: \"We shipped in a day.\", authorName: \"Sam Rivera\", authorRole: \"PM, Beta Co\" },\n  ]}\n  columns={2}\n/>\n```\n\nPair with `HeroCentered` above and `FooterMulti` below for a classic landing-page composition.",
+    "tags": [
+      "testimonials",
+      "social-proof",
+      "quotes",
+      "landing-page",
+      "reviews",
+      "layout-blocks"
+    ]
+  },
+  {
+    "category": "layout_blocks",
+    "title": "FooterMulti — multi-column site footer",
+    "content": "Brand + tagline + social icons on the left, up to 4 link columns on the right, copyright + bottom links at the bottom.\n\n```tsx\nimport { FooterMulti } from \"@appio/layout-blocks\";\n\n<FooterMulti\n  brand={<span className=\"text-lg font-bold\">Appio</span>}\n  tagline=\"Build apps with words.\"\n  linkColumns={[\n    { heading: \"Product\", links: [{ label: \"Features\", href: \"/features\" }] },\n    { heading: \"Company\", links: [{ label: \"About\", href: \"/about\" }] },\n  ]}\n  copyright=\"© 2026 Appio\"\n  bottomLinks={[{ label: \"Privacy\", href: \"/privacy\" }]}\n/>\n```\n\nNon-animated by design — site footers should feel grounded, not slide in.",
+    "tags": [
+      "footer-multi",
+      "footer",
+      "navigation",
+      "brand",
+      "links",
+      "layout-blocks"
+    ]
+  },
+  {
+    "category": "layout_blocks",
+    "title": "DashboardStats — KPI card row with trend deltas",
+    "content": "Row of stat cards: label + big value + optional delta with trend direction. Trend colors are universal (green/red/muted) regardless of persona — users expect traffic-light semantics on dashboards.\n\n```tsx\nimport { DashboardStats } from \"@appio/layout-blocks\";\n\n<DashboardStats\n  heading=\"This week\"\n  items={[\n    { label: \"Revenue\", value: \"$12,340\", delta: \"+12%\", trend: \"up\" },\n    { label: \"Churn\", value: \"2.1%\", delta: \"-0.3 pts\", trend: \"down\", invertTrend: true },\n  ]}\n/>\n```\n\nSet `invertTrend: true` when down=good (churn, latency, error rate) — the arrow still points down but the color goes green.",
+    "tags": [
+      "dashboard-stats",
+      "dashboard",
+      "metrics",
+      "kpi",
+      "analytics",
+      "layout-blocks"
+    ]
+  },
+  {
+    "category": "layout_blocks",
+    "title": "SettingsPanel — sectioned form layout",
+    "content": "Sectioned settings page. Each section is a Card with title + description + form-content slot + optional footer. Split layout on desktop (title left / inputs right), stacked on mobile.\n\n```tsx\nimport { SettingsPanel } from \"@appio/layout-blocks\";\nimport { Input, Label, Button } from \"@appio/ui\";\n\n<SettingsPanel\n  heading=\"Account\"\n  sections={[\n    {\n      id: \"profile\",\n      title: \"Profile\",\n      description: \"How others see you.\",\n      children: <div><Label>Name</Label><Input /></div>,\n    },\n    {\n      id: \"danger\",\n      title: \"Delete account\",\n      danger: true,\n      children: <Button variant=\"danger\">Delete</Button>,\n    },\n  ]}\n/>\n```\n\nUse `danger: true` on destructive sections for red-tinted styling.",
+    "tags": [
+      "settings-panel",
+      "settings",
+      "form",
+      "account",
+      "preferences",
+      "layout-blocks"
+    ]
+  },
+  {
+    "category": "layout_blocks",
+    "title": "PricingTable — tiered pricing cards",
+    "content": "Multi-tier pricing cards: name + price + feature list + per-tier CTA. Set `highlighted: true` on the recommended tier for primary ring + \"Most popular\" badge.\n\n```tsx\nimport { PricingTable } from \"@appio/layout-blocks\";\n\n<PricingTable\n  heading=\"Simple pricing\"\n  tiers={[\n    {\n      id: \"free\", name: \"Free\", price: \"$0\", period: \"/ mo\",\n      features: [{ label: \"3 apps\" }, { label: \"Custom domains\", included: false }],\n      cta: { label: \"Get started\", href: \"/signup\" },\n    },\n    {\n      id: \"pro\", name: \"Pro\", price: \"$12\", period: \"/ mo\",\n      highlighted: true,\n      features: [{ label: \"Unlimited apps\" }, { label: \"Team seats\", included: \"pending\", hint: \"Coming Q3\" }],\n      cta: { label: \"Start trial\", href: \"/signup?plan=pro\" },\n    },\n  ]}\n/>\n```\n\nFeatures: `included: true` (check), `false` (X + strikethrough), `\"pending\"` (muted check for \"coming soon\").",
+    "tags": [
+      "pricing-table",
+      "pricing",
+      "tiers",
+      "subscription",
+      "plans",
+      "layout-blocks"
+    ]
+  },
+  {
+    "category": "layout_blocks",
+    "title": "LoginCard — auth with OAuth + email/password",
+    "content": "Auth card with OAuth provider buttons + email form + forgot-password link + signup prompt. Handles pending/error state internally — just wire the handlers.\n\n```tsx\nimport { LoginCard } from \"@appio/layout-blocks\";\n\n<LoginCard\n  heading=\"Welcome back\"\n  oauthProviders={[\n    { id: \"google\", label: \"Continue with Google\", icon: <GoogleIcon/>, onClick: signInGoogle },\n  ]}\n  onEmailSubmit={async ({ email, password }) => { await signIn(email, password); }}\n  forgotPasswordHref=\"/forgot\"\n  signupPrompt={{ text: \"New here?\", linkLabel: \"Sign up\", href: \"/signup\" }}\n  errorMessage={authError ?? undefined}\n/>\n```\n\nCentered on the viewport by default. Set `errorMessage` to show an alert above the form.",
+    "tags": [
+      "login-card",
+      "auth",
+      "login",
+      "signin",
+      "oauth",
+      "layout-blocks"
+    ]
+  },
+  {
+    "category": "layout_blocks",
+    "title": "OnboardingStepper — multi-step wizard with progress indicator",
+    "content": "Multi-step flow with step dots + per-step content + Back/Next navigation. Controlled — consumer owns `currentStepIndex`.\n\n```tsx\nimport { OnboardingStepper } from \"@appio/layout-blocks\";\n\nconst [step, setStep] = useState(0);\n\n<OnboardingStepper\n  currentStepIndex={step}\n  onNext={() => setStep(step + 1)}\n  onBack={() => setStep(step - 1)}\n  onComplete={() => router.push(\"/dashboard\")}\n  steps={[\n    { id: \"name\", label: \"Name\", content: <NameForm/> },\n    { id: \"ws\", label: \"Workspace\", content: <WorkspaceForm/>, nextDisabled: !wsValid },\n  ]}\n/>\n```\n\nUse `nextDisabled` per-step for validation gating. Animates with `pageTransition` on step change.",
+    "tags": [
+      "onboarding-stepper",
+      "onboarding",
+      "wizard",
+      "stepper",
+      "setup",
+      "layout-blocks"
+    ]
+  },
+  {
+    "category": "layout_blocks",
+    "title": "MarketplaceGrid — product/listing catalog grid",
+    "content": "Grid of cards: image + title + price + optional badge + optional rating. Optional filter chip row above.\n\n```tsx\nimport { MarketplaceGrid } from \"@appio/layout-blocks\";\n\n<MarketplaceGrid\n  heading=\"Templates\"\n  filters={[\n    { id: \"all\", label: \"All\", active: true, onClick: () => setFilter(\"all\") },\n    { id: \"productivity\", label: \"Productivity\", onClick: () => setFilter(\"productivity\") },\n  ]}\n  items={items.map(i => ({\n    id: i.id, title: i.name, subtitle: i.blurb,\n    price: i.price, imageUrl: i.cover,\n    rating: i.rating, ratingCount: i.reviews,\n    href: `/templates/${i.id}`,\n  }))}\n  columns={3}\n/>\n```\n\nCards lift on hover. Empty state renders when `items` is empty — override via `emptyState` prop.",
+    "tags": [
+      "marketplace-grid",
+      "marketplace",
+      "catalog",
+      "ecommerce",
+      "products",
+      "grid",
+      "layout-blocks"
+    ]
+  },
+  {
+    "category": "layout_blocks",
+    "title": "ProfileCard — user profile surface",
+    "content": "Cover banner → avatar → name + role → bio → stats row → actions. Max-width ~500px; scales down to mobile.\n\n```tsx\nimport { ProfileCard } from \"@appio/layout-blocks\";\n\n<ProfileCard\n  coverUrl=\"/covers/abstract.jpg\"\n  avatarUrl={user.avatarUrl}\n  name={user.name}\n  role={user.title}\n  badge={user.plan === \"pro\" ? \"Pro\" : undefined}\n  bio={user.bio}\n  stats={[\n    { label: \"Apps\", value: user.appCount },\n    { label: \"Followers\", value: formatCount(user.followers) },\n  ]}\n  primaryAction={{ label: \"Follow\", onClick: follow }}\n  secondaryAction={{ label: \"Message\", onClick: openDm }}\n/>\n```\n\nFor in-header \"current user\" summaries prefer a custom composition — this block's footprint assumes the profile IS the page.",
+    "tags": [
+      "profile-card",
+      "profile",
+      "user",
+      "avatar",
+      "bio",
+      "team",
+      "layout-blocks"
+    ]
+  },
+  {
+    "category": "layout_blocks",
+    "title": "FaqAccordion — expandable FAQ list",
+    "content": "Expandable Q&A list with smooth height animation. `mode=\"single\"` (default) keeps one open at a time; `mode=\"multiple\"` allows independent toggling.\n\n```tsx\nimport { FaqAccordion } from \"@appio/layout-blocks\";\n\n<FaqAccordion\n  heading=\"Questions?\"\n  mode=\"single\"\n  defaultOpenIds={[\"free-plan\"]}\n  items={[\n    { id: \"free-plan\", question: \"Is there a free plan?\", answer: \"Yes — 3 apps, unlimited previews.\" },\n    { id: \"export\", question: \"Can I export my code?\", answer: \"Every published app ships with full source.\" },\n  ]}\n/>\n```\n\nAnswers accept JSX — include links, lists, code snippets in answers freely. Keyboard accessible (Tab + Enter/Space).",
+    "tags": [
+      "faq-accordion",
+      "faq",
+      "help",
+      "accordion",
+      "support",
+      "layout-blocks"
+    ]
+  },
+  {
+    "category": "layout_blocks",
+    "title": "EmptyStateIllustrated — illustration + CTA for empty views",
+    "content": "Illustration slot + heading + description + optional CTA pair. Use when a data view has no items and the absence is meaningful. NOT for loading states (use Skeleton there).\n\n```tsx\nimport { EmptyStateIllustrated } from \"@appio/layout-blocks\";\nimport { Inbox } from \"lucide-react\";\n\n<EmptyStateIllustrated\n  illustration={<Inbox className=\"h-16 w-16\"/>}\n  heading=\"No apps yet\"\n  description=\"Describe an app in the chat to get started.\"\n  primaryAction={{ label: \"Create your first app\", href: \"/create\" }}\n  secondaryAction={{ label: \"Browse templates\", href: \"/templates\" }}\n/>\n```\n\nSizes: `default` (min-h-60vh, page-scale) and `compact` (inline, for section-scale empty states).",
+    "tags": [
+      "empty-state-illustrated",
+      "empty-state",
+      "illustration",
+      "no-data",
+      "onboarding",
+      "layout-blocks"
+    ]
+  },
+  {
+    "category": "layout_blocks",
+    "title": "CommandPalette — ⌘K-style searchable launcher",
+    "content": "Dialog-based command palette with grouped results, keyboard navigation (↑↓ Enter Esc), and keyword matching. Controlled open state.\n\n```tsx\nimport { CommandPalette } from \"@appio/layout-blocks\";\n\nconst [open, setOpen] = useState(false);\n\n// Global ⌘K / Ctrl+K shortcut\nuseEffect(() => {\n  const handler = (e: KeyboardEvent) => {\n    if ((e.metaKey || e.ctrlKey) && e.key === \"k\") { e.preventDefault(); setOpen(o => !o); }\n  };\n  window.addEventListener(\"keydown\", handler);\n  return () => window.removeEventListener(\"keydown\", handler);\n}, []);\n\n<CommandPalette\n  open={open}\n  onOpenChange={setOpen}\n  groups={[\n    {\n      id: \"nav\", heading: \"Navigation\",\n      items: [\n        { id: \"home\", label: \"Go Home\", shortcut: \"⌘H\", onSelect: () => router.push(\"/\") },\n        { id: \"apps\", label: \"My Apps\", keywords: [\"apps\", \"projects\"], onSelect: () => router.push(\"/apps\") },\n      ],\n    },\n  ]}\n/>\n```\n\nItems match against `label` + `description` + `keywords`. Closes on select by default — set `closeOnSelect={false}` for multi-action flows.",
+    "tags": [
+      "command-palette",
+      "cmdk",
+      "search",
+      "keyboard",
+      "navigation",
+      "quick-actions",
+      "layout-blocks"
+    ]
+  }
+]

@@ -1,0 +1,68 @@
+# Docker build context exclusions — keeps API / builder images small
+# and avoids leaking secrets or dev state.
+
+# Secrets
+.env
+.env.*
+!.env.example
+service-account*.json
+
+# Dependencies / caches
+node_modules
+**/node_modules
+.venv
+**/.venv
+venv
+**/venv
+__pycache__
+**/__pycache__
+*.pyc
+*.pyo
+.pytest_cache
+**/.pytest_cache
+.mypy_cache
+**/.mypy_cache
+.ruff_cache
+**/.ruff_cache
+
+# Build outputs
+dist
+**/dist
+build
+**/build
+.next
+**/.next
+out
+**/out
+.turbo
+**/.turbo
+
+# Version control / IDE
+.git
+.gitignore
+.github
+.vscode
+.idea
+*.swp
+.DS_Store
+
+# Tests / fixtures (keep tests runnable inside CI but out of runtime image)
+tests/prompt-suite/runs
+tests/prompt-suite/snapshots
+
+# Docs
+docs
+*.md
+!README.md
+
+# macOS
+.DS_Store
+**/.DS_Store
+
+# Logs
+*.log
+logs
+
+# Misc
+.editorconfig
+LICENSE

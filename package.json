@@ -1,0 +1,26 @@
+{
+  "name": "appio",
+  "private": true,
+  "packageManager": "npm@10.8.2",
+  "workspaces": [
+    "apps/mobile",
+    "apps/web",
+    "apps/admin",
+    "packages/*"
+  ],
+  "devDependencies": {
+    "turbo": "^2.4.0",
+    "@types/react": "^19",
+    "@types/react-dom": "^19"
+  },
+  "overrides": {
+    "@types/react": "$@types/react",
+    "@types/react-dom": "$@types/react-dom"
+  },
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "type-check": "turbo type-check"
+  }
+}

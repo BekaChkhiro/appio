@@ -1,0 +1,73 @@
+name = "appio-pwa-worker"
+main = "src/index.ts"
+compatibility_date = "2025-01-09"
+# No compatibility flags — the Worker only uses fetch, R2, KV, and the
+# Cache API, all of which are in the default runtime. Adding
+# `nodejs_compat` would only inflate the bundle and slow cold starts.
+
+# Wildcard route — every subdomain of appiousercontent.com is served by this Worker.
+# Cloudflare requires the apex zone to be on the same Cloudflare account.
+routes = [
+  { pattern = "*.appiousercontent.com/*", zone_name = "appiousercontent.com" }
+]
+
+# R2 bucket holding the per-app per-version PWA artifacts. The builder
+# (python/builder/src/appio_builder/r2.py) uploads under
+# {app_id}/v{N}/{rel_path} with the appropriate Cache-Control already set.
+[[r2_buckets]]
+binding = "PWA_BUCKET"
+bucket_name = "appio-pwas"
+preview_bucket_name = "appio-pwas-preview"
+
+# KV namespace storing the current version pointer per app:
+#   KV[app_id] = "v{N}"
+# The builder updates this atomically *after* all R2 uploads succeed.
+# IDs below are placeholders — fill in after `wrangler kv namespace create`.
+[[kv_namespaces]]
+binding = "VERSION_KV"
+id = "422ac8799cb647d8aca11b5d2dcc32cf"
+preview_id = "f06a173cf8404e4b87eeef0b80c6cd0b"
+
+# KV namespace for push notification subscriptions.
+# Keys: push:{app_id}:subs (subscription array), push:{app_id}:secret (auth token)
+# Create with: wrangler kv namespace create PUSH_KV
+[[kv_namespaces]]
+binding = "PUSH_KV"
+id = "972b8a433bcb457f9d2535cd0e12248b"
+
+[vars]
+APEX_DOMAIN = "appiousercontent.com"
+LOG_LEVEL = "info"
+# Allowed origins for iframe embedding (CSP frame-ancestors) — both for
+# preview URLs AND production deployed apps. Dev origins are included
+# so the split-panel editor works on localhost without Worker redeploy.
+PREVIEW_FRAME_ANCESTORS = "https://appio.app https://beta.appio.app http://localhost:3000 http://localhost:3001"
+# VAPID keys — set as secrets in production:
+#   wrangler secret put VAPID_PUBLIC_KEY
+#   wrangler secret put VAPID_PRIVATE_KEY
+#   wrangler secret put VAPID_SUBJECT
+# Generate a VAPID key pair: npx web-push generate-vapid-keys
+
+# ---------------------------------------------------------------- staging
+[env.staging]
+name = "appio-pwa-worker-staging"
+routes = [
+  { pattern = "*.staging.appiousercontent.com/*", zone_name = "appiousercontent.com" }
+]
+
+[[env.staging.r2_buckets]]
+binding = "PWA_BUCKET"
+bucket_name = "appio-pwas-staging"
+
+[[env.staging.kv_namespaces]]
+binding = "VERSION_KV"
+id = "REPLACE_WITH_STAGING_NAMESPACE_ID"
+
+[[env.staging.kv_namespaces]]
+binding = "PUSH_KV"
+id = "REPLACE_WITH_STAGING_PUSH_KV_ID"
+
+[env.staging.vars]
+APEX_DOMAIN = "staging.appiousercontent.com"
+LOG_LEVEL = "debug"
+PREVIEW_FRAME_ANCESTORS = "https://beta.appio.app http://localhost:3000"

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="{{THEME_COLOR}}" />
+  <title>{{APP_NAME}}</title>
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="icon" href="/icon-192.png" type="image/png" />
+  <link rel="apple-touch-icon" href="/icon-192.png" />
+  <!-- {{ENTRY_CSS}} -->
+  <style>
+    :root {
+      --color-primary: {{PRIMARY_COLOR}};
+      --color-primary-light: {{PRIMARY_LIGHT_COLOR}};
+      --color-background: {{BACKGROUND_COLOR}};
+      --color-surface: {{SURFACE_COLOR}};
+      --color-text-primary: {{TEXT_PRIMARY_COLOR}};
+      --color-text-secondary: {{TEXT_SECONDARY_COLOR}};
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--color-background); color: var(--color-text-primary); }
+    #root { min-height: 100dvh; }
+
+    /* ========= Install Gate ========= */
+    .appio-gate {
+      position: fixed; inset: 0; z-index: 2147483647;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 20px; overflow-y: auto;
+      background: linear-gradient(160deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .appio-gate-card {
+      background: #fff; border-radius: 24px; padding: 28px 22px;
+      max-width: 380px; width: 100%;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+      text-align: center;
+    }
+    .appio-gate-icon {
+      position: relative;
+      width: 84px; height: 84px; border-radius: 20px;
+      margin: 0 auto 14px;
+      overflow: hidden;
+      background: var(--color-primary);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+      color: #fff; font-size: 36px; font-weight: 700;
+    }
+    .appio-gate-icon-fallback {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .appio-gate-icon img {
+      position: relative; z-index: 1;
+      width: 100%; height: 100%; display: block; object-fit: cover;
+    }
+    .appio-gate-title { font-size: 22px; font-weight: 700; color: #111827; margin-bottom: 6px; line-height: 1.25; }
+    .appio-gate-subtitle { font-size: 14px; color: #6b7280; margin-bottom: 22px; line-height: 1.5; }
+
+    .appio-gate-btn {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%; background: var(--color-primary, #6366f1); color: #fff;
+      border: none; border-radius: 12px; padding: 14px 20px;
+      font-size: 16px; font-weight: 600; cursor: pointer;
+      transition: opacity 0.15s ease, transform 0.1s ease;
+    }
+    .appio-gate-btn:active { opacity: 0.88; transform: scale(0.98); }
+    .appio-gate-btn[disabled] { opacity: 0.55; cursor: default; }
+    .appio-gate-btn-icon { width: 18px; height: 18px; }
+
+    .appio-gate-steps { text-align: left; }
+    .appio-gate-step { display: flex; gap: 12px; align-items: flex-start; padding: 11px 0; border-top: 1px solid #f3f4f6; }
+    .appio-gate-step:first-child { border-top: none; padding-top: 4px; }
+    .appio-gate-step-num {
+      flex-shrink: 0;
+      width: 26px; height: 26px; border-radius: 50%;
+      background: var(--color-primary, #6366f1); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700;
+    }
+    .appio-gate-step-text { font-size: 14px; color: #374151; line-height: 1.5; padding-top: 3px; }
+    .appio-gate-step-text strong { color: #111827; font-weight: 600; }
+    .appio-gate-share-icon {
+      display: inline-flex; vertical-align: middle; margin: 0 1px;
+      width: 16px; height: 18px;
+    }
+
+    .appio-gate-hint {
+      margin-top: 14px; font-size: 12px; color: #9ca3af; line-height: 1.5;
+    }
+    .appio-gate-hint strong { color: #6b7280; font-weight: 600; }
+
+    .appio-gate-footer {
+      margin-top: 22px; font-size: 12px; color: rgba(255, 255, 255, 0.9);
+      text-align: center;
+    }
+    .appio-gate-footer a { color: #fff; text-decoration: none; font-weight: 600; border-bottom: 1px solid rgba(255, 255, 255, 0.5); }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <div id="appio-gate-container"></div>
+
+  <script src="/gate.js" data-entry="{{ENTRY_JS}}"></script>
+</body>
+</html>

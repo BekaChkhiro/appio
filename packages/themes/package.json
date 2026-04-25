@@ -1,0 +1,43 @@
+{
+  "name": "@appio/themes",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/src/index.js",
+  "types": "./dist/src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "default": "./dist/src/index.js"
+    },
+    "./personas/*": {
+      "types": "./dist/src/personas/*.d.ts",
+      "default": "./dist/src/personas/*.js"
+    },
+    "./lib/color": {
+      "types": "./dist/src/lib/color.d.ts",
+      "default": "./dist/src/lib/color.js"
+    },
+    "./lib/css": {
+      "types": "./dist/src/lib/css.d.ts",
+      "default": "./dist/src/lib/css.js"
+    },
+    "./lib/validate": {
+      "types": "./dist/src/lib/validate.d.ts",
+      "default": "./dist/src/lib/validate.js"
+    }
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "type-check": "tsc --noEmit",
+    "build": "tsc",
+    "validate": "tsc && node dist/scripts/validate.js",
+    "clean": "rm -rf dist"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0"
+  }
+}

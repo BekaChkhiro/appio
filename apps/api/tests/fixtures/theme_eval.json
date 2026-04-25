@@ -1,0 +1,31 @@
+{
+  "text_prompts": [
+    {"prompt": "sunset over Tokyo", "name": "Tokyo Sunset"},
+    {"prompt": "brutalist newsprint", "name": "Brutalist Newsprint"},
+    {"prompt": "glacial ice palette", "name": "Glacial Ice"},
+    {"prompt": "warm bakery", "name": "Warm Bakery"},
+    {"prompt": "cyberpunk midnight", "name": "Cyberpunk Midnight"}
+  ],
+  "image_urls": [
+    {
+      "image_url": "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=400",
+      "name": "Tokyo Night"
+    },
+    {
+      "image_url": "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=400",
+      "name": "Ice Landscape"
+    },
+    {
+      "image_url": "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400",
+      "name": "Bakery Warmth"
+    },
+    {
+      "image_url": "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400",
+      "name": "Neon City"
+    },
+    {
+      "image_url": "https://images.unsplash.com/photo-1498036882173-b41c28a8ba34?w=400",
+      "name": "Newsprint Grey"
+    }
+  ]
+}

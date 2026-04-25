@@ -1,0 +1,55 @@
+{
+  "id": "expense-tracker",
+  "version": "1.0.0",
+  "name": "expense-tracker",
+  "displayName": "Expense Tracker",
+  "category": "Finance",
+  "description": "Track transactions with categories, charts, and monthly summaries",
+  "components": [
+    "TransactionList",
+    "TransactionItem",
+    "TransactionForm",
+    "CategoryBreakdown",
+    "MonthlySummary",
+    "Chart",
+    "BalanceCard",
+    "EmptyState"
+  ],
+  "layouts": ["stack", "tabs"],
+  "dataModel": {
+    "transaction": {
+      "_id": "Id<'transactions'>",
+      "tenantId": "string",
+      "amount": "number",
+      "description": "string",
+      "category": "string",
+      "type": "'income' | 'expense'",
+      "date": "string",
+      "createdAt": "number"
+    }
+  },
+  "persona": "glassmorphic-soft",
+  "defaultTheme": {
+    "primary": "#10b981",
+    "primaryLight": "#34d399",
+    "background": "#f0fdf4",
+    "surface": "#ffffff",
+    "textPrimary": "#022c22",
+    "textSecondary": "#6b7280"
+  },
+  "propSchemas": {
+    "TransactionList": { "filter": "string", "groupBy": "string", "title": "string", "limit": "number", "showDate": "boolean" },
+    "TransactionItem": { "transactionId": "string", "showCategory": "boolean", "showDate": "boolean" },
+    "TransactionForm": { "defaultType": "string", "title": "string", "placeholder": "string" },
+    "CategoryBreakdown": { "period": "string", "title": "string", "showPercentage": "boolean", "limit": "number" },
+    "MonthlySummary": { "month": "number", "year": "number", "title": "string", "showComparison": "boolean" },
+    "Chart": { "chartType": "string", "period": "string", "title": "string", "height": "number", "showLegend": "boolean" },
+    "BalanceCard": { "showTrend": "boolean", "title": "string", "label": "string" },
+    "EmptyState": { "message": "string", "actionLabel": "string", "title": "string", "icon": "string" }
+  },
+  "constraints": {
+    "maxPages": 5,
+    "maxComponentsPerPage": 6,
+    "storageBackend": "convex"
+  }
+}

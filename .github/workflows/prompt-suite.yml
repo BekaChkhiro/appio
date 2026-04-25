@@ -1,0 +1,79 @@
+name: Prompt Suite
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - "packages/prompts/**"
+      - "packages/templates/**"
+      - "python/codegen/**"
+      - "python/shared/**"
+      - "python/builder/**"
+      - "tests/prompt_suite/**"
+  pull_request:
+    branches: [main, master]
+    paths:
+      - "packages/prompts/**"
+      - "packages/templates/**"
+      - "python/codegen/**"
+      - "python/shared/**"
+      - "python/builder/**"
+      - "tests/prompt_suite/**"
+  workflow_dispatch:
+    inputs:
+      prompt_id:
+        description: "Run a single fixture by ID (e.g., 'todo-simple'). Leave empty for all."
+        required: false
+        default: ""
+
+jobs:
+  prompt-suite:
+    name: Run Prompt Suite
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    env:
+      PYTHONPATH: python/shared/src:python/db/src:python/builder/src:python/codegen/src
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Install Python dependencies
+        run: |
+          pip install -e python/shared -e python/codegen -e python/builder
+          pip install pytest anthropic playwright
+          npx playwright install --with-deps chromium
+
+      - name: Run prompt suite
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          EXTRA_ARGS=""
+          if [ -n "${{ github.event.inputs.prompt_id }}" ]; then
+            EXTRA_ARGS="--prompt-id=${{ github.event.inputs.prompt_id }}"
+          fi
+          pytest tests/prompt_suite/ -v --tb=short $EXTRA_ARGS || true
+
+      - name: Print dashboard
+        if: always()
+        run: python -m tests.prompt_suite.report || true
+
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prompt-suite-results
+          path: tests/prompt_suite/results/
+          retention-days: 90

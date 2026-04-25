@@ -1,0 +1,105 @@
+# Dependabot configuration for Appio.
+# - npm deps auto-patched (security only + weekly minor)
+# - pip deps weekly
+# - GitHub Actions weekly
+# - Docker base images weekly
+#
+# Major-version bumps are opened as PRs but NOT auto-merged — they need
+# human review because Next.js / React / Firebase majors have breaking
+# changes that TypeScript alone won't catch.
+
+version: 2
+
+updates:
+  # ── Root (workspaces hub) ───────────────────────────────
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "04:00"
+      timezone: "Etc/UTC"
+    open-pull-requests-limit: 10
+    commit-message:
+      prefix: "chore(deps)"
+    groups:
+      security:
+        applies-to: security-updates
+        patterns: ["*"]
+      types:
+        patterns: ["@types/*"]
+      shadcn-radix:
+        patterns: ["@radix-ui/*"]
+      dev:
+        dependency-type: development
+        patterns: ["*"]
+    ignore:
+      # Pin Next and React majors — manual review only
+      - dependency-name: "next"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "react"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "react-dom"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "firebase"
+        update-types: ["version-update:semver-major"]
+
+  # ── apps/web ────────────────────────────────────────────
+  - package-ecosystem: npm
+    directory: "/apps/web"
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore(web/deps)"
+
+  # ── apps/admin ──────────────────────────────────────────
+  - package-ecosystem: npm
+    directory: "/apps/admin"
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore(admin/deps)"
+
+  # ── Python backend ──────────────────────────────────────
+  - package-ecosystem: pip
+    directory: "/apps/api"
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore(api/deps)"
+    ignore:
+      - dependency-name: "fastapi"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "pydantic"
+        update-types: ["version-update:semver-major"]
+
+  # ── GitHub Actions ──────────────────────────────────────
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+    commit-message:
+      prefix: "chore(ci)"
+
+  # ── Docker base images ──────────────────────────────────
+  - package-ecosystem: docker
+    directory: "/docker"
+    schedule:
+      interval: weekly
+      day: monday
+    commit-message:
+      prefix: "chore(docker)"
+  - package-ecosystem: docker
+    directory: "/docker/builder"
+    schedule:
+      interval: weekly
+      day: monday
+    commit-message:
+      prefix: "chore(docker)"

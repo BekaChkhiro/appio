@@ -1,0 +1,51 @@
+{
+  "id": "todo-list",
+  "version": "1.0.0",
+  "name": "todo-list",
+  "displayName": "To-Do List",
+  "category": "Productivity",
+  "description": "Task management with categories, due dates, and completion tracking",
+  "components": [
+    "TaskList",
+    "TaskItem",
+    "TaskForm",
+    "CategoryFilter",
+    "ProgressBar",
+    "EmptyState"
+  ],
+  "layouts": ["stack", "tabs"],
+  "dataModel": {
+    "task": {
+      "id": "string",
+      "title": "string",
+      "description": "string",
+      "category": "string",
+      "completed": "boolean",
+      "dueDate": "date",
+      "priority": "string",
+      "createdAt": "date"
+    }
+  },
+  "persona": "minimal-mono",
+  "defaultTheme": {
+    "primary": "#6366f1",
+    "primaryLight": "#818cf8",
+    "background": "#f8fafc",
+    "surface": "#ffffff",
+    "textPrimary": "#0f172a",
+    "textSecondary": "#64748b"
+  },
+  "propSchemas": {
+    "TaskList": { "filter": "string", "sortBy": "string", "title": "string", "showCompleted": "boolean" },
+    "TaskItem": { "taskId": "string", "showDescription": "boolean", "showDueDate": "boolean", "showPriority": "boolean" },
+    "TaskForm": { "defaultCategory": "string", "defaultPriority": "string", "title": "string", "placeholder": "string" },
+    "CategoryFilter": { "categories": "string[]", "title": "string", "showAll": "boolean" },
+    "ProgressBar": { "showPercentage": "boolean", "label": "string", "title": "string", "height": "number" },
+    "EmptyState": { "message": "string", "actionLabel": "string", "title": "string", "icon": "string" }
+  },
+  "constraints": {
+    "maxPages": 5,
+    "maxComponentsPerPage": 6,
+    "storageBackend": "localStorage"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "name": "@appio/pwa-worker",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Cloudflare Worker that serves user-built PWAs from R2 on *.appiousercontent.com",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "deploy:staging": "wrangler deploy --env staging",
+    "type-check": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-pool-workers": "^0.5.0",
+    "@cloudflare/workers-types": "^4.20250109.0",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0",
+    "wrangler": "^3.99.0"
+  }
+}

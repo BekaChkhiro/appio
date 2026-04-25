@@ -1,0 +1,25 @@
+[project]
+name = "appio-python"
+version = "0.1.0"
+requires-python = ">=3.12"
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+select = ["E", "F", "I", "N", "W", "UP", "B", "A", "C4", "SIM", "TCH"]
+ignore = ["E501", "B008"]
+
+[tool.ruff.isort]
+known-first-party = ["appio_shared", "appio_db", "appio_builder", "appio_codegen"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+plugins = ["pydantic.mypy"]
+ignore_missing_imports = true
+explicit_package_bases = true
+mypy_path = "python/shared/src:python/db/src:python/builder/src:python/codegen/src"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["apps/api/tests", "python", "tests"]

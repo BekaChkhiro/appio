@@ -1,0 +1,53 @@
+# Dependencies
+node_modules/
+.venv/
+
+# Build outputs
+.next/
+dist/
+build/
+.expo/
+*.tsbuildinfo
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+
+# Claude Code (local-only)
+.claude/settings.local.json
+.claude/worktrees/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Turborepo
+.turbo/
+
+# Coverage
+coverage/
+htmlcov/
+
+# Prompt suite results (generated, not committed)
+tests/prompt_suite/results/*.json
+
+# Misc
+*.db
+*.sqlite3
+google-services.json
+GoogleService-Info.plist
+service-account*.json
