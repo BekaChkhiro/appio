@@ -15,7 +15,7 @@
 # over Fly's 6PN private network. The server in this image accepts the
 # request, runs nsjail+esbuild, and returns the dist tarball in the
 # response. See ``docker/builder/server.py`` for the contract.
-FROM node:20-slim
+FROM node:25-slim
 
 # Install nsjail, tar, and python3 (already part of slim, but pin minimal
 # package set explicitly). Avoid curl/wget/git so a successful nsjail
