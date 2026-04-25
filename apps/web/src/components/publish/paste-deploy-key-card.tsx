@@ -9,7 +9,10 @@ interface PasteDeployKeyCardProps {
   appId: string;
 }
 
-const CONVEX_CLOUD_RE = /^https:\/\/[^.]+\.convex\.cloud\/?$/;
+// Accepts both legacy URLs (https://name.convex.cloud) and current
+// region-scoped URLs (https://name.eu-west-1.convex.cloud) returned by
+// the Convex provisioning API.
+const CONVEX_CLOUD_RE = /^https:\/\/[a-z0-9-]+(\.[a-z0-9-]+)?\.convex\.cloud\/?$/;
 
 function validateDeploymentUrl(value: string): string | null {
   if (!value) return "Deployment URL is required.";
@@ -84,8 +87,13 @@ export function PasteDeployKeyCard({ appId }: PasteDeployKeyCardProps) {
     );
   }
 
+  // Both `prod:<team>|<secret>` (newer team-scoped) and
+  // `<deployment>|<secret>` (older deployment-scoped) keys are valid.
+  // Only warn when the format doesn't match either pattern.
   const keyWarnPrefix =
-    touched.deployKey && deployKey && !deployKey.startsWith("prod:");
+    touched.deployKey &&
+    deployKey.length > 0 &&
+    !/^(?:prod:)?[a-z0-9-]+\|.+$/.test(deployKey);
 
   return (
     <Card className="mx-auto w-full max-w-lg">
