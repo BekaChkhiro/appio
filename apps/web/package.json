@@ -43,6 +43,6 @@
     "postcss": "^8",
     "serwist": "^9.5.7",
     "tailwindcss": "^4.1.0",
-    "typescript": "^5.7.0"
+    "typescript": "^6.0.3"
   }
 }
