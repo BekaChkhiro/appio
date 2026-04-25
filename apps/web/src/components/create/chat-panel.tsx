@@ -149,7 +149,7 @@ export function ChatPanel({
     <div className="flex h-full flex-col">
       {/* ── Header ── */}
       <div
-        className="flex shrink-0 items-center gap-2.5 px-5 py-3"
+        className="flex shrink-0 items-center gap-2.5 px-4 py-3 sm:px-5"
         style={{ borderBottom: "1px solid var(--hair)" }}
       >
         <Sparkles size={16} style={{ color: "var(--accent-token)" }} />
@@ -238,7 +238,7 @@ export function ChatPanel({
       )}
 
       {/* ── Messages area ── */}
-      <div ref={scrollRef} className="scroll flex-1 overflow-y-auto px-5 pt-5">
+      <div ref={scrollRef} className="scroll flex-1 overflow-y-auto px-4 pt-4 sm:px-5 sm:pt-5">
         {hasMessages ? (
           <div className="flex flex-col gap-4 pb-4">
             {messages.map((msg, i) => (
@@ -386,7 +386,7 @@ export function ChatPanel({
       </div>
 
       {/* ── Input area ── */}
-      <div className="shrink-0 px-4 pb-4 pt-2" style={{ borderTop: "1px solid var(--hair)" }}>
+      <div className="shrink-0 px-3 pb-3 pt-2 sm:px-4 sm:pb-4" style={{ borderTop: "1px solid var(--hair)" }}>
         {/* Quick chips */}
         {hasMessages && (
           <div className="mb-2.5 flex gap-1.5 overflow-auto pb-1">

@@ -3,7 +3,7 @@
 import React, { useState, useMemo } from "react";
 import Link from "next/link";
 import { Button } from "@appio/ui";
-import { Plus, Search, MoreVertical, Sparkles, Loader2 } from "lucide-react";
+import { Plus, Search, MoreVertical, Sparkles, ArrowRight } from "lucide-react";
 import { useMyApps } from "@appio/api-client";
 import type { App } from "@appio/api-client";
 
@@ -105,13 +105,36 @@ function SkeletonCard() {
 // ---------- New app tile ----------
 function NewAppTile() {
   return (
-    <Link href="/create" style={{ textDecoration: "none" }}>
+    <Link href="/create" className="block" style={{ textDecoration: "none" }}>
       <div
+        className="flex min-h-[88px] items-center gap-3 rounded-xl p-3 sm:hidden"
+        style={{
+          background: "var(--surface-1)",
+          border: "1.5px dashed var(--strong)",
+        }}
+      >
+        <div
+          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl"
+          style={{ background: "var(--surface-2)", color: "var(--text-primary)" }}
+        >
+          <Plus className="h-5 w-5" />
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="text-[15px] font-semibold" style={{ color: "var(--text-primary)" }}>
+            New app
+          </div>
+          <div className="mt-1 text-[12px]" style={{ color: "var(--text-muted)" }}>
+            Start from a sentence
+          </div>
+        </div>
+        <ArrowRight className="h-4 w-4 shrink-0" style={{ color: "var(--text-muted)" }} />
+      </div>
+      <div
+        className="hidden sm:flex"
         style={{
           background: "var(--surface-0)",
           border: "1.5px dashed var(--strong)",
           borderRadius: "var(--r-card, 10px)",
-          display: "flex",
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
@@ -157,8 +180,35 @@ function AppCard({ app }: { app: App }) {
   const tint = app.theme_color || "#7C5CFF";
 
   return (
-    <Link href={`/build?app=${app.id}`} style={{ textDecoration: "none" }}>
+    <Link href={`/build?app=${app.id}`} className="block" style={{ textDecoration: "none" }}>
       <div
+        className="flex min-h-[92px] items-center gap-3 rounded-xl p-3 sm:hidden"
+        style={{
+          background: "var(--surface-1)",
+          border: "1px solid var(--hair)",
+        }}
+      >
+        <div
+          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-base font-bold text-white"
+          style={{ background: tint }}
+        >
+          {app.name.charAt(0).toUpperCase()}
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="truncate text-[15px] font-semibold" style={{ color: "var(--text-primary)" }}>
+            {app.name}
+          </div>
+          <div className="mt-2 flex min-w-0 items-center gap-2">
+            <StatusChip status={app.status} />
+            <span className="truncate text-[12px]" style={{ color: "var(--text-muted)" }}>
+              Edited {edited}
+            </span>
+          </div>
+        </div>
+        <ArrowRight className="h-4 w-4 shrink-0" style={{ color: "var(--text-muted)" }} />
+      </div>
+      <div
+        className="hidden sm:block"
         style={{
           background: "var(--surface-1)",
           border: "1px solid var(--hair)",
@@ -227,7 +277,7 @@ function AppCard({ app }: { app: App }) {
 // ---------- Empty state ----------
 function EmptyState() {
   return (
-    <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: 48 }}>
+    <div className="flex flex-1 items-center justify-center px-3 py-14 sm:p-12">
       <div style={{ textAlign: "center", maxWidth: 560 }}>
         <div
           style={{
@@ -250,8 +300,8 @@ function EmptyState() {
         <div className="t-body-lg muted" style={{ marginBottom: 32 }}>
           What do you want to build? A habit tracker. A wedding RSVP. A dashboard for your bakery. Anything you can describe, Appio can make.
         </div>
-        <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>
-          <Button size="lg" asChild>
+        <div className="flex justify-center gap-3">
+          <Button size="lg" asChild className="w-full sm:w-auto">
             <Link href="/build" className="inline-flex items-center gap-2">
               <Sparkles className="h-4 w-4" />
               Start from scratch
@@ -268,7 +318,7 @@ export function MyAppsView() {
   const [filter, setFilter] = useState("all");
   const [search, setSearch] = useState("");
 
-  const apps = data?.items || [];
+  const apps = useMemo(() => data?.items ?? [], [data?.items]);
 
   const filtered = useMemo(() => {
     let result = apps;
@@ -291,7 +341,7 @@ export function MyAppsView() {
 
   return (
     <div
-      className="scroll"
+      className="scroll mobile-page-scroll"
       style={{
         height: "100%",
         overflow: "auto",
@@ -299,18 +349,11 @@ export function MyAppsView() {
       }}
     >
       <div
-        className="px-6 py-8 sm:px-12 lg:px-16"
-        style={{ maxWidth: 1440, margin: "0 auto" }}
+        className="px-4 pb-6 pt-5 sm:px-12 sm:py-8 lg:px-16"
+        style={{ maxWidth: 1440, margin: "0 auto", width: "100%" }}
       >
         <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "flex-end",
-            marginBottom: 40,
-            flexWrap: "wrap",
-            gap: 16,
-          }}
+          className="mb-6 flex flex-col gap-4 sm:mb-10 sm:flex-row sm:items-end sm:justify-between"
         >
           <div>
             <div className="t-overline" style={{ marginBottom: 8 }}>
@@ -318,8 +361,9 @@ export function MyAppsView() {
             </div>
             <div className="t-display" style={{ color: "var(--text-primary)" }}>Your apps</div>
           </div>
-          <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+          <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center sm:gap-3">
             <div
+              className="w-full sm:w-60"
               style={{
                 display: "inline-flex",
                 alignItems: "center",
@@ -329,7 +373,6 @@ export function MyAppsView() {
                 padding: "0 10px",
                 height: 36,
                 gap: 8,
-                width: 240,
               }}
             >
               <Search className="h-3.5 w-3.5 shrink-0" style={{ color: "var(--text-muted)" }} />
@@ -348,7 +391,7 @@ export function MyAppsView() {
                 }}
               />
             </div>
-            <Button size="sm" asChild className="inline-flex items-center gap-1.5">
+            <Button size="sm" asChild className="inline-flex h-10 w-full items-center gap-1.5 sm:w-auto">
               <Link href="/create">
                 <Plus className="h-3.5 w-3.5" />
                 New app
@@ -377,10 +420,8 @@ export function MyAppsView() {
         {/* Filter tabs */}
         {!isLoading && !error && apps.length > 0 && (
           <div
+            className="no-scrollbar -mx-4 mb-5 flex gap-1 overflow-x-auto border-b px-4 sm:mx-0 sm:mb-8 sm:px-0"
             style={{
-              display: "flex",
-              gap: 6,
-              marginBottom: 32,
               borderBottom: "1px solid var(--hair)",
             }}
           >
@@ -391,7 +432,8 @@ export function MyAppsView() {
                 ["published", "Published"],
               ] as const
             ).map(([k, l]) => (
-              <div
+              <button
+                type="button"
                 key={k}
                 onClick={() => setFilter(k)}
                 style={{
@@ -403,20 +445,21 @@ export function MyAppsView() {
                   marginBottom: -1,
                   cursor: "pointer",
                   userSelect: "none",
+                  whiteSpace: "nowrap",
                 }}
               >
                 {l}{" "}
                 <span style={{ color: "var(--text-subtle)", marginLeft: 4 }}>
                   {counts[k as keyof typeof counts]}
                 </span>
-              </div>
+              </button>
             ))}
           </div>
         )}
 
         {/* Grid */}
         {isLoading ? (
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3 xl:grid-cols-4">
             <NewAppTile />
             {Array.from({ length: 6 }).map((_, i) => (
               <SkeletonCard key={i} />
@@ -430,7 +473,7 @@ export function MyAppsView() {
             <div className="t-body muted">Nothing matched your search. Try another word.</div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3 xl:grid-cols-4">
             <NewAppTile />
             {filtered.map((app) => (
               <AppCard key={app.id} app={app} />

@@ -55,7 +55,7 @@ function Chip({ variant, children, style }: { variant: string; children: React.R
 
 function SettingGroup({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div style={{ marginBottom: 32 }}>
+    <div className="profile-setting-group" style={{ marginBottom: 32 }}>
       <div className="t-overline" style={{ marginBottom: 12 }}>{label}</div>
       <div style={{ background: "var(--surface-1)", border: "1px solid var(--hair)", borderRadius: 10 }}>{children}</div>
     </div>
@@ -64,16 +64,27 @@ function SettingGroup({ label, children }: { label: string; children: React.Reac
 
 function SettingRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div style={{ padding: "16px 20px", display: "flex", alignItems: "center", gap: 16, borderBottom: "1px solid var(--hair)" }}>
-      <div style={{ width: 140, fontSize: 13, color: "var(--text-muted)", flexShrink: 0 }}>{label}</div>
-      <div style={{ flex: 1 }}>{children}</div>
+    <div
+      className="profile-setting-row"
+      style={{ padding: "16px 20px", display: "flex", alignItems: "center", gap: 16, borderBottom: "1px solid var(--hair)" }}
+    >
+      <div
+        className="profile-setting-label"
+        style={{ width: 140, fontSize: 13, color: "var(--text-muted)", flexShrink: 0 }}
+      >
+        {label}
+      </div>
+      <div className="profile-setting-value" style={{ flex: 1 }}>{children}</div>
     </div>
   );
 }
 
 function ServiceRow({ icon, name, acct }: { icon: string; name: string; acct: string }) {
   return (
-    <div style={{ padding: "16px 20px", display: "flex", alignItems: "center", gap: 14, borderBottom: "1px solid var(--hair)" }}>
+    <div
+      className="profile-service-row"
+      style={{ padding: "16px 20px", display: "flex", alignItems: "center", gap: 14, borderBottom: "1px solid var(--hair)" }}
+    >
       <div style={{ width: 36, height: 36, borderRadius: 8, background: "var(--surface-2)", display: "flex", alignItems: "center", justifyContent: "center" }}>
         {icon === "github" ? (
           <Github className="h-[18px] w-[18px]" style={{ color: "var(--text-primary)" }} />
@@ -107,7 +118,8 @@ function ThemeToggleWidget() {
         const label = key === "dark" ? "☾  Dark" : "☀  Light";
         const active = mode === key;
         return (
-          <div
+          <button
+            type="button"
             key={key}
             onClick={() => setMode(key)}
             style={{
@@ -122,7 +134,7 @@ function ThemeToggleWidget() {
             }}
           >
             {label}
-          </div>
+          </button>
         );
       })}
     </div>
@@ -187,48 +199,47 @@ export function ProfileView() {
 
   return (
     <div
-      className="scroll"
+      className="scroll mobile-page-scroll"
       style={{ height: "100%", overflow: "auto", background: "var(--surface-0)" }}
     >
       <div
-        className="px-6 py-8 sm:px-12 lg:px-16"
-        style={{ maxWidth: 960, margin: "0 auto" }}
+        className="px-4 pb-6 pt-5 sm:px-12 sm:py-8 lg:px-16"
+        style={{ maxWidth: 960, margin: "0 auto", width: "100%" }}
       >
         <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "200px 1fr",
-            gap: 48,
-          }}
           className="profile-grid"
         >
           {/* Sidebar */}
           <div>
             <div className="t-overline" style={{ marginBottom: 16 }}>Account</div>
-            {TABS.map((t) => (
-              <div
-                key={t}
-                onClick={() => setActiveTab(t)}
-                style={{
-                  padding: "8px 10px",
-                  marginBottom: 2,
-                  borderRadius: 6,
-                  fontSize: 13,
-                  fontWeight: 500,
-                  background: activeTab === t ? "var(--surface-2)" : "transparent",
-                  color: activeTab === t ? "var(--text-primary)" : "var(--text-muted)",
-                  cursor: "pointer",
-                  userSelect: "none",
-                }}
-              >
-                {t}
-              </div>
-            ))}
+            <div className="profile-tabs-list">
+              {TABS.map((t) => (
+                <button
+                  type="button"
+                  key={t}
+                  onClick={() => setActiveTab(t)}
+                  className="profile-tab-button"
+                  style={{
+                    padding: "8px 10px",
+                    marginBottom: 2,
+                    borderRadius: 6,
+                    fontSize: 13,
+                    fontWeight: 500,
+                    background: activeTab === t ? "var(--surface-2)" : "transparent",
+                    color: activeTab === t ? "var(--text-primary)" : "var(--text-muted)",
+                    cursor: "pointer",
+                    userSelect: "none",
+                  }}
+                >
+                  {t}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Content */}
           <div>
-            <div className="t-display" style={{ marginBottom: 32, color: "var(--text-primary)" }}>
+            <div className="t-display" style={{ marginBottom: 24, color: "var(--text-primary)" }}>
               {activeTab}
             </div>
 

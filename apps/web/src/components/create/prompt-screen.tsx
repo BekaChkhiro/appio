@@ -63,10 +63,10 @@ export function PromptScreen() {
   };
 
   return (
-    <div className="scroll flex h-full flex-col items-center justify-center overflow-auto px-4 py-12" style={{ background: "var(--surface-0)" }}>
+    <div className="scroll mobile-page-scroll flex h-full flex-col items-center justify-start overflow-auto px-4 py-6 sm:justify-center sm:py-12" style={{ background: "var(--surface-0)" }}>
       <div className="w-full max-w-[640px]">
         {/* Hero */}
-        <div className="mb-8 text-center">
+        <div className="mb-6 text-center sm:mb-8">
           <div
             className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl"
             style={{ background: "var(--accent-soft)" }}
@@ -101,7 +101,6 @@ export function PromptScreen() {
             onChange={(e) => setVal(e.target.value)}
             onKeyDown={handleKeyDown}
             rows={3}
-            autoFocus
             placeholder="A quiet habit tracker with streaks and a morning routine mode"
             className="w-full resize-none bg-transparent text-[18px] leading-relaxed outline-none sm:text-[20px]"
             style={{
@@ -113,7 +112,7 @@ export function PromptScreen() {
           <div className="mt-3 flex justify-end">
             <Button
               size="sm"
-              className="gap-1.5"
+              className="h-10 w-full gap-1.5 sm:w-auto"
               style={{ background: val.trim() ? "var(--accent-token)" : "var(--surface-2)" }}
               disabled={!val.trim()}
               onClick={handleStart}
@@ -140,7 +139,7 @@ export function PromptScreen() {
                 <button
                   key={t.label}
                   onClick={() => handleTemplate(t.prompt)}
-                  className="flex items-center gap-2.5 rounded-lg px-3.5 py-3 text-left text-[13px] font-medium transition-colors"
+                  className="flex min-h-11 items-center gap-2.5 rounded-lg px-3.5 py-3 text-left text-[13px] font-medium transition-colors"
                   style={{
                     background: "var(--surface-1)",
                     border: "1px solid var(--hair)",

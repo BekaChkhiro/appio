@@ -14,12 +14,12 @@ export default function AppLayout({
 
   return (
     <AuthGate>
-      <div className="flex h-screen overflow-hidden">
+      <div className="app-shell flex overflow-hidden">
         {/* Desktop sidebar */}
         <AppSidebar currentPath={pathname} />
 
         {/* Main content area */}
-        <main className="flex flex-1 flex-col overflow-hidden pb-16 md:pb-0">
+        <main className="app-main flex min-w-0 flex-1 flex-col overflow-hidden">
           {children}
         </main>
 

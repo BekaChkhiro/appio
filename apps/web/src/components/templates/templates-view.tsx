@@ -34,9 +34,9 @@ export function TemplatesView() {
   }, [templates, search]);
 
   return (
-    <div className="flex h-full flex-col overflow-y-auto">
+    <div className="mobile-page-scroll flex h-full flex-col overflow-y-auto">
       {/* Header */}
-      <div className="flex items-center gap-3 border-b border-border px-6 py-4">
+      <div className="flex items-center gap-3 border-b border-border px-4 py-3 sm:px-6 sm:py-4">
         <Button asChild variant="ghost" size="icon" className="h-8 w-8">
           <Link href="/build">
             <ArrowLeft className="h-4 w-4" />
@@ -46,7 +46,7 @@ export function TemplatesView() {
       </div>
 
       {/* Search */}
-      <div className="px-6 pt-4">
+      <div className="px-4 pt-4 sm:px-6">
         <TemplateSearch value={search} onChange={setSearch} />
       </div>
 
@@ -63,7 +63,7 @@ export function TemplatesView() {
       )}
 
       {/* Grid */}
-      <div className="flex-1 p-6 pt-3">
+      <div className="flex-1 p-4 pt-3 sm:p-6 sm:pt-3">
         {isLoading ? (
           <TemplatesSkeleton />
         ) : isError ? (
@@ -95,7 +95,7 @@ export function TemplatesView() {
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
             {filtered.map((template, i) => (
               <TemplateCard key={template.id} template={template} index={i} />
             ))}

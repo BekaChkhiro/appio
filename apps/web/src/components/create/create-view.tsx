@@ -37,7 +37,7 @@ export function CreateView() {
   const templateHandledRef = useRef(false);
   const lastLoadedAppIdRef = useRef<string | null>(null);
 
-  const { addMessage, messages, clearMessages, setMessages } = useChatStore();
+  const { addMessage, messages, setMessages } = useChatStore();
   const { incrementGenerations } = useInstallStore();
   const { getIdToken } = useAuth();
 
@@ -187,7 +187,7 @@ export function CreateView() {
     <div className="flex h-full flex-col" style={{ background: "var(--surface-0)" }}>
       {/* ── Mobile tab bar ── */}
       <div
-        className="flex shrink-0 items-center md:hidden"
+        className="flex h-12 shrink-0 items-center md:hidden"
         style={{ borderBottom: "1px solid var(--hair)", background: "var(--surface-0)" }}
       >
         {(["chat", "preview"] as const).map((tab) => {
@@ -196,7 +196,7 @@ export function CreateView() {
             <button
               key={tab}
               onClick={() => setMobileTab(tab)}
-              className="relative flex flex-1 items-center justify-center gap-2 py-3 text-sm font-medium transition-colors"
+              className="relative flex h-full flex-1 items-center justify-center gap-2 text-sm font-medium transition-colors"
               style={{
                 color: isActive ? "var(--accent-token)" : "var(--text-muted)",
               }}

@@ -27,7 +27,7 @@ function LogoMark({ size = 22 }: { size?: number }) {
         fontSize: size * 0.6,
         fontFamily: "var(--font-display)",
         fontWeight: 700,
-        letterSpacing: "-0.03em",
+        letterSpacing: 0,
         flexShrink: 0,
       }}
     >
@@ -42,6 +42,8 @@ export function MarketingNavbar() {
   const { user, loading, signOut } = useAuth();
 
   const isAuthRoute = pathname?.startsWith("/auth");
+
+  if (isAuthRoute) return null;
 
   const handleSignOut = async () => {
     await signOut();
@@ -63,7 +65,7 @@ export function MarketingNavbar() {
             fontFamily: "var(--font-display)",
             fontSize: 18,
             fontWeight: 600,
-            letterSpacing: "-0.02em",
+            letterSpacing: 0,
             color: "var(--text-primary)",
           }}
         >
@@ -105,21 +107,19 @@ export function MarketingNavbar() {
             </Button>
           </>
         ) : (
-          !isAuthRoute && (
-            <>
-              <Button
-                size="sm"
-                variant="ghost"
-                asChild
-                className="hidden sm:inline-flex"
-              >
-                <Link href="/auth/sign-in">Sign in</Link>
-              </Button>
-              <Button size="sm" asChild>
-                <Link href="/auth/sign-up">Start free</Link>
-              </Button>
-            </>
-          )
+          <>
+            <Button
+              size="sm"
+              variant="ghost"
+              asChild
+              className="hidden sm:inline-flex"
+            >
+              <Link href="/auth/sign-in">Sign in</Link>
+            </Button>
+            <Button size="sm" asChild>
+              <Link href="/auth/sign-up">Start free</Link>
+            </Button>
+          </>
         )}
       </div>
     </header>

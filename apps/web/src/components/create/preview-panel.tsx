@@ -105,7 +105,7 @@ export function PreviewPanel({
     <div className="flex h-full min-h-0 flex-col">
       {/* ── Top toolbar ── */}
       <div
-        className="flex shrink-0 items-center gap-2.5 px-5 py-2.5"
+        className="flex shrink-0 items-center gap-2 px-3 py-2.5 sm:gap-2.5 sm:px-5"
         style={{ borderBottom: "1px solid var(--hair)" }}
       >
         {/* Device toggle */}
@@ -121,8 +121,9 @@ export function PreviewPanel({
           ).map(([d, Icon]) => (
             <button
               key={d}
+              type="button"
               onClick={() => setDevice(d)}
-              className="rounded px-2 py-1 transition-colors"
+              className="flex h-8 w-8 items-center justify-center rounded transition-colors"
               style={{
                 background:
                   device === d ? "var(--surface-0)" : "transparent",
@@ -139,15 +140,16 @@ export function PreviewPanel({
 
         {/* Divider */}
         <div
-          className="h-4 w-px"
+          className="hidden h-4 w-px sm:block"
           style={{ background: "var(--hair)" }}
         />
 
         {/* Zoom */}
-        <div className="flex items-center gap-0.5">
+        <div className="hidden items-center gap-0.5 sm:flex">
           <button
             className="rounded p-1 transition-colors hover:bg-white/5"
             style={{ color: "var(--text-muted)" }}
+            type="button"
           >
             <Minus size={14} />
           </button>
@@ -160,6 +162,7 @@ export function PreviewPanel({
           <button
             className="rounded p-1 transition-colors hover:bg-white/5"
             style={{ color: "var(--text-muted)" }}
+            type="button"
           >
             <PlusIcon size={14} />
           </button>
@@ -167,14 +170,15 @@ export function PreviewPanel({
 
         {/* Divider */}
         <div
-          className="h-4 w-px"
+          className="hidden h-4 w-px sm:block"
           style={{ background: "var(--hair)" }}
         />
 
         {/* Refresh */}
         <button
-          className="rounded p-1.5 transition-colors hover:bg-white/5"
+          className="flex h-8 w-8 items-center justify-center rounded-lg transition-colors hover:bg-white/5"
           style={{ color: "var(--text-muted)" }}
+          type="button"
           onClick={() => {
             if (displayUrl) setIframeLoading(true);
           }}
@@ -183,26 +187,26 @@ export function PreviewPanel({
         </button>
 
         {/* Right side */}
-        <div className="ml-auto flex items-center gap-2.5">
+        <div className="ml-auto flex min-w-0 items-center gap-1.5 sm:gap-2.5">
           {publicUrl && <AppInstallButton publicUrl={publicUrl} />}
 
           {displayUrl && (
             <Button
               variant="ghost"
               size="sm"
-              className="h-7 gap-1.5 text-[12px]"
+              className="h-8 gap-1.5 px-2 text-[12px] sm:h-7"
               onClick={() =>
                 window.open(withPreviewBypass(displayUrl), "_blank")
               }
             >
               <ExternalLink size={13} />
-              Open
+              <span className="hidden sm:inline">Open</span>
             </Button>
           )}
 
           <Button
             size="sm"
-            className="h-7 gap-1.5 text-[12px]"
+            className="h-8 gap-1.5 px-3 text-[12px] sm:h-7"
             style={{ background: "var(--accent-token)" }}
             onClick={() => {}}
           >
@@ -432,5 +436,3 @@ function StatusChip({ label }: { label: string }) {
     </div>
   );
 }
-
-

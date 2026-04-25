@@ -59,12 +59,12 @@ export function TemplateCard({ template, index }: TemplateCardProps) {
           </p>
 
           {/* Footer: use count + CTA */}
-          <div className="mt-4 flex items-center justify-between">
+          <div className="mt-4 flex items-center justify-between gap-3">
             <span className="flex items-center gap-1 text-xs text-muted-foreground">
               <Users className="h-3 w-3" />
               {template.use_count.toLocaleString()} uses
             </span>
-            <Button asChild size="sm" className="h-8 gap-1.5 text-xs">
+            <Button asChild size="sm" className="h-9 shrink-0 gap-1.5 text-xs">
               <Link href={`/build?template=${template.slug}`}>
                 <Wand2 className="h-3.5 w-3.5" />
                 Customize

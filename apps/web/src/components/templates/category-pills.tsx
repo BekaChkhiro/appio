@@ -24,7 +24,7 @@ export function CategoryPills({
       ref={scrollRef}
       role="tablist"
       aria-label="Filter by category"
-      className="no-scrollbar flex gap-2 overflow-x-auto px-6 py-3"
+      className="no-scrollbar flex gap-2 overflow-x-auto px-4 py-3 sm:px-6"
     >
       {all.map((cat) => {
         const isActive = cat === selected;
@@ -37,7 +37,7 @@ export function CategoryPills({
             aria-label={`Filter by ${label}`}
             onClick={() => onSelect(cat)}
             className={cn(
-              "relative shrink-0 rounded-full px-4 py-1.5 text-sm font-medium transition-colors",
+              "relative min-h-9 shrink-0 rounded-full px-4 py-1.5 text-sm font-medium transition-colors",
               isActive
                 ? "text-primary-foreground"
                 : "text-muted-foreground hover:text-foreground hover:bg-accent"

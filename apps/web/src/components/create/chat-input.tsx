@@ -65,33 +65,37 @@ export function ChatInput({
       />
       <div className="mt-1 flex items-center gap-1">
         <button
-          className="rounded p-1.5 transition-colors hover:bg-white/5"
+          className="flex h-9 w-9 items-center justify-center rounded-lg transition-colors hover:bg-white/5"
           style={{ color: "var(--text-muted)" }}
           title="Attach file"
+          type="button"
         >
           <Paperclip size={16} />
         </button>
         <button
-          className="rounded p-1.5 transition-colors hover:bg-white/5"
+          className="flex h-9 w-9 items-center justify-center rounded-lg transition-colors hover:bg-white/5"
           style={{ color: "var(--text-muted)" }}
           title="Voice input"
+          type="button"
         >
           <Mic size={16} />
         </button>
         <div className="ml-auto">
           {isGenerating ? (
             <button
+              type="button"
               onClick={onCancel}
-              className="flex h-8 w-8 items-center justify-center rounded-lg transition-colors"
+              className="flex h-10 w-10 items-center justify-center rounded-lg transition-colors"
               style={{ background: "rgba(244,63,94,0.15)" }}
             >
               <Square size={14} style={{ color: "#f43f5e" }} />
             </button>
           ) : (
             <button
+              type="button"
               onClick={onSend}
               disabled={!value.trim() || disabled}
-              className="flex h-8 w-8 items-center justify-center rounded-lg transition-colors disabled:opacity-40"
+              className="flex h-10 w-10 items-center justify-center rounded-lg transition-colors disabled:opacity-40"
               style={{
                 background: value.trim()
                   ? "var(--accent-token)"

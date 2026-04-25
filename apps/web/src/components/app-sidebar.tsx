@@ -10,10 +10,10 @@ import { UserMenu } from "@/components/auth/user-menu";
 import { useChatStore } from "@/stores/chat-store";
 
 const navItems = [
-  { href: "/create", label: "Create", icon: Plus },
-  { href: "/my-apps", label: "My Apps", icon: LayoutGrid },
-  { href: "/marketplace", label: "Marketplace", icon: Store },
-  { href: "/profile", label: "Profile", icon: User },
+  { href: "/create", label: "Create", icon: Plus, matches: ["/create", "/build"] },
+  { href: "/my-apps", label: "My Apps", icon: LayoutGrid, matches: ["/my-apps", "/apps", "/publish"] },
+  { href: "/marketplace", label: "Marketplace", icon: Store, matches: ["/marketplace"] },
+  { href: "/profile", label: "Profile", icon: User, matches: ["/profile"] },
 ];
 
 const SIDEBAR_COLLAPSED_KEY = "appio-sidebar-collapsed";
@@ -50,6 +50,11 @@ export function AppSidebar({ currentPath }: AppSidebarProps) {
     }
   };
 
+  const isItemActive = (item: (typeof navItems)[number]) =>
+    item.matches.some(
+      (path) => currentPath === path || currentPath.startsWith(`${path}/`)
+    );
+
   return (
     <aside
       className="app-sidebar flex shrink-0 flex-col border-r border-border bg-card transition-[width] duration-200"
@@ -71,7 +76,7 @@ export function AppSidebar({ currentPath }: AppSidebarProps) {
       {/* Navigation */}
       <nav className="flex flex-1 flex-col gap-1 p-3">
         {navItems.map((item) => {
-          const isActive = currentPath === item.href;
+          const isActive = isItemActive(item);
           return (
             <Link
               key={item.href}

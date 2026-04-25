@@ -9,8 +9,8 @@ import { useApp, useDeleteApp } from "@appio/api-client";
 
 const TABS = [
   { id: "builder", label: "Builder", href: (id: string) => `/build?app=${id}` },
-  { id: "analytics", label: "Analytics", href: (id: string) => `#` },
-  { id: "versions", label: "Versions", href: (id: string) => `#` },
+  { id: "analytics", label: "Analytics", href: () => `#` },
+  { id: "versions", label: "Versions", href: () => `#` },
   { id: "settings", label: "Settings", href: (id: string) => `/apps/${id}/settings` },
 ];
 
@@ -60,7 +60,7 @@ export function AppSettingsView({ appId }: AppSettingsViewProps) {
     <div className="scroll flex h-full flex-col overflow-auto" style={{ background: "var(--surface-0)" }}>
       {/* Sub-nav */}
       <div
-        className="flex shrink-0 items-center gap-2 px-6"
+        className="app-settings-subnav flex shrink-0 items-center gap-2 px-6"
         style={{ borderBottom: "1px solid var(--hair)", background: "var(--surface-0)" }}
       >
         <Link
@@ -115,8 +115,11 @@ export function AppSettingsView({ appId }: AppSettingsViewProps) {
       </div>
 
       {/* Content */}
-      <div className="px-6 py-8 sm:px-12 lg:px-16" style={{ maxWidth: 720, margin: "0 auto" }}>
-        <div className="t-display" style={{ marginBottom: 40, color: "var(--text-primary)" }}>
+      <div
+        className="app-settings-content px-6 py-8 sm:px-12 lg:px-16"
+        style={{ maxWidth: 720, margin: "0 auto", width: "100%" }}
+      >
+        <div className="t-display" style={{ marginBottom: 28, color: "var(--text-primary)" }}>
           App settings
         </div>
 
@@ -203,7 +206,7 @@ export function AppSettingsView({ appId }: AppSettingsViewProps) {
           </div>
 
           <div
-            className="flex items-center justify-between py-3"
+            className="danger-row flex items-center justify-between py-3"
             style={{ borderTop: "1px solid rgba(244,63,94,0.2)" }}
           >
             <div>
@@ -218,7 +221,7 @@ export function AppSettingsView({ appId }: AppSettingsViewProps) {
           </div>
 
           <div
-            className="flex items-center justify-between py-3"
+            className="danger-row flex items-center justify-between py-3"
             style={{ borderTop: "1px solid rgba(244,63,94,0.2)" }}
           >
             <div>
@@ -301,16 +304,16 @@ function SettingGroup({ label, children }: { label: string; children: React.Reac
 function SettingRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div
-      className="flex items-center gap-4 px-5 py-4"
+      className="app-setting-row flex items-center gap-4 px-5 py-4"
       style={{ borderBottom: "1px solid var(--hair)" }}
     >
       <div
-        className="w-[140px] shrink-0 text-[13px]"
+        className="app-setting-label w-[140px] shrink-0 text-[13px]"
         style={{ color: "var(--text-muted)" }}
       >
         {label}
       </div>
-      <div className="flex-1">{children}</div>
+      <div className="app-setting-value flex-1">{children}</div>
     </div>
   );
 }
