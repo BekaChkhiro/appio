@@ -31,20 +31,29 @@ COPY apps/api/pyproject.toml apps/api/pyproject.toml
 COPY python/shared/pyproject.toml python/shared/pyproject.toml
 COPY python/db/pyproject.toml python/db/pyproject.toml
 COPY python/builder/pyproject.toml python/builder/pyproject.toml
+COPY python/codegen/pyproject.toml python/codegen/pyproject.toml
 COPY apps/api/__init__.py apps/api/__init__.py
 
 # Now copy source so the editable installs have actual code to link to.
 COPY python/ python/
 COPY apps/api/ apps/api/
 
+# Generated PWA templates + prompts + UI tokens. Required at runtime by
+# warm_golden_workspace() and the agent's RAG retrieval. .dockerignore
+# excludes node_modules so this stays small.
+COPY packages/ packages/
+
 # Install into an isolated prefix so we can copy just the packages into
-# the runtime image.  codegen/ is deprecated (Agent-Only architecture v6)
-# and intentionally omitted from the image.
+# the runtime image. Non-editable install — packages get materialized into
+# site-packages directly (avoids .pth indirection that breaks under
+# `--prefix` since site.py doesn't process .pth files outside the default
+# site-packages dirs).
 RUN pip install --prefix=/install \
-        -e python/shared \
-        -e python/db \
-        -e python/builder \
-        -e apps/api
+        python/shared \
+        python/db \
+        python/codegen \
+        python/builder \
+        apps/api
 
 # ───────────────────────── Stage 2: runtime ────────────────────────────
 
@@ -53,7 +62,9 @@ FROM python:3.12-slim-bookworm AS runtime
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PATH=/install/bin:$PATH \
-    PYTHONPATH=/src
+    PYTHONPATH=/src:/install/lib/python3.12/site-packages \
+    APPIO_PACKAGES_ROOT=/src/packages \
+    GOLDEN_WORKSPACE_PATH=/home/appio/golden-template
 
 # libpq is needed at runtime for asyncpg; curl for HEALTHCHECK.
 # Node 20 + the convex CLI are required by the Dramatiq publish worker

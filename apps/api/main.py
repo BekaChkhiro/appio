@@ -46,16 +46,32 @@ if settings.sentry_dsn:
 
 def _init_firebase() -> None:
     """Initialize Firebase Admin SDK (idempotent — safe to call multiple times)."""
+    import json
+    import os
+
     try:
         firebase_admin.get_app()
         return  # Already initialized
     except ValueError:
         pass  # Not yet initialized — proceed
-    if settings.firebase_service_account_path:
-        cred = firebase_credentials.Certificate(settings.firebase_service_account_path)
+
+    # Priority order:
+    #   1. FIREBASE_SERVICE_ACCOUNT_JSON env var with the JSON content
+    #      inline (used in Fly.io / container deploys where mounting a
+    #      file is fragile)
+    #   2. firebase_service_account_path pointing at a file on disk
+    #      (local dev workflow)
+    #   3. Application Default Credentials (GCP / GOOGLE_APPLICATION_CREDENTIALS)
+    sa_json_inline = os.environ.get("FIREBASE_SERVICE_ACCOUNT_JSON", "").strip()
+    sa_path = settings.firebase_service_account_path
+
+    if sa_json_inline:
+        cred = firebase_credentials.Certificate(json.loads(sa_json_inline))
+        firebase_admin.initialize_app(cred)
+    elif sa_path and os.path.exists(sa_path):
+        cred = firebase_credentials.Certificate(sa_path)
         firebase_admin.initialize_app(cred)
     else:
-        # Use Application Default Credentials (ADC) or GOOGLE_APPLICATION_CREDENTIALS
         firebase_admin.initialize_app()
     logger.info("firebase_initialized", project_id=settings.firebase_project_id)
 
@@ -74,6 +90,12 @@ async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
     init_db(settings.database_url, is_neon=is_neon)
     logger.info("database_connected")
     _init_firebase()
+    # Wire Dramatiq → Upstash Redis so `actor.send()` calls from API
+    # routers actually enqueue work for the worker process.
+    from appio_builder.tasks import BROKER_AVAILABLE, configure_broker
+    if BROKER_AVAILABLE:
+        configure_broker(settings.redis_url)
+        logger.info("dramatiq_broker_configured")
     # Warm the golden workspace in a background thread so the first
     # generation doesn't pay the ~15 s npm-install cost.
     asyncio.create_task(_warm_golden_workspace_bg())

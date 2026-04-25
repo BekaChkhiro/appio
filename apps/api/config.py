@@ -65,6 +65,8 @@ class Settings(BaseSettings):
         "http://localhost:3001",
         "https://appio.app",
         "https://app.appio.app",
+        "https://rideway.ge",
+        "https://www.rideway.ge",
     ]
 
     # Rate limiting

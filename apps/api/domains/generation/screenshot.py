@@ -24,7 +24,12 @@ import threading
 from dataclasses import dataclass
 from pathlib import Path
 
-from playwright.sync_api import sync_playwright
+# Playwright is imported lazily — it's only needed for vision critique
+# screenshots and isn't part of the API server's deploy footprint.
+try:
+    from playwright.sync_api import sync_playwright
+except ImportError:  # pragma: no cover
+    sync_playwright = None  # type: ignore[assignment]
 
 log = logging.getLogger(__name__)
 
@@ -151,6 +156,11 @@ def capture_app_screenshots(
     :class:`ScreenshotError` if the screenshot pipeline fails — the
     caller should treat that as "skip vision critique, deploy as-is."
     """
+    if sync_playwright is None:
+        raise ScreenshotError(
+            "playwright not installed — vision critique unavailable in this image"
+        )
+
     dist = workspace / "dist"
     if not dist.is_dir():
         raise ScreenshotError(f"workspace has no dist/ — did the build run?")

@@ -472,7 +472,7 @@ export const sampleBlocks: readonly SampleBlock[] = [
             label: "Invite team",
             content: (
               <p className="text-sm text-muted-foreground">
-                Skip this if you'll invite people later.
+                Skip this if you&apos;ll invite people later.
               </p>
             ),
           },

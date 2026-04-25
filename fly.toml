@@ -1,0 +1,53 @@
+# Appio FastAPI backend on Fly.io
+# Two processes:
+#   api    — uvicorn HTTP server (auto-scales to zero on idle)
+#   worker — Dramatiq consumer for publish pipeline (always-on)
+
+app = 'appio-api'
+primary_region = 'fra'
+
+[build]
+  dockerfile = 'docker/Dockerfile.api'
+
+# Firebase service account JSON is read directly from the
+# FIREBASE_SERVICE_ACCOUNT_JSON secret in apps/api/main.py
+# (no file mount — simpler and avoids fly [[files]] timing).
+
+[processes]
+  api = 'uvicorn apps.api.main:app --host 0.0.0.0 --port 8000 --timeout-keep-alive 75 --no-server-header'
+  worker = 'dramatiq apps.api.worker --processes 1 --threads 4'
+
+# HTTP service routes only to the api process.
+[http_service]
+  internal_port = 8000
+  force_https = true
+  auto_stop_machines = 'stop'
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ['api']
+
+  [http_service.concurrency]
+    type = 'requests'
+    soft_limit = 200
+    hard_limit = 250
+
+# Default VM (api process inherits unless overridden).
+[[vm]]
+  memory = '1gb'
+  cpu_kind = 'shared'
+  cpus = 1
+  processes = ['api']
+
+# Worker can stay smaller — pure background work.
+[[vm]]
+  memory = '512mb'
+  cpu_kind = 'shared'
+  cpus = 1
+  processes = ['worker']
+
+[[http_service.checks]]
+  grace_period = '30s'
+  interval = '30s'
+  method = 'GET'
+  timeout = '5s'
+  path = '/health'

@@ -54,6 +54,7 @@ const connectSrc = [
   "'self'",
   "https://*.appio.app",
   "https://api.appio.app",
+  "https://api.rideway.ge",
   "https://*.googleapis.com",
   "https://*.firebaseio.com",
   "https://*.firebaseapp.com",

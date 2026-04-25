@@ -195,8 +195,10 @@ _AGENT_TIMEOUT_S = 600.0  # 10 minutes wall-clock
 
 _MAX_TOKENS_PER_TURN = 8192
 
-_PROMPTS_DIR = Path(__file__).resolve().parents[4] / "packages" / "prompts"
-_TEMPLATES_DIR = Path(__file__).resolve().parents[4] / "packages" / "templates"
+_DEFAULT_PACKAGES_ROOT = Path(__file__).resolve().parents[4] / "packages"
+_PACKAGES_ROOT = Path(os.environ.get("APPIO_PACKAGES_ROOT", str(_DEFAULT_PACKAGES_ROOT)))
+_PROMPTS_DIR = _PACKAGES_ROOT / "prompts"
+_TEMPLATES_DIR = _PACKAGES_ROOT / "templates"
 _BASE_TEMPLATE = _TEMPLATES_DIR / "base"
 
 # Pre-warmed golden workspace with node_modules already installed.
