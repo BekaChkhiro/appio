@@ -241,6 +241,7 @@ export function CreateView() {
               publicUrl={publicUrl ?? editApp?.url ?? null}
               isGenerating={isGenerating}
               previewVersion={previewVersion}
+              appId={editAppId}
             />
           </div>
 
@@ -275,6 +276,7 @@ export function CreateView() {
               publicUrl={publicUrl ?? editApp?.url ?? null}
               isGenerating={isGenerating}
               previewVersion={previewVersion}
+              appId={editAppId}
             />
           )}
         </div>

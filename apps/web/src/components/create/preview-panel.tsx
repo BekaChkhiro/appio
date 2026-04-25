@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { ExternalLink, RefreshCw, Smartphone, Tablet, Minus, Plus as PlusIcon, Loader2 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { Button } from "@appio/ui";
@@ -35,6 +36,7 @@ interface PreviewPanelProps {
   publicUrl: string | null;
   isGenerating: boolean;
   previewVersion: number;
+  appId?: string | null;
 }
 
 export function PreviewPanel({
@@ -42,7 +44,9 @@ export function PreviewPanel({
   publicUrl,
   isGenerating,
   previewVersion,
+  appId,
 }: PreviewPanelProps) {
+  const router = useRouter();
   const displayUrl = publicUrl ?? previewUrl;
   const [iframeLoading, setIframeLoading] = useState(false);
   const [themeSheetOpen, setThemeSheetOpen] = useState(false);
@@ -206,9 +210,12 @@ export function PreviewPanel({
 
           <Button
             size="sm"
-            className="h-8 gap-1.5 px-3 text-[12px] sm:h-7"
+            className="h-8 gap-1.5 px-3 text-[12px] sm:h-7 disabled:opacity-50"
             style={{ background: "var(--accent-token)" }}
-            onClick={() => {}}
+            disabled={!appId || isGenerating}
+            onClick={() => {
+              if (appId) router.push(`/publish/${appId}`);
+            }}
           >
             Publish
           </Button>
