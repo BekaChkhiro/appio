@@ -41,7 +41,7 @@ _DEPLOY_KEY_RE = re.compile(r"^(?:prod:)?([a-z0-9-]+)\|.+$")
 # https://<name>.<region>.convex.cloud (e.g. eu-west-1). Validated against
 # real Management API responses 2026-04-21.
 _DEPLOYMENT_URL_RE = re.compile(
-    r"^https://[a-z0-9-]+(\.[a-z0-9-]+)?\.convex\.(cloud|site)$"
+    r"^https://[a-z0-9-]+(\.[a-z0-9-]+)?\.convex\.(cloud|site)/?$"
 )
 
 
