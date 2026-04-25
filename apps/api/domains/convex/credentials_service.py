@@ -28,9 +28,13 @@ if TYPE_CHECKING:
 
 logger = structlog.stdlib.get_logger()
 
-# prod:<team-slug>|<secret>
-# team-slug is lower-case alphanumeric + hyphens
-_DEPLOY_KEY_RE = re.compile(r"^prod:([a-z0-9-]+)\|.+$")
+# Two valid formats:
+#   1. prod:<team-slug>|<secret>      — newer team-scoped prod key
+#   2. <deployment-name>|<secret>     — older deployment-scoped admin key
+#      (returned by /api/create_project provisioning)
+# Both are accepted by `npx convex deploy`. team-slug / deployment-name
+# are lower-case alphanumeric + hyphens.
+_DEPLOY_KEY_RE = re.compile(r"^(?:prod:)?([a-z0-9-]+)\|.+$")
 
 # https://<deployment>.convex.cloud  OR  https://<deployment>.convex.site
 # Current Convex production URLs include an optional region segment:
@@ -47,7 +51,8 @@ def _validate_deploy_key(key: str) -> str:
     if m is None:
         raise AppError(
             detail=(
-                "Deploy key must be in the format prod:<team-slug>|<secret>. "
+                "Deploy key must be in the format prod:<team-slug>|<secret> "
+                "or <deployment-name>|<secret>. "
                 "Copy it from Convex dashboard → Settings → Deploy Keys."
             ),
             status_code=400,
