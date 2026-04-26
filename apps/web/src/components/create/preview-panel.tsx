@@ -37,6 +37,10 @@ interface PreviewPanelProps {
   isGenerating: boolean;
   previewVersion: number;
   appId?: string | null;
+  // True when the backend is mid-generation but this tab is NOT the
+  // active SSE stream (user navigated away and came back). Renders the
+  // same skeleton as isGenerating so users see "still building".
+  isBuildingOnBackend?: boolean;
 }
 
 export function PreviewPanel({
@@ -45,9 +49,11 @@ export function PreviewPanel({
   isGenerating,
   previewVersion,
   appId,
+  isBuildingOnBackend = false,
 }: PreviewPanelProps) {
   const router = useRouter();
   const displayUrl = publicUrl ?? previewUrl;
+  const showSkeleton = isGenerating || isBuildingOnBackend;
   const [iframeLoading, setIframeLoading] = useState(false);
   const [themeSheetOpen, setThemeSheetOpen] = useState(false);
   const [device, setDevice] = useState<"phone" | "tablet">("phone");
@@ -332,7 +338,7 @@ export function PreviewPanel({
             {/* Status chip */}
             <StatusChip label={statusLabel} />
           </div>
-        ) : isGenerating ? (
+        ) : showSkeleton ? (
           <div className="flex flex-col items-center gap-5">
             <PhoneFrame scale={phoneScale}>
               <div
@@ -391,7 +397,13 @@ export function PreviewPanel({
                 </p>
               </div>
             </PhoneFrame>
-            <StatusChip label="Building…" />
+            <StatusChip
+              label={
+                isBuildingOnBackend && !isGenerating
+                  ? "Still building on server…"
+                  : "Building…"
+              }
+            />
           </div>
         ) : (
           <div className="z-10 flex flex-col items-center gap-3">

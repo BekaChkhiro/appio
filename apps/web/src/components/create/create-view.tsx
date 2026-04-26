@@ -242,6 +242,7 @@ export function CreateView() {
               isGenerating={isGenerating}
               previewVersion={previewVersion}
               appId={editAppId}
+              isBuildingOnBackend={editApp?.status === "building"}
             />
           </div>
 
@@ -277,6 +278,7 @@ export function CreateView() {
               isGenerating={isGenerating}
               previewVersion={previewVersion}
               appId={editAppId}
+              isBuildingOnBackend={editApp?.status === "building"}
             />
           )}
         </div>

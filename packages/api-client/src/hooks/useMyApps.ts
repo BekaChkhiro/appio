@@ -176,6 +176,13 @@ export function useApp(appId: string | null | undefined) {
       }
       return { ...app, messages };
     },
+    // Poll every 3 s while the backend is still generating, so users who
+    // navigate away mid-stream see status changes when they return.
+    // Stops polling once status leaves "building".
+    refetchInterval: (query) => {
+      const status = query.state.data?.status;
+      return status === "building" ? 3_000 : false;
+    },
   });
 }
 
