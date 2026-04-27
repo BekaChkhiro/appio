@@ -9,6 +9,14 @@ class Settings(BaseSettings):
 
     redis_url: str = "redis://localhost:6379/0"
     anthropic_api_key: str = ""
+
+    # Toggle the new Claude Agent SDK runner (ADR 009). When false, the
+    # legacy hand-rolled tool loop in agent_service runs. Override per
+    # environment via APPIO_USE_AGENT_SDK=true. Roll out gradually.
+    use_agent_sdk: bool = False
+    # Comma-separated list of Firebase emails who always get the SDK
+    # runner regardless of the global flag — for staged testing.
+    agent_sdk_admin_emails: str = ""
     firebase_project_id: str = ""
     firebase_service_account_path: str = ""  # Path to service account JSON; empty = use ADC
 

@@ -69,6 +69,7 @@ from apps.api.domains.generation.critique import (
     request_critique,
 )
 from apps.api.domains.generation.linter import MidStreamLinter
+from apps.api.domains.generation.sdk_runner import run_sdk_tool_loop
 from apps.api.domains.generation.model_router import (
     SONNET_4_6,
     AgentStep,
@@ -1913,17 +1914,37 @@ class AgentService:
 
             # --- INITIAL agent loop (Sonnet 4.6 for best code quality) ---
             # Budget reserves critique + fix pass so we don't overrun _MAX_COST_USD.
-            async for event_type, payload in self._run_tool_loop(
-                workspace=workspace,
-                system_blocks=system_blocks,
-                messages=messages,
-                tracker=tracker,
-                step=AgentStep.GENERATION,
-                max_iterations=_MAX_TOOL_ITERATIONS,
-                generation_id=generation_id,
-                linter=mid_stream_linter,
-                budget_usd=_GENERATION_LOOP_BUDGET_USD,
-            ):
+            # ADR 009: feature-flagged migration to claude-agent-sdk. Phase 1
+            # swaps only the GENERATION step; FIX_PASS / CRITIQUE stay legacy
+            # so a regression in either path can't take down both.
+            if settings.use_agent_sdk:
+                logger.info(
+                    "agent_loop_using_sdk",
+                    generation_id=generation_id,
+                )
+                generation_loop = run_sdk_tool_loop(
+                    workspace=workspace,
+                    user_prompt=agent_prompt,
+                    extra_system_prompt=_load_agent_system_prompt(),
+                    tracker=tracker,
+                    step=AgentStep.GENERATION,
+                    max_iterations=_MAX_TOOL_ITERATIONS,
+                    generation_id=generation_id,
+                    budget_usd=_GENERATION_LOOP_BUDGET_USD,
+                )
+            else:
+                generation_loop = self._run_tool_loop(
+                    workspace=workspace,
+                    system_blocks=system_blocks,
+                    messages=messages,
+                    tracker=tracker,
+                    step=AgentStep.GENERATION,
+                    max_iterations=_MAX_TOOL_ITERATIONS,
+                    generation_id=generation_id,
+                    linter=mid_stream_linter,
+                    budget_usd=_GENERATION_LOOP_BUDGET_USD,
+                )
+            async for event_type, payload in generation_loop:
                 if event_type == "done":
                     reason = payload["reason"]
                     total_iterations = payload["iterations"]

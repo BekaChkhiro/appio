@@ -15,6 +15,7 @@ dependencies = [
     "sentry-sdk[fastapi]>=2.19.0",
     "slowapi>=0.1.9",
     "anthropic>=0.42.0",
+    "claude-agent-sdk>=0.1.68",
     "firebase-admin>=6.6.0",
     "voyageai>=0.2.3",  # 0.3.x requires Python <3.14; 0.2.x supports 3.14
     "pgvector>=0.3.6",

@@ -66,6 +66,12 @@ class ModelConfig:
 
 # ── Pre-built configs for supported models ──────────────────────────
 
+SONNET_4_5 = ModelConfig(
+    model_id="claude-sonnet-4-5",
+    input_cost_per_m=3.00,
+    output_cost_per_m=15.00,
+)
+
 SONNET_4_6 = ModelConfig(
     model_id="claude-sonnet-4-6",
     input_cost_per_m=3.00,
@@ -85,6 +91,10 @@ _DEFAULT_ROUTING: dict[AgentStep, ModelConfig] = {
     # cascades into wasted agent iterations. PROJECT_PLAN.md T2.9/T2.10
     # specifies Sonnet for planning. Override with APPIO_MODEL_PLANNING=
     # claude-haiku-4-5-20251001 for cost A/B testing.
+    # Note: the SDK runner (use_agent_sdk=true) overrides to SONNET_4_5
+    # because the bundled Claude Code CLI doesn't recognize the
+    # "claude-sonnet-4-6" alias. Legacy raw-Anthropic path keeps SONNET_4_6
+    # since that's what we've been running in production.
     AgentStep.PLANNING: SONNET_4_6,
     AgentStep.GENERATION: SONNET_4_6,
     AgentStep.LINTING: HAIKU_4_5,
@@ -95,6 +105,7 @@ _DEFAULT_ROUTING: dict[AgentStep, ModelConfig] = {
 # Environment variable overrides (e.g. APPIO_MODEL_FIX_PASS=claude-sonnet-4-6
 # to use Sonnet for fix passes too).
 _MODEL_LOOKUP: dict[str, ModelConfig] = {
+    "claude-sonnet-4-5": SONNET_4_5,
     "claude-sonnet-4-6": SONNET_4_6,
     "claude-haiku-4-5-20251001": HAIKU_4_5,
 }
