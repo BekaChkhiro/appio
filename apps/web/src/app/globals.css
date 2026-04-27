@@ -74,6 +74,7 @@
   --input: 240 6% 90%;
   --ring: 262 83% 58%;
   --radius: 0.625rem;
+  --app-mobile-safe-top: calc(env(safe-area-inset-top, 0px) + 12px);
 }
 
 /* Dark theme (default for Appio) */
@@ -262,6 +263,7 @@
   height: 100vh;
   height: 100dvh;
   background: var(--surface-0);
+  padding-top: var(--app-mobile-safe-top);
 }
 
 .app-main {
@@ -272,6 +274,10 @@
   display: none !important;
 }
 @media (min-width: 768px) {
+  .app-shell {
+    padding-top: 0;
+  }
+
   .app-main {
     padding-bottom: 0;
   }
@@ -292,7 +298,7 @@
 .auth-layout-grid > div:first-child {
   min-height: 100vh;
   min-height: 100dvh;
-  padding: 28px 24px !important;
+  padding: calc(28px + var(--app-mobile-safe-top)) 24px 28px !important;
 }
 
 .auth-layout-grid > div:last-child {

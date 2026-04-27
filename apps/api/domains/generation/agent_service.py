@@ -295,7 +295,7 @@ _AGENT_INDEX_HTML = """\
     }
     /* Real devices (PWA-installed on iOS) supply the inset via env(). */
     html:not([data-preview]) #root {
-      padding-top: env(safe-area-inset-top, 0);
+      padding-top: calc(env(safe-area-inset-top, 0) + 12px);
       padding-bottom: env(safe-area-inset-bottom, 0);
     }
     /* Preview iframe embeds the app inside a faux phone frame with a
