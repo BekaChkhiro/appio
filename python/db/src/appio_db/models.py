@@ -77,7 +77,7 @@ class App(Base):
 
     # T3.6: publish status columns — mirrored from latest AppPublishJob for fast reads
     published_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
-    publish_status: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    publish_status: Mapped[str | None] = mapped_column(String(50), nullable=True)
     sandbox_archived_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
     user: Mapped["User"] = relationship(back_populates="apps")
@@ -291,7 +291,7 @@ class AppPublishJob(Base):
     app_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("apps.id"), index=True)
     user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id"), index=True)
     # pending | provisioning | pushing_schema | copying_data | rewriting_config | rebuilding | published | failed
-    status: Mapped[str] = mapped_column(String(20), nullable=False, default="pending")
+    status: Mapped[str] = mapped_column(String(50), nullable=False, default="pending")
     current_step: Mapped[str | None] = mapped_column(String(50), nullable=True)
     error_message: Mapped[str | None] = mapped_column(Text, nullable=True)
     deployment_url: Mapped[str | None] = mapped_column(Text, nullable=True)

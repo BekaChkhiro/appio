@@ -1,11 +1,10 @@
 """Dramatiq task — run the Convex publish pipeline in a background worker (T3.6/T3.8).
 
-The existing builds/tasks.py is a stub (single docstring). This file follows
-the same pattern of bridging sync Dramatiq → async work via asyncio.run.
-
-TODO(T3.6): replace asyncio.run with a proper async-aware broker bridge once
-the builds domain establishes one. asyncio.run works for single-actor
-processes but creates a new event loop per invocation (no connection reuse).
+Each invocation creates a fresh asyncio event loop via asyncio.run().
+asyncpg connections are bound to the loop they were created on, so we
+also create a fresh engine inside _run() and dispose it at the end —
+sharing the worker's startup engine across loops triggers
+"Future attached to a different loop" errors.
 """
 
 from __future__ import annotations
@@ -14,6 +13,8 @@ import asyncio
 
 import dramatiq
 import structlog
+
+from apps.api.config import settings
 
 logger = structlog.stdlib.get_logger()
 
@@ -24,15 +25,23 @@ def run_publish_job(job_id: str) -> None:
 
     Receives job_id as a string because Dramatiq serialises arguments to JSON.
     """
-    from appio_db import get_session_factory
+    from appio_db.session import create_engine, create_session_factory
     from apps.api.domains.convex.migration_service import run_publish_pipeline
 
     async def _run() -> None:
         from uuid import UUID
 
-        factory = get_session_factory()
-        async with factory() as db, db.begin():
-            await run_publish_pipeline(db, UUID(job_id))
+        is_neon = "neon" in settings.database_url
+        engine = create_engine(settings.database_url, is_neon=is_neon)
+        try:
+            factory = create_session_factory(engine)
+            # No outer db.begin() — the pipeline commits per-step so the UI
+            # can poll progress, and the failure path can persist its own
+            # status update without being rolled back by an enclosing tx.
+            async with factory() as db:
+                await run_publish_pipeline(db, UUID(job_id))
+        finally:
+            await engine.dispose()
 
     logger.info("publish_task_start", job_id=job_id)
     asyncio.run(_run())

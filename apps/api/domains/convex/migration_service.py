@@ -167,7 +167,10 @@ async def run_publish_pipeline(
         job.error_message = str(exc)
         job.completed_at = datetime.now(UTC)
         app.publish_status = "failed"
-        await db.flush()
+        # Commit before re-raising — the outer db.begin() block would
+        # otherwise roll back this failure update, leaving the job stuck
+        # in "pending" forever and blocking retries from the UI.
+        await db.commit()
         logger.error(
             "publish_pipeline_failed",
             job_id=str(job_id),
@@ -180,7 +183,9 @@ async def run_publish_pipeline(
 async def _advance(db: AsyncSession, job: AppPublishJob, status: str, step: str) -> None:
     job.status = status
     job.current_step = step
-    await db.flush()
+    # Commit per step so the polling UI sees progress in real time and a
+    # crashed worker leaves a recoverable trace of where it stopped.
+    await db.commit()
 
 
 async def _step_validate_credentials(
@@ -210,9 +215,12 @@ async def _step_push_code(
     deploy_key: str,
     deployment_url: str,
 ) -> None:
-    """Run `npx convex deploy` from the rewritten workspace."""
+    """Install deps, then run `npx convex deploy` from the rewritten workspace."""
     await _advance(db, job, "pushing_code", "Pushing Convex schema + functions")
     logger.info("publish_step_push_code", job_id=str(job.id))
+    # R2 archive excludes node_modules to stay small (~1-10 MB). Convex CLI
+    # bundles convex/server from local node_modules, so install before deploy.
+    await _npm_install(workspace, job_id=str(job.id))
     try:
         await run_convex_deploy(
             workspace=workspace,
@@ -224,6 +232,36 @@ async def _step_push_code(
             f"npx convex deploy failed: {exc.stderr[:200]}",
             step="pushing_code",
         ) from exc
+
+
+async def _npm_install(workspace: Path, *, job_id: str) -> None:
+    """Run `npm install` in workspace, raise PublishError on failure."""
+    logger.info("publish_npm_install_start", job_id=job_id, workspace=str(workspace))
+    proc = await asyncio.create_subprocess_exec(
+        "npm",
+        "install",
+        "--no-audit",
+        "--no-fund",
+        "--prefer-offline",
+        cwd=str(workspace),
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
+    )
+    try:
+        stdout_b, stderr_b = await asyncio.wait_for(proc.communicate(), timeout=300)
+    except TimeoutError as exc:
+        proc.kill()
+        raise PublishError(
+            "npm install timed out after 300s",
+            step="pushing_code",
+        ) from exc
+    if proc.returncode != 0:
+        stderr = stderr_b.decode("utf-8", errors="replace")[:500]
+        raise PublishError(
+            f"npm install failed (exit {proc.returncode}): {stderr}",
+            step="pushing_code",
+        )
+    logger.info("publish_npm_install_done", job_id=job_id, stdout_bytes=len(stdout_b))
 
 
 _MAX_TABLES_PER_MIGRATION = 50
@@ -615,7 +653,7 @@ async def _step_mark_published(
         app.published_at = now
     app.publish_status = "published"
 
-    await db.flush()
+    await db.commit()
     logger.info(
         "publish_complete",
         job_id=str(job.id),
