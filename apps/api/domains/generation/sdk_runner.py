@@ -13,6 +13,8 @@ from __future__ import annotations
 
 import asyncio
 import json
+import os
+import shutil
 from pathlib import Path
 from typing import Any, AsyncIterator
 
@@ -61,6 +63,69 @@ _DISALLOWED_TOOLS: list[str] = [
 ]
 
 
+def _skills_source_path() -> Path | None:
+    """Locate the bundled ``.claude/skills`` directory to sync into workspaces.
+
+    Resolution order:
+      1. ``APPIO_SKILLS_PATH`` env override (test scenarios)
+      2. ``$APPIO_PACKAGES_ROOT/skills`` (production — set in Dockerfile.api)
+      3. Repo-relative ``packages/skills`` (local dev)
+
+    Returns the *parent* dir whose ``.claude/skills/`` we copy into each
+    new workspace. Returns None when no skills directory exists.
+    """
+    override = os.environ.get("APPIO_SKILLS_PATH")
+    candidates: list[Path] = []
+    if override:
+        candidates.append(Path(override))
+    packages_root = os.environ.get("APPIO_PACKAGES_ROOT")
+    if packages_root:
+        candidates.append(Path(packages_root) / "skills")
+    candidates.append(Path(__file__).resolve().parents[4] / "packages" / "skills")
+
+    for candidate in candidates:
+        if (candidate / ".claude" / "skills").is_dir():
+            return candidate
+    return None
+
+
+def _sync_skills_into_workspace(workspace: Path) -> int:
+    """Copy bundled skills into ``<workspace>/.claude/skills/``.
+
+    The Claude Code CLI discovers skills by scanning ``setting_sources``
+    locations relative to ``cwd``. The plugin path mechanism (``plugins=
+    [{"type":"local"}]``) only loads built-in CLI commands, not custom
+    skill directories, so workspace copy is the way to make our skills
+    visible per-session.
+
+    Returns the number of skill directories materialized so the caller
+    can decide whether to enable ``setting_sources=["project"]``.
+    """
+    src = _skills_source_path()
+    if src is None:
+        return 0
+    src_dir = src / ".claude" / "skills"
+    dst_dir = workspace / ".claude" / "skills"
+    try:
+        dst_dir.mkdir(parents=True, exist_ok=True)
+        count = 0
+        for child in src_dir.iterdir():
+            if not child.is_dir():
+                continue
+            target = dst_dir / child.name
+            # ``copytree(dirs_exist_ok=True)`` would silently merge with
+            # whatever is already there. Workspaces start empty for our
+            # generations, but be explicit to avoid surprise.
+            if target.exists():
+                shutil.rmtree(target)
+            shutil.copytree(child, target)
+            count += 1
+        return count
+    except OSError as exc:
+        logger.warning("sdk_skills_sync_failed", error=str(exc))
+        return 0
+
+
 def _build_options(
     *,
     workspace: Path,
@@ -83,15 +148,25 @@ def _build_options(
     if extra_system_prompt:
         system_prompt["append"] = extra_system_prompt
 
+    skill_count = _sync_skills_into_workspace(workspace)
+    if skill_count:
+        logger.info("sdk_skills_synced", workspace=str(workspace), count=skill_count)
+
     return ClaudeAgentOptions(
         model=model.model_id,
         cwd=str(workspace),
         permission_mode="acceptEdits",
         allowed_tools=_ALLOWED_TOOLS,
         disallowed_tools=_DISALLOWED_TOOLS,
-        # ``setting_sources=[]`` for Phase 1 — Phase 4 will switch to
-        # ``["project"]`` once we ship a skills bundle.
-        setting_sources=[],
+        # ``["project"]`` makes the CLI scan ``cwd/.claude/`` — required
+        # for our workspace-synced skills to be visible. Generated apps
+        # never write to ``.claude/`` themselves (we sync it ourselves
+        # right before launch), so there's no adversarial-config risk.
+        # ``skills="all"`` then enables all discovered skills for the
+        # session. Both fields are required together; either alone is a
+        # no-op.
+        setting_sources=["project"] if skill_count else [],
+        skills="all" if skill_count else None,
         max_turns=max_turns,
         max_budget_usd=max_budget_usd,
         system_prompt=system_prompt,
