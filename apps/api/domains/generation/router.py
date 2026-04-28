@@ -18,6 +18,7 @@ from appio_db import get_session_factory
 from apps.api.core.rate_limit import invalidate_monthly_budget_cache, set_cooldown
 from apps.api.core.security import FirebaseUser
 from apps.api.dependencies import RateLimitResult, enforce_generation_limits, require_verified_email
+from apps.api.config import settings
 from apps.api.domains.generation.agent_service import AgentService
 from apps.api.domains.generation.schemas import GenerateRequest
 from apps.api.domains.templates.service import increment_use_count
@@ -68,6 +69,19 @@ async def generate_app(
     user_id = user.id
     user_tier = user.tier or "free"
 
+    # ADR 009 staged rollout: SDK runner is gated by either the global
+    # flag or per-email allowlist. Comma-separated emails (case-insensitive,
+    # whitespace tolerant) so we can A/B test internally before flipping
+    # global. Resolved here so AgentService stays single-flag.
+    admin_emails = {
+        e.strip().lower()
+        for e in (settings.agent_sdk_admin_emails or "").split(",")
+        if e.strip()
+    }
+    use_sdk = settings.use_agent_sdk or (
+        (user.email or "").lower() in admin_emails
+    )
+
     # Analytics: increment marketplace template use_count. Fire-and-forget —
     # a DB blip here must not block generation. Uses a fresh session (we
     # intentionally don't share the rate-limit session since it closes as
@@ -94,6 +108,7 @@ async def generate_app(
             prompt=body.prompt,
             app_id=body.app_id,
             user_tier=user_tier,
+            use_agent_sdk=use_sdk,
         )
 
         queue: asyncio.Queue[str | None] = asyncio.Queue()

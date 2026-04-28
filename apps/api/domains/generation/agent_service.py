@@ -1775,6 +1775,7 @@ class AgentService:
         prompt: str,
         app_id: uuid.UUID | None = None,
         user_tier: str = "free",
+        use_agent_sdk: bool | None = None,
     ):
         """Async generator yielding SSE-formatted strings.
 
@@ -1916,8 +1917,13 @@ class AgentService:
             # Budget reserves critique + fix pass so we don't overrun _MAX_COST_USD.
             # ADR 009: feature-flagged migration to claude-agent-sdk. Phase 1
             # swaps only the GENERATION step; FIX_PASS / CRITIQUE stay legacy
-            # so a regression in either path can't take down both.
-            if settings.use_agent_sdk:
+            # so a regression in either path can't take down both. Per-call
+            # override (set in router for admin-email allowlist) takes
+            # precedence over the global env flag.
+            sdk_active = (
+                use_agent_sdk if use_agent_sdk is not None else settings.use_agent_sdk
+            )
+            if sdk_active:
                 logger.info(
                     "agent_loop_using_sdk",
                     generation_id=generation_id,
