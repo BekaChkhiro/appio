@@ -103,12 +103,19 @@ async def generate_app(
         session_factory = get_session_factory()
         service = AgentService(session_factory)
 
+        chat_history: list[dict] | None = None
+        if body.app_id is not None and body.messages:
+            # Pydantic models → plain dicts for the service layer; keeps
+            # AgentService runtime-decoupled from the request schema.
+            chat_history = [m.model_dump() for m in body.messages]
+
         gen = service.generate(
             user_id=user_id,
             prompt=body.prompt,
             app_id=body.app_id,
             user_tier=user_tier,
             use_agent_sdk=use_sdk,
+            chat_history=chat_history,
         )
 
         queue: asyncio.Queue[str | None] = asyncio.Queue()

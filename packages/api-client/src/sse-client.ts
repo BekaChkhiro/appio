@@ -45,6 +45,10 @@ export async function streamGeneration(
     template_slug?: string;
     app_id?: string;
     idempotency_key?: string;
+    // Optional chat history; only sent on iteration so the backend can
+    // synthesize an "edit existing app" prompt. See GenerateRequest in
+    // apps/api/domains/generation/schemas.py.
+    messages?: Array<{ role: "user" | "assistant"; content: string }>;
   },
   options: SSEOptions
 ): Promise<void> {

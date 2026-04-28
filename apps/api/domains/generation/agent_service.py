@@ -988,8 +988,21 @@ class AgentService:
                 result = await session.execute(select(App).where(App.id == app_id))
                 app = result.scalar_one_or_none()
                 if app is not None:
-                    next_version = (app.current_version or 0) + 1
-                    return app.slug, next_version, app.id
+                    # Tenant guard: silently fall through to creating a
+                    # fresh app if the caller doesn't own the existing one.
+                    # We don't raise — the user already passed validation
+                    # at the router; treating this as "new app" is the
+                    # safe default. Logged so abuse is visible.
+                    if app.user_id != user_id:
+                        logger.warning(
+                            "agent_app_id_tenant_mismatch",
+                            requested_app_id=str(app_id),
+                            requesting_user=str(user_id),
+                            owner=str(app.user_id),
+                        )
+                    else:
+                        next_version = (app.current_version or 0) + 1
+                        return app.slug, next_version, app.id
 
         # New app — create the row now so the user sees it building in
         # /my-apps. Derive a sensible name from the prompt's first line.
@@ -1008,6 +1021,128 @@ class AgentService:
             new_app_id = new_app.id
             await session.commit()
         return slug, 1, new_app_id
+
+    async def _fetch_latest_generation_for_app(
+        self, app_id: uuid.UUID
+    ) -> Generation | None:
+        """Return the most recent successful Generation row for ``app_id``.
+
+        Used at iteration time so we can hydrate the workspace from R2 and
+        feed the agent context about what was previously built. Filters to
+        ``build_status='success'`` because failed generations may have a
+        partial workspace_url that points at an unbuildable archive.
+        """
+        async with self._session_factory() as session:
+            result = await session.execute(
+                select(Generation)
+                .where(Generation.app_id == app_id)
+                .where(Generation.build_status == "success")
+                .where(Generation.workspace_url.isnot(None))
+                .order_by(Generation.created_at.desc())
+                .limit(1)
+            )
+            return result.scalar_one_or_none()
+
+    @staticmethod
+    def _restore_prior_workspace(
+        *, workspace: Path, prior_generation_id: str
+    ) -> None:
+        """Download and extract a prior generation's workspace into ``workspace``.
+
+        Mirrors the pattern in ``migration_service._download_workspace`` so
+        we share a single tested R2 download path. The R2 archive lays
+        files under ``<dest>/workspace/`` which we flatten into
+        ``workspace`` itself so the agent sees the project root directly.
+
+        Raises ``R2Error`` (or a subclass) when the archive is missing,
+        corrupt, or extraction fails. Caller is expected to fall back to a
+        fresh template.
+        """
+        from appio_builder.r2 import R2Client
+
+        build_config = _build_config_from_settings()
+        r2 = R2Client(
+            account_id=build_config.r2_account_id,
+            access_key=build_config.r2_access_key,
+            secret_key=build_config.r2_secret_key,
+            bucket=build_config.r2_bucket,
+            endpoint_url=build_config.r2_endpoint,
+        )
+
+        scratch = Path(tempfile.mkdtemp(prefix=f"appio-restore-{prior_generation_id[:8]}-"))
+        try:
+            r2.download_workspace(prior_generation_id, dest_dir=scratch)
+            extracted = scratch / "workspace"
+            if not extracted.is_dir():
+                raise RuntimeError(
+                    f"prior workspace archive for {prior_generation_id} did not "
+                    f"contain a 'workspace' directory"
+                )
+            # Move contents up into ``workspace`` (which is the agent's cwd).
+            # shutil.copytree(dirs_exist_ok=True) handles the merge with whatever
+            # was created by mkdtemp; we run it on each child rather than the
+            # whole tree to keep the destination root flat.
+            for child in extracted.iterdir():
+                target = workspace / child.name
+                if child.is_dir():
+                    shutil.copytree(child, target, dirs_exist_ok=True)
+                else:
+                    shutil.copy2(child, target)
+        finally:
+            shutil.rmtree(scratch, ignore_errors=True)
+
+    @staticmethod
+    def _compose_iterative_prompt(
+        *,
+        new_prompt: str,
+        prior_prompt: str,
+        chat_history: list[dict[str, Any]],
+    ) -> str:
+        """Build the user-turn that the agent sees on iteration.
+
+        Replaying raw multi-turn (tool calls + tool results from the
+        previous build) is fragile — the SDK runner is happy to interpret
+        old tool calls as fresh and re-execute them. Instead we synthesize
+        a single new-style "edit existing app" prompt that summarizes the
+        prior context, references the workspace files (which the agent
+        will discover via Glob/Read), and states the new request clearly.
+
+        chat_history is the frontend-stored chat (role/content dicts);
+        we keep only the last few user-side turns to bound context.
+        """
+        prior_user_turns: list[str] = []
+        for msg in chat_history:
+            role = msg.get("role")
+            content = (msg.get("content") or "").strip()
+            if role == "user" and content:
+                # Skip the pseudo-message wrappers from chat-message.tsx
+                # (e.g. ``__APP_READY__{...}``); they're not real prompts.
+                if content.startswith("__APP_READY__"):
+                    continue
+                prior_user_turns.append(content)
+
+        prior_user_turns = prior_user_turns[-3:]  # last 3 turns max
+        prior_section = ""
+        if prior_user_turns:
+            joined = "\n".join(f"- {turn}" for turn in prior_user_turns)
+            prior_section = f"\n\nPrior user requests in this conversation:\n{joined}"
+
+        prior_prompt_section = ""
+        if prior_prompt and prior_prompt.strip() and prior_prompt.strip() not in prior_user_turns:
+            prior_prompt_section = (
+                f"\n\nOriginal app prompt:\n{prior_prompt.strip()}"
+            )
+
+        return (
+            "You are iterating on an existing app. Its files are already in your "
+            "working directory. Discover them with Glob/Read first, then make "
+            "targeted Edit calls. Do NOT rewrite whole files unless asked — "
+            "preserve everything that wasn't requested to change."
+            f"{prior_prompt_section}"
+            f"{prior_section}"
+            "\n\nCurrent change request:\n"
+            f"{new_prompt}"
+        )
 
     async def _finalize_app_record(
         self,
@@ -1776,6 +1911,7 @@ class AgentService:
         app_id: uuid.UUID | None = None,
         user_tier: str = "free",
         use_agent_sdk: bool | None = None,
+        chat_history: list[dict[str, Any]] | None = None,
     ):
         """Async generator yielding SSE-formatted strings.
 
@@ -1798,6 +1934,20 @@ class AgentService:
             user_id, prompt, resolved_app_id
         )
         generation_id = str(gen_id)
+
+        # On iteration (existing app), attempt to inherit the prior
+        # generation's workspace from R2 so the agent can read existing
+        # files and use the Edit tool. Fall through to a fresh template
+        # if no prior workspace is archived or R2 is unavailable.
+        prior_generation = (
+            await self._fetch_latest_generation_for_app(resolved_app_id)
+            if app_id is not None and resolved_app_id == app_id
+            else None
+        )
+        is_iteration = prior_generation is not None and bool(
+            prior_generation.workspace_url
+        )
+
         yield _sse("status", "Setting up workspace...", generation_id=generation_id)
 
         # --- Workspace ---
@@ -1806,7 +1956,37 @@ class AgentService:
 
         try:
             try:
-                await asyncio.to_thread(self._setup_workspace, workspace)
+                if is_iteration:
+                    try:
+                        await asyncio.to_thread(
+                            self._restore_prior_workspace,
+                            workspace=workspace,
+                            prior_generation_id=str(prior_generation.id),
+                        )
+                        logger.info(
+                            "agent_workspace_restored",
+                            generation_id=generation_id,
+                            prior_generation_id=str(prior_generation.id),
+                            app_id=str(resolved_app_id),
+                        )
+                    except Exception as restore_exc:  # noqa: BLE001
+                        logger.warning(
+                            "agent_workspace_restore_failed_falling_back",
+                            generation_id=generation_id,
+                            prior_generation_id=str(prior_generation.id),
+                            error=str(restore_exc),
+                        )
+                        # Reset the workspace before falling back so partial
+                        # extraction artifacts can't pollute the fresh setup.
+                        for entry in workspace.iterdir():
+                            if entry.is_dir():
+                                shutil.rmtree(entry, ignore_errors=True)
+                            else:
+                                entry.unlink(missing_ok=True)
+                        is_iteration = False
+                        await asyncio.to_thread(self._setup_workspace, workspace)
+                else:
+                    await asyncio.to_thread(self._setup_workspace, workspace)
             except Exception as exc:
                 await self._update_generation(gen_id, build_status="failed")
                 logger.exception("agent_workspace_setup_failed", generation_id=generation_id)
@@ -1822,33 +2002,47 @@ class AgentService:
             # --- PLANNING STEP (Sonnet 4.6, no tools) ---
             # Produces a structured build plan that the agent follows,
             # reducing wasted iterations and improving component selection.
+            # Iterations skip planning — the workspace already has the
+            # prior plan materialized as code; re-planning would invent a
+            # new architecture and cause the agent to rewrite working code.
             agent_prompt = prompt
-            plan_step = tracker.begin_step(AgentStep.PLANNING)
-            try:
-                plan_result = await generate_plan(prompt, plan_step)
-                agent_prompt = plan_result.to_agent_message(prompt)
-                yield _sse(
-                    "plan",
-                    f"Plan ready: {plan_result.app_name} — "
-                    f"{len(plan_result.screens)} screens, "
-                    f"{len(plan_result.files_to_create)} files",
-                    app_name=plan_result.app_name,
-                    theme_color=plan_result.theme_color,
-                    screens=len(plan_result.screens),
-                    steps=len(plan_result.implementation_steps),
-                    cost_usd=plan_result.cost_usd,
-                )
-            except PlanningError as exc:
-                # Planning is best-effort — fall back to raw prompt if it fails.
-                logger.warning(
-                    "planning_failed_fallback_to_raw_prompt",
-                    generation_id=generation_id,
-                    error=str(exc),
+            if is_iteration:
+                agent_prompt = self._compose_iterative_prompt(
+                    new_prompt=prompt,
+                    prior_prompt=prior_generation.prompt or "",
+                    chat_history=chat_history or [],
                 )
                 yield _sse(
                     "status",
-                    f"Planning skipped ({exc}) — proceeding with raw prompt.",
+                    "Editing existing app — skipping planning",
                 )
+            else:
+                plan_step = tracker.begin_step(AgentStep.PLANNING)
+                try:
+                    plan_result = await generate_plan(prompt, plan_step)
+                    agent_prompt = plan_result.to_agent_message(prompt)
+                    yield _sse(
+                        "plan",
+                        f"Plan ready: {plan_result.app_name} — "
+                        f"{len(plan_result.screens)} screens, "
+                        f"{len(plan_result.files_to_create)} files",
+                        app_name=plan_result.app_name,
+                        theme_color=plan_result.theme_color,
+                        screens=len(plan_result.screens),
+                        steps=len(plan_result.implementation_steps),
+                        cost_usd=plan_result.cost_usd,
+                    )
+                except PlanningError as exc:
+                    # Planning is best-effort — fall back to raw prompt if it fails.
+                    logger.warning(
+                        "planning_failed_fallback_to_raw_prompt",
+                        generation_id=generation_id,
+                        error=str(exc),
+                    )
+                    yield _sse(
+                        "status",
+                        f"Planning skipped ({exc}) — proceeding with raw prompt.",
+                    )
 
             # --- RAG RETRIEVAL (Voyage AI embeddings → pgvector) ---
             # Retrieve relevant UI patterns, Tailwind v4 rules, and component

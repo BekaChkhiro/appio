@@ -1,8 +1,21 @@
 """Schemas for the generation domain."""
 
 import uuid
+from typing import Literal
 
 from pydantic import BaseModel, Field
+
+
+class ChatTurn(BaseModel):
+    """Single chat message the frontend has cached for an in-progress app.
+
+    Sent up on iteration so the agent can synthesize an "edit existing app"
+    prompt that references prior turns. We don't replay tool-call/tool-
+    result pairs here — only user/assistant text turns.
+    """
+
+    role: Literal["user", "assistant"]
+    content: str = Field(..., max_length=10_000)
 
 
 class GenerateRequest(BaseModel):
@@ -18,6 +31,11 @@ class GenerateRequest(BaseModel):
         max_length=128,
         description="Client-provided key to resume a dropped stream.",
     )
+    # Frontend-cached chat history. Used only when ``app_id`` is set —
+    # gives the agent context about prior user requests so iterative edits
+    # can land precisely instead of regenerating from scratch. Capped at
+    # 30 turns to keep request bodies tiny; backend uses only the last 3.
+    messages: list[ChatTurn] | None = Field(default=None, max_length=30)
 
 
 class TokenUsage(BaseModel):

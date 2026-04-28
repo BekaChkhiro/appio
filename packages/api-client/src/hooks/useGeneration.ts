@@ -22,7 +22,17 @@ export function useGeneration({ getToken }: UseGenerationOptions) {
   const generate = useCallback(
     async (
       prompt: string,
-      opts: { templateId?: string; templateSlug?: string; appId?: string } = {}
+      opts: {
+        templateId?: string;
+        templateSlug?: string;
+        appId?: string;
+        // Frontend-cached chat history. When the user edits an existing
+        // app, the backend uses this to synthesize an "edit" prompt so
+        // the agent has context about prior turns instead of regenerating
+        // from scratch. Caller should pass the in-memory ChatStore array;
+        // backend caps at 30 entries.
+        messages?: Array<{ role: "user" | "assistant"; content: string }>;
+      } = {}
     ) => {
       abortRef.current?.abort();
       const controller = new AbortController();
@@ -42,6 +52,7 @@ export function useGeneration({ getToken }: UseGenerationOptions) {
             template_id: opts.templateId,
             template_slug: opts.templateSlug,
             app_id: opts.appId,
+            messages: opts.messages,
           },
           {
             getToken,

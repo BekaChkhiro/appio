@@ -129,9 +129,20 @@ export function CreateView() {
 
   const handleGenerate = useCallback(
     (prompt: string) => {
-      generate(prompt, editAppId ? { appId: editAppId } : {});
+      if (!editAppId) {
+        generate(prompt);
+        return;
+      }
+      // On iteration, hand the backend the chat history we've been
+      // accumulating so the agent can synthesize an "edit existing app"
+      // prompt. We strip our internal __APP_READY__ marker payloads —
+      // they're a frontend rendering hint, not a real assistant turn.
+      const trimmed = messages
+        .filter((m) => !m.content.startsWith("__APP_READY__"))
+        .map((m) => ({ role: m.role, content: m.content }));
+      generate(prompt, { appId: editAppId, messages: trimmed });
     },
-    [generate, editAppId]
+    [generate, editAppId, messages]
   );
 
   const prevStatusRef = useRef(status);
