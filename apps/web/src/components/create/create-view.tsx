@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback, useRef, useEffect } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { motion } from "motion/react";
 import { MessageSquare, Eye } from "lucide-react";
 import { useGeneration, useAppTemplateDetail, useApp, useUpdateAppMessages } from "@appio/api-client";
@@ -20,8 +20,14 @@ const PENDING_PROMPT_PREFIX = "appio_pending_prompt_";
 export function CreateView() {
   const [mobileTab, setMobileTab] = useState<MobileTab>("chat");
   const searchParams = useSearchParams();
+  const router = useRouter();
   const templateSlug = searchParams.get("template");
-  const editAppId = searchParams.get("app");
+  // After the first generation lands, we promote the URL from
+  // ``?b=<build-id>`` to ``?app=<uuid>`` so subsequent prompts in the same
+  // browser session pick up edit mode (auto-save + iteration). Until then
+  // this state mirrors the URL param.
+  const [resolvedAppId, setResolvedAppId] = useState<string | null>(null);
+  const editAppId = searchParams.get("app") ?? resolvedAppId;
   const buildId = searchParams.get("b");
   // Legacy fallback: `?prompt=` was the pre-build-id URL scheme. Still honored
   // so old browser history / external links don't 404.
@@ -152,8 +158,18 @@ export function CreateView() {
       if (lastComplete) {
         const data = lastComplete.data as {
           public_url: string;
+          app_id?: string;
           tokens?: { cost_usd?: number };
         };
+        // Promote the URL to edit-mode (?app=<uuid>) so subsequent prompts
+        // become iterations — auto-save fires, agent reuses the prior
+        // workspace, Edit tool replaces full Writes. Without this, the
+        // URL stays as ``?b=<build-id>`` and every prompt creates a fresh
+        // app with a new slug.
+        if (data.app_id && !searchParams.get("app")) {
+          setResolvedAppId(data.app_id);
+          router.replace(`/build?app=${data.app_id}`);
+        }
         // Encoded as a marker so ChatMessage can render a rich card.
         // The `__APP_READY__` prefix is inert in plain-text fallback paths
         // (mobile install messages, etc.) but gets parsed into structured
@@ -184,7 +200,7 @@ export function CreateView() {
       });
     }
     prevStatusRef.current = status;
-  }, [status, events, addMessage, incrementGenerations]);
+  }, [status, events, addMessage, incrementGenerations, router, searchParams]);
 
   const prevPreviewVersionRef = useRef(0);
   useEffect(() => {
