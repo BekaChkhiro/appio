@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useRef, useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@appio/ui";
 import { Plus, Search, MoreVertical, Sparkles, ArrowRight } from "lucide-react";
@@ -317,6 +317,18 @@ export function MyAppsView() {
   const { data, isLoading, error } = useMyApps();
   const [filter, setFilter] = useState("all");
   const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+    searchTimeoutRef.current = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 250);
+    return () => {
+      if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+    };
+  }, [search]);
 
   const apps = useMemo(() => data?.items ?? [], [data?.items]);
 
@@ -325,18 +337,21 @@ export function MyAppsView() {
     if (filter !== "all") {
       result = result.filter((a) => a.status === filter);
     }
-    if (search.trim()) {
-      const q = search.toLowerCase();
+    if (debouncedSearch.trim()) {
+      const q = debouncedSearch.toLowerCase();
       result = result.filter((a) => a.name.toLowerCase().includes(q));
     }
     return result;
-  }, [apps, filter, search]);
+  }, [apps, filter, debouncedSearch]);
 
   const counts = useMemo(() => {
     const all = apps.length;
     const draft = apps.filter((a) => a.status === "draft").length;
+    const building = apps.filter((a) => a.status === "building").length;
+    const ready = apps.filter((a) => a.status === "ready").length;
     const published = apps.filter((a) => a.status === "published").length;
-    return { all, draft, published };
+    const failed = apps.filter((a) => a.status === "failed").length;
+    return { all, draft, building, ready, published, failed };
   }, [apps]);
 
   return (
@@ -429,7 +444,10 @@ export function MyAppsView() {
               [
                 ["all", "All"],
                 ["draft", "Drafts"],
+                ["building", "Building"],
+                ["ready", "Ready"],
                 ["published", "Published"],
+                ["failed", "Failed"],
               ] as const
             ).map(([k, l]) => (
               <button

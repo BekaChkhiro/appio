@@ -1,8 +1,8 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
-import { LogOut, User as UserIcon } from "lucide-react";
+import { LogOut, User as UserIcon, AlertTriangle } from "lucide-react";
 import { useAuth } from "@appio/auth";
 import {
   Avatar,
@@ -39,10 +39,16 @@ function initialsOf(name: string | null | undefined, email: string | null | unde
 export function UserMenu({ variant = "full" }: UserMenuProps) {
   const router = useRouter();
   const { user, loading, signOut } = useAuth();
+  const [signOutError, setSignOutError] = useState<string | null>(null);
 
   const handleSignOut = useCallback(async () => {
-    await signOut();
-    router.replace("/");
+    try {
+      setSignOutError(null);
+      await signOut();
+      router.replace("/");
+    } catch {
+      setSignOutError("Sign out failed. Please try again.");
+    }
   }, [router, signOut]);
 
   if (loading) {
@@ -65,47 +71,55 @@ export function UserMenu({ variant = "full" }: UserMenuProps) {
   const displayName = user.displayName || user.email?.split("@")[0] || "Signed in";
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <button
-          type="button"
-          className="group flex w-full items-center gap-3 rounded-lg p-2 text-left transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          aria-label="Account menu"
-        >
-          <Avatar className="h-9 w-9 shrink-0">
-            {user.photoURL ? <AvatarImage src={user.photoURL} alt="" /> : null}
-            <AvatarFallback>{initials}</AvatarFallback>
-          </Avatar>
-          {variant === "full" && (
-            <div className="min-w-0 flex-1">
+    <div className="w-full">
+      {signOutError && (
+        <div className="mb-2 flex items-center gap-2 rounded-md bg-destructive/10 px-2 py-1.5 text-xs text-destructive">
+          <AlertTriangle className="h-3 w-3 shrink-0" />
+          {signOutError}
+        </div>
+      )}
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <button
+            type="button"
+            className="group flex w-full items-center gap-3 rounded-lg p-2 text-left transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            aria-label="Account menu"
+          >
+            <Avatar className="h-9 w-9 shrink-0">
+              {user.photoURL ? <AvatarImage src={user.photoURL} alt="" /> : null}
+              <AvatarFallback>{initials}</AvatarFallback>
+            </Avatar>
+            {variant === "full" && (
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-medium">{displayName}</p>
+                {user.email && (
+                  <p className="truncate text-xs text-muted-foreground">{user.email}</p>
+                )}
+              </div>
+            )}
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-56">
+          <DropdownMenuLabel className="font-normal">
+            <div className="min-w-0">
               <p className="truncate text-sm font-medium">{displayName}</p>
               {user.email && (
                 <p className="truncate text-xs text-muted-foreground">{user.email}</p>
               )}
             </div>
-          )}
-        </button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56">
-        <DropdownMenuLabel className="font-normal">
-          <div className="min-w-0">
-            <p className="truncate text-sm font-medium">{displayName}</p>
-            {user.email && (
-              <p className="truncate text-xs text-muted-foreground">{user.email}</p>
-            )}
-          </div>
-        </DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem onSelect={() => router.push("/profile")}>
-          <UserIcon className="mr-2 h-4 w-4" />
-          Profile
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem onSelect={handleSignOut} className="text-destructive focus:text-destructive">
-          <LogOut className="mr-2 h-4 w-4" />
-          Sign out
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+          </DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onSelect={() => router.push("/profile")}>
+            <UserIcon className="mr-2 h-4 w-4" />
+            Profile
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onSelect={handleSignOut} className="text-destructive focus:text-destructive">
+            <LogOut className="mr-2 h-4 w-4" />
+            Sign out
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
   );
 }

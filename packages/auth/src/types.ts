@@ -9,6 +9,7 @@ export type AuthUser = {
 export type AuthContextValue = {
   user: AuthUser | null;
   loading: boolean;
+  error: Error | null;
   signOut: () => Promise<void>;
   getIdToken: (forceRefresh?: boolean) => Promise<string | null>;
 };

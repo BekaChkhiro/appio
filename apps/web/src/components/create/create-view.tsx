@@ -79,12 +79,20 @@ export function CreateView() {
   }, [editAppId, editApp, setMessages]);
 
   // Auto-save messages to backend (debounced 1s)
+  const [saveError, setSaveError] = useState<string | null>(null);
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
     if (!editAppId || messages.length === 0) return;
     if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
     saveTimeoutRef.current = setTimeout(() => {
-      updateMessages.mutate(messages);
+      setSaveError(null);
+      updateMessages.mutate(messages, {
+        onError: (err) => {
+          const msg = err instanceof Error ? err.message : "Auto-save failed.";
+          setSaveError(msg);
+          console.error("Auto-save failed:", err);
+        },
+      });
     }, 1000);
     return () => {
       if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
@@ -278,6 +286,11 @@ export function CreateView() {
             className="flex shrink-0 flex-col border-l"
             style={{ width: 420, borderColor: "var(--hair)", background: "var(--surface-0)" }}
           >
+            {saveError && (
+              <div className="shrink-0 border-b border-destructive/20 bg-destructive/10 px-4 py-2 text-xs text-destructive">
+                Save failed: {saveError}
+              </div>
+            )}
             <ChatPanel
               events={events}
               isGenerating={isGenerating}
@@ -290,6 +303,11 @@ export function CreateView() {
 
         {/* Mobile: single full-width panel */}
         <div className="flex h-full w-full flex-col md:hidden">
+          {mobileTab === "chat" && saveError && (
+            <div className="shrink-0 border-b border-destructive/20 bg-destructive/10 px-4 py-2 text-xs text-destructive">
+              Save failed: {saveError}
+            </div>
+          )}
           {mobileTab === "chat" ? (
             <ChatPanel
               events={events}

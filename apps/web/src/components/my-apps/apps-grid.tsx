@@ -1,11 +1,11 @@
 "use client";
 
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Skeleton } from "@appio/ui";
 import { useMyAppsInfinite, useDeleteApp } from "@appio/api-client";
 import { AppCard } from "./app-card";
 import { EmptyState } from "./empty-state";
-import { Loader2 } from "lucide-react";
+import { Loader2, AlertTriangle } from "lucide-react";
 
 export function AppsGrid() {
   const {
@@ -19,10 +19,18 @@ export function AppsGrid() {
   } = useMyAppsInfinite();
   const deleteApp = useDeleteApp();
   const sentinelRef = useRef<HTMLDivElement>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const handleDelete = useCallback(
     (id: string) => {
-      deleteApp.mutate(id);
+      setDeleteError(null);
+      deleteApp.mutate(id, {
+        onError: (err) => {
+          const message =
+            err instanceof Error ? err.message : "Failed to delete app. Please try again.";
+          setDeleteError(message);
+        },
+      });
     },
     [deleteApp],
   );
@@ -99,6 +107,13 @@ export function AppsGrid() {
 
   return (
     <>
+      {deleteError && (
+        <div className="mb-4 flex items-center gap-2 rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
+          <AlertTriangle className="h-4 w-4 shrink-0" />
+          {deleteError}
+        </div>
+      )}
+
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {apps.map((app, i) => (
           <AppCard

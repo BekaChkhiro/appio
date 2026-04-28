@@ -34,14 +34,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const app = useFirebaseApp();
   const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
     const auth = getAuth(app);
-    const unsubscribe = onAuthStateChanged(auth, (fbUser) => {
-      setUser(mapFirebaseUser(fbUser));
+    let unsubscribe: (() => void) | undefined;
+    try {
+      unsubscribe = onAuthStateChanged(
+        auth,
+        (fbUser) => {
+          setUser(mapFirebaseUser(fbUser));
+          setLoading(false);
+          setError(null);
+        },
+        (err) => {
+          setError(err instanceof Error ? err : new Error(String(err)));
+          setLoading(false);
+        }
+      );
+    } catch (err) {
+      setError(err instanceof Error ? err : new Error("Auth initialization failed"));
       setLoading(false);
-    });
-    return unsubscribe;
+    }
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
   }, [app]);
 
   const signOut = useCallback(async () => {
@@ -60,7 +77,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 
   return (
-    <AuthContext.Provider value={{ user, loading, signOut, getIdToken }}>
+    <AuthContext.Provider value={{ user, loading, error, signOut, getIdToken }}>
       {children}
     </AuthContext.Provider>
   );
