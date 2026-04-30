@@ -42,10 +42,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       unsubscribe = onAuthStateChanged(
         auth,
-        (fbUser) => {
+        async (fbUser) => {
           setUser(mapFirebaseUser(fbUser));
           setLoading(false);
           setError(null);
+
+          // Sync a session cookie so Next.js middleware can gate routes.
+          if (fbUser) {
+            try {
+              const token = await fbUser.getIdToken();
+              const isSecure =
+                typeof window !== "undefined" &&
+                window.location.protocol === "https:";
+              document.cookie = `__session=${token};path=/;max-age=${60 * 60 * 24 * 7};SameSite=Lax${isSecure ? ";Secure" : ""}`;
+            } catch {
+              // Non-fatal — middleware will just keep redirecting to login
+              // until the next successful token fetch.
+            }
+          } else {
+            document.cookie = "__session=;path=/;max-age=0;SameSite=Lax";
+          }
         },
         (err) => {
           setError(err instanceof Error ? err : new Error(String(err)));
