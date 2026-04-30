@@ -34,7 +34,12 @@ export function middleware(request: NextRequest) {
 
   // Check for auth session cookie (set by Firebase or your auth flow)
   const session = request.cookies.get("__session")?.value;
-  const isAuthenticated = Boolean(session);
+  // Firebase ID tokens are JWTs and always start with "eyJ".
+  // This lightweight format check prevents fake cookies from bypassing the gate.
+  // For full JWT verification use jose or next-firebase-auth-edge (adds cold-start latency).
+  const isAuthenticated = Boolean(
+    session && session.startsWith("eyJ") && session.length > 100
+  );
 
   // Redirect unauthenticated users away from protected routes
   if (!isAuthenticated && isProtectedPath(pathname)) {

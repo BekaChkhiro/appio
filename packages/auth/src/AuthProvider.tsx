@@ -54,10 +54,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               const isSecure =
                 typeof window !== "undefined" &&
                 window.location.protocol === "https:";
-              document.cookie = `__session=${token};path=/;max-age=${60 * 60 * 24 * 7};SameSite=Lax${isSecure ? ";Secure" : ""}`;
-            } catch {
-              // Non-fatal — middleware will just keep redirecting to login
-              // until the next successful token fetch.
+              // Use 1-hour TTL to match Firebase ID token expiration.
+              // onAuthStateChanged auto-refreshes the token before it expires,
+              // so the cookie is updated implicitly on every auth event.
+              document.cookie = `__session=${token};path=/;max-age=${60 * 60};SameSite=Lax${isSecure ? ";Secure" : ""}`;
+            } catch (tokenErr) {
+              // Token fetch failed — clear the stale cookie so middleware
+              // treats the user as logged-out on the next request.
+              document.cookie = "__session=;path=/;max-age=0;SameSite=Lax";
+              setError(
+                tokenErr instanceof Error
+                  ? tokenErr
+                  : new Error("Failed to refresh session token")
+              );
             }
           } else {
             document.cookie = "__session=;path=/;max-age=0;SameSite=Lax";

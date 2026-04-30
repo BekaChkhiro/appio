@@ -59,8 +59,10 @@ export function AuthCard({ mode }: AuthCardProps) {
   }, [user, loading, router, redirectTo]);
 
   const handleSuccess = useCallback(() => {
-    router.replace(redirectTo);
-  }, [router, redirectTo]);
+    // Redirect is already handled by the useEffect above when the auth
+    // state change propagates.  We just clear any stale error here.
+    setError(null);
+  }, []);
 
   const handleError = useCallback((message: string) => {
     setError(message);
