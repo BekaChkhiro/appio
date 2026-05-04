@@ -9,7 +9,7 @@
     "packages/*"
   ],
   "devDependencies": {
-    "turbo": "^2.4.0",
+    "turbo": "^2.9.8",
     "@types/react": "^19",
     "@types/react-dom": "^19"
   },
