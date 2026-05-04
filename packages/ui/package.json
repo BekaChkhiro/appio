@@ -34,8 +34,8 @@
   "devDependencies": {
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "convex": "^1.35.1",
-    "typescript": "^5.7.0"
+    "convex": "^1.37.0",
+    "typescript": "^6.0.3"
   },
   "peerDependencies": {
     "convex": "^1.35.0",
