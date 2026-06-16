@@ -34,7 +34,7 @@
     "react-native-sse": "^1.2.1",
     "react-native-unistyles": "^3.2.2",
     "react-native-webview": "^13.16.1",
-    "scheduler": "^0.26.0"
+    "scheduler": "^0.27.0"
   },
   "devDependencies": {
     "@types/react": "~19.1.0",
